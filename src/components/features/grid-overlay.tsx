@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function GridOverlay() {
   const [isVisible, setIsVisible] = useState(false);
@@ -8,17 +8,19 @@ export function GridOverlay() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Cmd+G (Mac) or Ctrl+G (Windows/Linux)
-      if ((event.metaKey || event.ctrlKey) && event.key === 'g') {
+      if ((event.metaKey || event.ctrlKey) && event.key === "g") {
         event.preventDefault();
         setIsVisible((prev) => !prev);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div className="pointer-events-none absolute inset-0 z-50 min-h-full">
@@ -27,7 +29,7 @@ export function GridOverlay() {
         className="absolute inset-0 min-h-full"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(to bottom, rgb(239 68 68 / 0.1) 0px, rgb(239 68 68 / 0.1) 4px, transparent 4px, transparent 8px)',
+            "repeating-linear-gradient(to bottom, rgb(239 68 68 / 0.1) 0px, rgb(239 68 68 / 0.1) 4px, transparent 4px, transparent 8px)",
         }}
       />
 
@@ -37,8 +39,8 @@ export function GridOverlay() {
           className="h-full bg-[length:1120px_100%]"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(90deg, rgb(239 68 68 / 0.1) 0px, rgb(239 68 68 / 0.1) 64px, transparent 64px, transparent 96px)',
-            width: '1120px',
+              "repeating-linear-gradient(90deg, rgb(239 68 68 / 0.1) 0px, rgb(239 68 68 / 0.1) 64px, transparent 64px, transparent 96px)",
+            width: "1120px",
           }}
         />
       </div>

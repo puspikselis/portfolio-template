@@ -8,7 +8,9 @@
     "utils": "@/lib/utils"
   },
   "iconLibrary": "none",
-  "registries": {},
+  "registries": {
+    "@animate-ui": "https://animate-ui.com/r/{name}.json"
+  },
   "rsc": true,
   "style": "new-york",
   "tailwind": {

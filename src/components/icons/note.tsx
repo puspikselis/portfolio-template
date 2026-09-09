@@ -1,6 +1,12 @@
 export function Note() {
   return (
-    <svg fill="none" height="10" viewBox="0 0 10 10" width="10" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      fill="none"
+      height="10"
+      viewBox="0 0 10 10"
+      width="10"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <title>Music note</title>
       <path
         d="M0.5 8.00003C0.5 7.1716 1.17157 6.50003 2 6.50003C2.82843 6.50003 3.5 7.1716 3.5 8.00003C3.5 8.82845 2.82843 9.50003 2 9.50003C1.17157 9.50003 0.5 8.82845 0.5 8.00003Z"

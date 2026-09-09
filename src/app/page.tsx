@@ -1,41 +1,39 @@
-'use client';
+import type { Metadata } from "next";
 
-import { useState } from 'react';
+import { Businesses } from "@/components/businesses";
+import { FloatingThingy } from "@/components/features/floating-thingy";
+import { Projects } from "@/components/projects";
 
-import { Businesses } from '@/components/businesses';
-import { ContactDialog } from '@/components/dialogs/contact-dialog';
-import { FloatingThingy } from '@/components/features/floating-thingy';
-import { Projects } from '@/components/projects';
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
-  const [isContactOpen, setIsContactOpen] = useState(false);
-
   return (
     <>
       <FloatingThingy />
-      <div className="pt-13 pb-42">
-        <main
+      <main className="pt-13 pb-42">
+        <section
           className="narrow-container space-y-4"
           data-color="var(--color-orange-100)"
           data-title="Intro"
         >
-          <h1 className="-tracking-[0.01em] font-medium text-28/10 text-white">
-            Product designer with 10+ years of experience based in Latvia. I design digital products
-            people enjoy using.
+          <h1 className="font-medium text-28/10 text-ink -tracking-[0.01em]">
+            Product designer with 10+ years of experience based in Latvia. I
+            design digital products people enjoy using.
           </h1>
-          <p className="-tracking-[0.01em] font-medium text-28/10">
-            Passion and persistence drive what I build - from my own ventures to projects with
-            clients worldwide.
+          <p className="font-medium text-28/10 -tracking-[0.01em]">
+            I build with passion and persistence — my own ventures and client
+            work worldwide.
           </p>
-        </main>
+        </section>
         <div className="mt-20 md:mt-33.5">
           <Projects />
         </div>
         <div className="mt-20 md:mt-37">
           <Businesses />
         </div>
-      </div>
-      <ContactDialog isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+      </main>
     </>
   );
 }

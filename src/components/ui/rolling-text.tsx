@@ -1,49 +1,58 @@
-'use client';
+import type { CSSProperties } from "react";
 
-import { motion } from 'framer-motion';
-
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 interface RollingTextProps {
-  text: string;
   className?: string;
+  text: string;
 }
 
-const transition = { duration: 0.3, ease: [0.33, 1, 0.68, 1] as const };
+// Matches the previous motion/react config: 0.3s, cubic-bezier(0.33,1,0.68,1), 15ms/char stagger.
+const CHAR_CLASSES =
+  "inline-block transition-[translate,opacity,filter] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]";
 
-export function RollingText({ text, className }: RollingTextProps) {
+export function RollingText({ className, text }: RollingTextProps) {
   return (
-    <motion.span className={cn('inline-block', className)} initial="initial" whileHover="hover">
-      {text.split('').map((char, index) => {
-        const displayChar = char === ' ' ? '\u00A0' : char;
-        return (
-          <span
-            className="relative inline-block overflow-hidden align-bottom"
-            key={`${index}-${char}`}
-          >
-            <motion.span
-              className="inline-block"
-              transition={{ ...transition, delay: index * 0.015 }}
-              variants={{
-                hover: { filter: 'blur(4px)', opacity: 0, y: '100%' },
-                initial: { filter: 'blur(0px)', opacity: 1, y: 0 },
-              }}
+    <span className={cn("inline-block", className)}>
+      <span className="sr-only">{text}</span>
+      {/* Characters render twice for the roll effect; hide them from screen readers. */}
+      <span aria-hidden="true">
+        {Array.from(text, (c, position) => ({
+          char: c,
+          id: `${position}-${c}`,
+          position,
+        })).map(({ char, id, position }) => {
+          const displayChar = char === " " ? " " : char;
+          const style: CSSProperties = {
+            transitionDelay: `${position * 15}ms`,
+          };
+          return (
+            <span
+              className="relative inline-block overflow-hidden align-bottom"
+              key={id}
             >
-              {displayChar}
-            </motion.span>
-            <motion.span
-              className="absolute inset-0 inline-block"
-              transition={{ ...transition, delay: index * 0.015 }}
-              variants={{
-                hover: { filter: 'blur(0px)', opacity: 1, y: 0 },
-                initial: { filter: 'blur(4px)', opacity: 0, y: '-100%' },
-              }}
-            >
-              {displayChar}
-            </motion.span>
-          </span>
-        );
-      })}
-    </motion.span>
+              <span
+                className={cn(
+                  CHAR_CLASSES,
+                  "group-hover:translate-y-full group-hover:opacity-0 group-hover:blur-[4px]"
+                )}
+                style={style}
+              >
+                {displayChar}
+              </span>
+              <span
+                className={cn(
+                  CHAR_CLASSES,
+                  "absolute inset-0 -translate-y-full opacity-0 blur-[4px] group-hover:translate-y-0 group-hover:opacity-100 group-hover:blur-none"
+                )}
+                style={style}
+              >
+                {displayChar}
+              </span>
+            </span>
+          );
+        })}
+      </span>
+    </span>
   );
 }

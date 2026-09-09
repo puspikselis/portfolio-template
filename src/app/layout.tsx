@@ -1,63 +1,108 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Script from 'next/script';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import Script from "next/script";
 
-import { CursorPreviewProvider } from '@/components/features/cursor-preview';
-import { GridOverlay } from '@/components/features/grid-overlay';
-import { Footer } from '@/components/footer';
-import { Header } from '@/components/header';
-import { ToastProvider } from '@/components/ui/toast';
+import { CursorPreviewProvider } from "@/components/features/cursor-preview";
+import { GridOverlay } from "@/components/features/grid-overlay";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { JsonLd, ThemeInitScript } from "@/components/inline-scripts";
+import { ToastProvider } from "@/components/ui/toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { SITE_URL } from "@/lib/constants";
 
-import './globals.css';
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
+const SITE_TITLE = "Kristaps Krūze — Designer";
+const SITE_DESCRIPTION =
+  "Product designer with 10+ years of experience. I've built my own ventures and designed digital products for clients worldwide.";
+const GA_ID = "G-1BYJXYBJPS";
+
+export const viewport: Viewport = {
+  initialScale: 1,
+  themeColor: [
+    { color: "#ffffff", media: "(prefers-color-scheme: light)" },
+    { color: "#000000", media: "(prefers-color-scheme: dark)" },
+  ],
+  width: "device-width",
+};
 
 export const metadata: Metadata = {
-  authors: [{ name: 'Kristaps Krūze' }],
-  creator: 'Kristaps Krūze',
-  description:
-    "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
+  authors: [{ name: "Kristaps Krūze", url: SITE_URL }],
+  creator: "Kristaps Krūze",
+  description: SITE_DESCRIPTION,
   icons: {
-    apple: '/favicon/apple-icon.png',
-    icon: '/favicon/icon.png',
+    apple: "/favicon/apple-icon.png",
+    icon: "/favicon/icon.png",
   },
   keywords: [
-    'Product Designer',
-    'UX/UI Design',
-    'Kristaps Krūze',
-    'Digital Product Design',
-    'Latvia',
-    'Portfolio',
+    "Product Designer",
+    "UX/UI Design",
+    "Kristaps Krūze",
+    "Digital Product Design",
+    "Latvia",
+    "Portfolio",
   ],
-  metadataBase: new URL('https://kristaps.kruze.lv'),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
-    description:
-      "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
-    locale: 'en_US',
-    siteName: 'Kristaps Krūze - Designer',
-    title: 'Kristaps Krūze - Designer',
-    type: 'website',
-    url: 'https://kristaps.kruze.lv',
+    description: SITE_DESCRIPTION,
+    locale: "en_US",
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    type: "website",
+    url: SITE_URL,
   },
-  publisher: 'Kristaps Krūze',
+  publisher: "Kristaps Krūze",
   robots: {
     follow: true,
     googleBot: {
       follow: true,
       index: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-      'max-video-preview': -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
     index: true,
   },
-  title: 'Kristaps Krūze - Designer',
+  title: SITE_TITLE,
   twitter: {
-    card: 'summary_large_image',
-    description:
-      "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
-    title: 'Kristaps Krūze - Designer',
+    card: "summary_large_image",
+    description: SITE_DESCRIPTION,
+    title: SITE_TITLE,
   },
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  description: SITE_DESCRIPTION,
+  image: `${SITE_URL}/images/KK.avif`,
+  jobTitle: "Designer",
+  knowsAbout: [
+    "Product Design",
+    "UX Design",
+    "UI Design",
+    "Digital Product Design",
+  ],
+  name: "Kristaps Krūze",
+  nationality: "Latvian",
+  sameAs: [
+    "https://www.linkedin.com/in/kristapskruze/",
+    "https://github.com/puspikselis",
+    "https://heywisp.com",
+    "https://datreal.com",
+  ],
+  url: SITE_URL,
+  worksFor: { "@type": "Organization", name: "Ubiquiti" },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  author: { "@type": "Person", name: "Kristaps Krūze" },
+  name: SITE_TITLE,
+  url: SITE_URL,
 };
 
 export default function RootLayout({
@@ -68,12 +113,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      style={{ '--default-font-family': inter.style.fontFamily } as React.CSSProperties}
+      style={
+        {
+          "--default-font-family": inter.style.fontFamily,
+        } as React.CSSProperties
+      }
+      suppressHydrationWarning
     >
       <body className="relative">
-        {/* Google Analytics */}
+        <ThemeInitScript />
+        <JsonLd data={[personJsonLd, websiteJsonLd]} />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-1BYJXYBJPS"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -81,20 +132,22 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-1BYJXYBJPS');
+            gtag('config', '${GA_ID}');
           `}
         </Script>
 
-        <ToastProvider>
-          <CursorPreviewProvider>
-            <GridOverlay />
-            <div className="relative mx-auto max-w-404 border-nero-500 border-r border-l">
-              <Header />
-              {children}
-              <Footer />
-            </div>
-          </CursorPreviewProvider>
-        </ToastProvider>
+        <TooltipProvider delayDuration={150}>
+          <ToastProvider>
+            <CursorPreviewProvider>
+              <GridOverlay />
+              <div className="relative mx-auto max-w-404 border-nero-500 border-r border-l">
+                <Header />
+                {children}
+                <Footer />
+              </div>
+            </CursorPreviewProvider>
+          </ToastProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

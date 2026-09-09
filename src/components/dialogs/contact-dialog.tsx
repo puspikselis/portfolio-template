@@ -1,28 +1,40 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as Dialog from '@radix-ui/react-dialog';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Close as DialogClose,
+  Content as DialogContent,
+  Description as DialogDescription,
+  Overlay as DialogOverlay,
+  Portal as DialogPortal,
+  Root as DialogRoot,
+  Title as DialogTitle,
+} from "@radix-ui/react-dialog";
+import { useCallback, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { useToast } from '@/components/ui/toast';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { useToast } from "@/components/ui/toast";
 
-type Props = { isOpen: boolean; onClose: () => void };
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 const schema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email("Enter a valid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-const inputC =
-  'inset-shadow-0-1-0 inset-shadow-white/8 h-11 w-full rounded-xl bg-nero-100 px-4 py-3 text-15/6 text-white shadow-[0_1px_2px_rgba(0,0,0,.48)] transition-all placeholder:text-dim-gray-100 focus:placeholder:opacity-50 focus:outline-none focus:ring-1 focus:ring-orange-100';
+function preventAutoFocus(e: Event) {
+  e.preventDefault();
+}
 
 export function ContactDialog({ isOpen, onClose }: Props) {
   const { showToast } = useToast();
@@ -34,248 +46,177 @@ export function ContactDialog({ isOpen, onClose }: Props) {
     reset,
     formState: { errors, isSubmitting, isValid },
   } = useForm<FormValues>({
-    defaultValues: { email: '', message: '', name: '', phone: '' },
-    mode: 'onChange', // real-time button enable/disable
+    defaultValues: { email: "", message: "", name: "", phone: "" },
+    mode: "onChange",
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (values: FormValues) => {
-    // Honeypot guard
-    if (honeyRef.current?.value) return;
+    if (honeyRef.current?.value) {
+      return;
+    }
 
     const fd = new FormData();
-    fd.set('name', values.name);
-    fd.set('email', values.email);
-    fd.set('phone', values.phone ?? '');
-    fd.set('message', values.message);
-    fd.set('_replyto', values.email);
-    fd.set('_subject', `Portfolio Contact from ${values.name}`);
+    fd.set("name", values.name);
+    fd.set("email", values.email);
+    fd.set("phone", values.phone ?? "");
+    fd.set("message", values.message);
+    fd.set("_replyto", values.email);
+    fd.set("_subject", `Portfolio Contact from ${values.name}`);
 
     try {
-      const res = await fetch('https://formsubmit.co/ajax/kristaps@kruze.lv', {
+      const res = await fetch("https://formsubmit.co/ajax/kristaps@kruze.lv", {
         body: fd,
-        headers: { Accept: 'application/json' },
-        method: 'POST',
+        headers: { Accept: "application/json" },
+        method: "POST",
       });
-      if (!res.ok) throw new Error('send failed');
+      if (!res.ok) {
+        throw new Error("send failed");
+      }
 
-      // Play success sound
-      const audio = new Audio('/audio/mail-sent.mp3');
-      audio.play().catch(() => {});
+      new Audio("/audio/mail-sent.mp3").play().catch(() => {
+        // autoplay blocked — the toast is confirmation enough
+      });
       reset();
       onClose();
-      showToast('Message sent successfully!', "I'll get back to you as soon as possible.");
+      showToast("Message sent", "I'll get back to you as soon as possible.");
     } catch {
-      showToast('Failed to send message', 'Please email me directly at kristaps@kruze.lv');
+      showToast(
+        "Couldn't send your message",
+        "Email me at kristaps@kruze.lv instead"
+      );
     }
   };
 
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        return;
+      }
+      reset();
+      onClose();
+    },
+    [reset, onClose]
+  );
+
   return (
-    <Dialog.Root
-      onOpenChange={(open) => {
-        if (!open) {
-          reset();
-          onClose();
-        }
-      }}
-      open={isOpen}
-    >
-      <AnimatePresence>
-        {isOpen && (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild forceMount>
-              <motion.div
-                animate={{ opacity: 1 }}
-                className="fixed inset-0 z-30"
-                exit={{ opacity: 0 }}
-                initial={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
+    <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
+      <DialogPortal>
+        <DialogOverlay className="fixed inset-0 z-30 data-[state=closed]:animate-[fade-out_200ms_ease-in-out_both] data-[state=open]:animate-[fade-in_200ms_ease-in-out_both]">
+          <div className="fixed inset-y-0 left-1/2 w-full max-w-404 -translate-x-1/2">
+            <div className="mx-px h-full bg-canvas/95 backdrop-blur-sm" />
+          </div>
+        </DialogOverlay>
+        <DialogContent
+          className="scrollbar-thin scrollbar-thumb-nero-100 scrollbar-track-transparent fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
+          onOpenAutoFocus={preventAutoFocus}
+        >
+          <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
+            <DialogClose asChild>
+              <Button
+                className="absolute top-5 right-5 z-60 md:top-8 md:right-12"
+                variant="pill"
               >
-                <div className="-translate-x-1/2 fixed inset-y-0 left-1/2 w-full max-w-404">
-                  <div className="mx-px h-full bg-black/95 backdrop-blur-sm" />
-                </div>
-              </motion.div>
-            </Dialog.Overlay>
-            <Dialog.Content asChild forceMount onOpenAutoFocus={(e) => e.preventDefault()}>
-              <motion.div
-                animate={{ filter: 'blur(0px)', opacity: 1, scale: 1, y: 0 }}
-                className="fixed inset-0 z-40 overflow-y-auto"
-                exit={{ filter: 'blur(8px)', opacity: 0, scale: 0.98, y: 4 }}
-                initial={{ filter: 'blur(8px)', opacity: 0, scale: 0.98, y: 4 }}
-                transition={{
-                  damping: 30,
-                  duration: 0.4,
-                  filter: { delay: 0.05 },
-                  stiffness: 200,
-                  type: 'spring',
-                }}
+                Close
+              </Button>
+            </DialogClose>
+
+            <div className="w-full max-w-136 space-y-12 px-8 py-12">
+              <div className="space-y-2">
+                <DialogTitle asChild>
+                  <h2 className="font-medium text-28/10 text-ink -tracking-[0.01em]">
+                    Get in Touch
+                  </h2>
+                </DialogTitle>
+                <DialogDescription asChild>
+                  <p className="text-15/7 text-nobel-100 -tracking-[0.02em]">
+                    Fill out the form below. Or reach me directly at{" "}
+                    <a
+                      className="text-ink transition-opacity hover:opacity-80"
+                      href="mailto:kristaps@kruze.lv"
+                    >
+                      kristaps@kruze.lv
+                    </a>{" "}
+                    or{" "}
+                    <a
+                      className="text-ink transition-opacity hover:opacity-80"
+                      href="tel:+37129234926"
+                    >
+                      +371 292 34 926
+                    </a>
+                    .
+                  </p>
+                </DialogDescription>
+              </div>
+
+              <form
+                className="space-y-5"
+                noValidate
+                onSubmit={handleSubmit(onSubmit)}
               >
-                <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
-                  <Dialog.Close
-                    asChild
-                    className="absolute inset-shadow-0-1-0 inset-shadow-white/8 top-5 right-5 z-60 h-9 rounded-full bg-nero-100 px-5 font-semibold text-12 text-white hover:bg-nero-200 md:top-8 md:right-12"
-                  >
-                    <button type="button">Close</button>
-                  </Dialog.Close>
-
-                  <div className="w-full max-w-136 space-y-12 px-8 py-12">
-                    <div className="space-y-2">
-                      <Dialog.Title asChild>
-                        <h2 className="-tracking-[0.01em] font-medium text-28/10 text-white">
-                          Get in touch
-                        </h2>
-                      </Dialog.Title>
-                      <Dialog.Description asChild>
-                        <p className="-tracking-[0.02em] text-15/7 text-nobel-100">
-                          You can reach me by filling out the form below, or directly via email at{' '}
-                          <a
-                            className="text-white transition-opacity hover:opacity-80"
-                            href="mailto:kristaps@kruze.lv"
-                          >
-                            kristaps@kruze.lv
-                          </a>{' '}
-                          or phone{' '}
-                          <a
-                            className="text-white transition-opacity hover:opacity-80"
-                            href="tel:+37129234926"
-                          >
-                            +371 292 34 926
-                          </a>
-                          .
-                        </p>
-                      </Dialog.Description>
-                    </div>
-
-                    <form className="space-y-5" noValidate onSubmit={handleSubmit(onSubmit)}>
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="name"
-                          >
-                            Name
-                          </label>
-                          <input
-                            id="name"
-                            {...register('name')}
-                            className={inputC}
-                            placeholder="John Doe"
-                            {...(errors.name && {
-                              'aria-describedby': 'name-error',
-                              'aria-invalid': 'true',
-                            })}
-                          />
-                          {errors.name && (
-                            <p
-                              className="-tracking-[0.01em] text-12/4 text-red-500"
-                              id="name-error"
-                            >
-                              {errors.name.message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="email"
-                          >
-                            Email
-                          </label>
-                          <input
-                            id="email"
-                            type="email"
-                            {...register('email')}
-                            className={inputC}
-                            placeholder="your@email.com"
-                            {...(errors.email && {
-                              'aria-describedby': 'email-error',
-                              'aria-invalid': 'true',
-                            })}
-                          />
-                          {errors.email && (
-                            <p
-                              className="-tracking-[0.01em] text-12/4 text-red-500"
-                              id="email-error"
-                            >
-                              {errors.email.message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="phone"
-                          >
-                            Phone # <span className="text-dim-gray-100">(optional)</span>
-                          </label>
-                          <input
-                            id="phone"
-                            type="tel"
-                            {...register('phone')}
-                            className={inputC}
-                            placeholder="+1 (555) 000-0000"
-                          />
-                        </div>
-                        <div className="flex-1" />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label
-                          className="-tracking-[0.01em] block font-medium text-15 text-white"
-                          htmlFor="message"
-                        >
-                          Message
-                        </label>
-                        <textarea
-                          id="message"
-                          {...register('message')}
-                          className={cn(inputC, 'h-auto min-h-24 resize-y')}
-                          placeholder="I'm looking for help with..."
-                          {...(errors.message && {
-                            'aria-describedby': 'message-error',
-                            'aria-invalid': 'true',
-                          })}
-                        />
-                        {errors.message && (
-                          <p
-                            className="-tracking-[0.01em] text-12/4 text-red-500"
-                            id="message-error"
-                          >
-                            {errors.message.message}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Honeypot */}
-                      <input
-                        aria-hidden="true"
-                        autoComplete="off"
-                        className="hidden"
-                        name="_honey"
-                        ref={honeyRef}
-                        tabIndex={-1}
-                        type="text"
-                      />
-
-                      <button
-                        className="inset-shadow-0-1-0 inset-shadow-white/8 h-12 rounded-full bg-white px-6 font-semibold text-13/4 text-nero-100 hover:bg-white/90 disabled:cursor-not-allowed disabled:bg-nero-300 disabled:text-dim-gray-100 disabled:opacity-50"
-                        disabled={isSubmitting || !isValid}
-                        type="submit"
-                      >
-                        {isSubmitting ? 'Sending…' : 'Send'}
-                      </button>
-                    </form>
-                  </div>
+                <div className="flex gap-4">
+                  <Field
+                    error={errors.name}
+                    id="name"
+                    label="Name"
+                    placeholder="John Doe"
+                    register={register("name")}
+                  />
+                  <Field
+                    error={errors.email}
+                    id="email"
+                    label="Email"
+                    placeholder="your@email.com"
+                    register={register("email")}
+                    type="email"
+                  />
                 </div>
-              </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        )}
-      </AnimatePresence>
-    </Dialog.Root>
+
+                <div className="flex gap-4">
+                  <Field
+                    hint={
+                      <span className="text-dim-gray-100"> (optional)</span>
+                    }
+                    id="phone"
+                    label="Phone"
+                    placeholder="+1 (555) 000-0000"
+                    register={register("phone")}
+                    type="tel"
+                  />
+                  <div className="flex-1" />
+                </div>
+
+                <Field
+                  error={errors.message}
+                  id="message"
+                  label="Message"
+                  multiline
+                  placeholder="I'm looking for help with..."
+                  register={register("message")}
+                />
+
+                <input
+                  aria-hidden="true"
+                  autoComplete="off"
+                  className="hidden"
+                  name="_honey"
+                  ref={honeyRef}
+                  tabIndex={-1}
+                  type="text"
+                />
+
+                <Button
+                  disabled={isSubmitting || !isValid}
+                  type="submit"
+                  variant="pillLg"
+                >
+                  {isSubmitting ? "Sending…" : "Send"}
+                </Button>
+              </form>
+            </div>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </DialogRoot>
   );
 }

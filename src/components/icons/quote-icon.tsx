@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import type { SVGProps } from "react";
 
 export function QuoteIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -32,7 +32,12 @@ export function QuoteIcon(props: SVGProps<SVGSVGElement>) {
           y="0"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend in="SourceGraphic" in2="BackgroundImageFix" mode="normal" result="shape" />
+          <feBlend
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            mode="normal"
+            result="shape"
+          />
           <feColorMatrix
             in="SourceAlpha"
             result="hardAlpha"
@@ -41,8 +46,15 @@ export function QuoteIcon(props: SVGProps<SVGSVGElement>) {
           />
           <feOffset dy="1" />
           <feComposite in2="hardAlpha" k2="-1" k3="1" operator="arithmetic" />
-          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0" />
-          <feBlend in2="shape" mode="normal" result="effect1_innerShadow_294_4309" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0"
+          />
+          <feBlend
+            in2="shape"
+            mode="normal"
+            result="effect1_innerShadow_294_4309"
+          />
         </filter>
       </defs>
     </svg>

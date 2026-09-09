@@ -1,67 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": {
-          "level": "on",
-          "options": {
-            "groups": [":PACKAGE:", ":BLANK_LINE:", ":ALIAS:", ":BLANK_LINE:", ":PATH:"]
-          }
-        },
-        "useSortedAttributes": "on",
-        "useSortedKeys": "on"
-      }
-    }
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
-  "files": {
-    "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "trailingCommas": "all"
-    }
-  },
-  "linter": {
-    "domains": {
-      "next": "recommended",
-      "react": "recommended"
-    },
-    "enabled": true,
-    "rules": {
-      "correctness": {
-        "noUnusedImports": "error"
-      },
-      "nursery": {
-        "recommended": true,
-        "useSortedClasses": {
-          "fix": "safe",
-          "level": "error",
-          "options": {}
-        }
-      },
-      "performance": {
-        "noImgElement": "off"
-      },
-      "recommended": true,
-      "suspicious": {
-        "noUnknownAtRules": "off"
-      }
-    }
-  },
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/next"
+  ],
   "vcs": {
     "clientKind": "git",
     "enabled": true,
