@@ -79,7 +79,7 @@ export const businesses: Business[] = [
         label: "Website",
         preview: {
           height: 156,
-          image: "/images/wisp/website.avif",
+          image: "/images/wisp/preview.webm",
           width: 248,
         },
       },
