@@ -78,6 +78,11 @@ export const businesses: Business[] = [
       {
         href: "https://heywisp.com",
         label: "Website",
+        preview: {
+          height: 156,
+          image: "/images/wisp/website.avif",
+          width: 248,
+        },
       },
     ],
     cardHref: "https://heywisp.com",
