@@ -77,7 +77,7 @@ export function SpotifyStatus({ className }: { className?: string }) {
       <div className="relative max-w-20 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap font-medium text-12/4 -tracking-[0.03em]">
           {[0, 1].map((i) => (
-            <span className="pr-6" key={i}>
+            <span aria-hidden={i > 0 || undefined} className="pr-6" key={i}>
               <span className="text-nobel-100">Listening to </span>
               <span className="text-dim-gray-100">
                 {data.title} - {data.artist}

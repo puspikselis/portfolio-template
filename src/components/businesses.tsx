@@ -120,6 +120,7 @@ function BusinessCard({
                 ) : (
                   button.label
                 )}
+                <span className="sr-only"> {business.company}</span>
               </a>
             </Button>
           );

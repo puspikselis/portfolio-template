@@ -1,5 +1,6 @@
 import { QuoteIcon } from "@/components/icons/quote-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const IMAGE_EXT_RE = /\.(jpg|png|avif)$/;
 
@@ -20,15 +21,16 @@ interface TestimonialProps {
     title: string;
   };
   children: string;
+  className?: string;
 }
 
-export function Testimonial({ author, children }: TestimonialProps) {
+export function Testimonial({ author, children, className }: TestimonialProps) {
   const paragraphs = children.split("\n\n").filter(Boolean);
 
   return (
     <section
       aria-labelledby="testimonial-heading"
-      className="narrow-container"
+      className={cn("narrow-container", className)}
       data-title="Reference"
     >
       <h2 className="sr-only" id="testimonial-heading">

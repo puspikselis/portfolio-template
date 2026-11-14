@@ -14,6 +14,9 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/kristapskruze/";
 export const GITHUB_PROFILE_URL = "https://github.com/puspikselis";
 export const GITHUB_REPO_URL = `${GITHUB_PROFILE_URL}/portfolio`;
 
+export const RESUME_PATH = "/documents/kristaps-kruze-resume.pdf";
+export const RESUME_UPDATED = "October 5, 2025";
+
 export const CONTACT_EMAIL = "kristaps@kruze.lv";
 export const CONTACT_PHONE = {
   display: "+371 292 34 926",

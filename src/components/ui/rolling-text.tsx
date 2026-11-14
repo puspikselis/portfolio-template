@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { CharSlot, displayChar, toCharItems } from "@/components/ui/char-split";
 import { cn } from "@/lib/utils";
 
 interface RollingTextProps {
@@ -17,20 +18,13 @@ export function RollingText({ className, text }: RollingTextProps) {
       <span className="sr-only">{text}</span>
       {/* Characters render twice for the roll effect; hide them from screen readers. */}
       <span aria-hidden="true">
-        {Array.from(text, (c, position) => ({
-          char: c,
-          id: `${position}-${c}`,
-          position,
-        })).map(({ char, id, position }) => {
-          const displayChar = char === " " ? " " : char;
+        {toCharItems(text).map(({ char, id, position }) => {
+          const shown = displayChar(char);
           const style: CSSProperties = {
             transitionDelay: `${position * 15}ms`,
           };
           return (
-            <span
-              className="relative inline-block overflow-hidden align-bottom"
-              key={id}
-            >
+            <CharSlot key={id}>
               <span
                 className={cn(
                   CHAR_CLASSES,
@@ -38,7 +32,7 @@ export function RollingText({ className, text }: RollingTextProps) {
                 )}
                 style={style}
               >
-                {displayChar}
+                {shown}
               </span>
               <span
                 className={cn(
@@ -47,9 +41,9 @@ export function RollingText({ className, text }: RollingTextProps) {
                 )}
                 style={style}
               >
-                {displayChar}
+                {shown}
               </span>
-            </span>
+            </CharSlot>
           );
         })}
       </span>

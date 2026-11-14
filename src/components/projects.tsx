@@ -20,12 +20,21 @@ function fallbackButtonLabel(hasDetailPage: boolean, comingSoon?: boolean) {
   return comingSoon ? null : "Archive";
 }
 
-function ProjectAction({ label, slug }: { label: string; slug?: string }) {
+function ProjectAction({
+  company,
+  label,
+  slug,
+}: {
+  company: string;
+  label: string;
+  slug?: string;
+}) {
   return (
     <Button asChild className="ml-auto" variant="pill">
       {slug ? (
         <Link className="link-overlay" href={`/projects/${slug}`}>
           {label}
+          <span className="sr-only"> {company}</span>
         </Link>
       ) : (
         <span data-inactive="">{label}</span>
@@ -59,7 +68,11 @@ function ProjectCard({
     <EntryCard
       actions={
         buttonLabel ? (
-          <ProjectAction label={buttonLabel} slug={project.slug} />
+          <ProjectAction
+            company={project.company}
+            label={buttonLabel}
+            slug={project.slug}
+          />
         ) : null
       }
       color={previewColor}
@@ -81,6 +94,7 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
   const filteredProjects = excludeSlug
     ? projects.filter((project) => project.slug && project.slug !== excludeSlug)
     : projects;
+  const title = excludeSlug ? "Other Positions" : "Employment History";
   const [isExpanded, setIsExpanded] = useState(false);
   const expand = useCallback(() => setIsExpanded(true), []);
   const earlierRef = useRef<HTMLDivElement>(null);
@@ -102,10 +116,10 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
       aria-labelledby="projects-heading"
       className="narrow-container"
       data-color="var(--color-orange-100)"
-      data-title={excludeSlug ? "Other Positions" : "Employment History"}
+      data-title={title}
     >
       <h2 className="sr-only" id="projects-heading">
-        {excludeSlug ? "Other Positions" : "Employment History"}
+        {title}
       </h2>
       <div className="space-y-14">
         {recent.map((project, index) => (
@@ -137,7 +151,6 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
           {!isExpanded && (
             <Button
               aria-controls="earlier-roles"
-              aria-expanded={isExpanded}
               className="mt-14 w-full"
               onClick={expand}
               variant="outline"

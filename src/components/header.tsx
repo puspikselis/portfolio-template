@@ -13,7 +13,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { LINKEDIN_URL, SITE_NAME } from "@/lib/constants";
+import {
+  LINKEDIN_URL,
+  RESUME_PATH,
+  RESUME_UPDATED,
+  SITE_NAME,
+} from "@/lib/constants";
 
 function handleLinksChange(e: ChangeEvent<HTMLSelectElement>) {
   if (e.target.value) {
@@ -58,8 +63,8 @@ export function Header() {
             onChange={handleLinksChange}
           >
             <option value="">Links</option>
-            <option value="/documents/kristaps-kruze-resume.pdf">
-              Resume (updated October 5, 2025)
+            <option value={RESUME_PATH}>
+              Resume (updated {RESUME_UPDATED})
             </option>
             <option value={LINKEDIN_URL}>LinkedIn</option>
           </select>
@@ -72,7 +77,7 @@ export function Header() {
               >
                 <a
                   aria-label="Download Resume PDF"
-                  href="/documents/kristaps-kruze-resume.pdf"
+                  href={RESUME_PATH}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -80,7 +85,7 @@ export function Header() {
                 </a>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Updated October 5, 2025</TooltipContent>
+            <TooltipContent>Updated {RESUME_UPDATED}</TooltipContent>
           </Tooltip>
           <Button
             asChild

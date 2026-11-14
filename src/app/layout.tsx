@@ -17,7 +17,7 @@ import {
   SITE_TITLE,
   SITE_URL,
 } from "@/lib/constants";
-import { buildPersonJsonLd } from "@/lib/json-ld";
+import { AUTHOR, buildPersonJsonLd, schemaNode } from "@/lib/json-ld";
 import { OPEN_GRAPH_BASE, TWITTER_BASE } from "@/lib/metadata";
 
 import "./globals.css";
@@ -66,13 +66,11 @@ export const metadata: Metadata = {
   },
 };
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  author: { "@type": "Person", name: SITE_NAME },
+const websiteJsonLd = schemaNode("WebSite", {
+  author: AUTHOR,
   name: SITE_TITLE,
   url: SITE_URL,
-};
+});
 
 const VIDEO_PREVIEWS = [
   ...projects.map((project) => project.preview),

@@ -2,6 +2,8 @@
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 
+import { CharSlot, displayChar, toCharItems } from "@/components/ui/char-split";
+
 interface AnimatedTextProps {
   text: string;
 }
@@ -15,14 +17,6 @@ interface Leaving {
   width?: number;
 }
 
-function toCharItems(text: string) {
-  return Array.from(text, (char, position) => ({
-    char,
-    id: `${position}-${char}`,
-    position,
-  }));
-}
-
 function Chars({ anim, text }: { anim: "in" | "none" | "out"; text: string }) {
   return toCharItems(text).map((item) => {
     const style: CSSProperties | undefined =
@@ -32,14 +26,11 @@ function Chars({ anim, text }: { anim: "in" | "none" | "out"; text: string }) {
             animation: `char-${anim} ${DURATION_MS}ms ${EASE} ${item.position * STAGGER_MS}ms both`,
           };
     return (
-      <span
-        className="relative inline-block overflow-hidden align-bottom"
-        key={item.id}
-      >
+      <CharSlot key={item.id}>
         <span className="inline-block" style={style}>
-          {item.char === " " ? "\u00A0" : item.char}
+          {displayChar(item.char)}
         </span>
-      </span>
+      </CharSlot>
     );
   });
 }

@@ -37,3 +37,14 @@ describe("Person JSON-LD", () => {
     expect(person.jobTitle).toBe("Product Designer");
   });
 });
+
+describe("schemaNode", () => {
+  test("every node carries the schema.org context", async () => {
+    const { schemaNode } = await import("@/lib/json-ld");
+    expect(schemaNode("WebSite", { name: "x" })).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "x",
+    });
+  });
+});

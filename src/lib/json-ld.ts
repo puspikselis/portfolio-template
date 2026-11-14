@@ -9,6 +9,17 @@ import {
   SITE_URL,
 } from "@/lib/constants";
 
+/** A top-level schema.org node: adds the shared @context. */
+export function schemaNode<T extends Record<string, unknown>>(
+  type: string,
+  props: T
+) {
+  return { "@context": "https://schema.org", "@type": type, ...props };
+}
+
+/** The site owner as a schema.org author reference. */
+export const AUTHOR = { "@type": "Person", name: SITE_NAME } as const;
+
 function organization(name: string, url?: string) {
   return url
     ? { "@type": "Organization", name, url }
@@ -20,9 +31,7 @@ export function buildPersonJsonLd() {
   const current = projects.filter((project) => isCurrentRole(project.year));
   const past = projects.filter((project) => !isCurrentRole(project.year));
 
-  return {
-    "@context": "https://schema.org",
-    "@type": "Person",
+  return schemaNode("Person", {
     alumniOf: past.map((project) => organization(project.company)),
     description: SITE_DESCRIPTION,
     image: `${SITE_URL}/images/KK.avif`,
@@ -43,5 +52,5 @@ export function buildPersonJsonLd() {
         organization(business.company, business.cardHref)
       ),
     ],
-  };
+  });
 }

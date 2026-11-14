@@ -7,7 +7,8 @@ import { Projects } from "@/components/projects";
 import { TagChip } from "@/components/ui/tag-chip";
 import { Testimonial } from "@/components/ui/testimonial";
 import { getCaseStudy } from "@/data/projects";
-import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { SITE_URL } from "@/lib/constants";
+import { AUTHOR, schemaNode } from "@/lib/json-ld";
 import { caseStudyPath } from "@/lib/metadata";
 import { getYear } from "@/lib/utils";
 
@@ -51,22 +52,18 @@ export function ProjectPage({
   const startYear = getYear(year);
 
   const jsonLd = [
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
+    schemaNode("BreadcrumbList", {
       itemListElement: [
         { "@type": "ListItem", item: SITE_URL, name: "Home", position: 1 },
         { "@type": "ListItem", item: url, name, position: 2 },
       ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "CreativeWork",
-      author: { "@type": "Person", name: SITE_NAME },
+    }),
+    schemaNode("CreativeWork", {
+      author: AUTHOR,
       dateCreated: startYear,
       name,
       url,
-    },
+    }),
   ];
 
   return (
@@ -121,11 +118,9 @@ export function ProjectPage({
           ))}
         </section>
         {testimonial ? (
-          <div className="mt-20 md:mt-35">
-            <Testimonial author={testimonial.author}>
-              {testimonial.text}
-            </Testimonial>
-          </div>
+          <Testimonial author={testimonial.author} className="mt-20 md:mt-35">
+            {testimonial.text}
+          </Testimonial>
         ) : null}
         <div className={testimonial ? "mt-20 md:mt-35" : "mt-20 md:mt-37"}>
           <Projects excludeSlug={slug} />
