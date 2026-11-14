@@ -9,7 +9,7 @@ import { Testimonial } from "@/components/ui/testimonial";
 import { getCaseStudy } from "@/data/projects";
 import { SITE_URL } from "@/lib/constants";
 import { AUTHOR, schemaNode } from "@/lib/json-ld";
-import { caseStudyPath } from "@/lib/metadata";
+import { caseStudyUrl } from "@/lib/metadata";
 import { getYear } from "@/lib/utils";
 
 interface ProjectImage {
@@ -48,7 +48,7 @@ export function ProjectPage({
   testimonial,
 }: ProjectPageProps) {
   const { company: name, year } = getCaseStudy(slug);
-  const url = `${SITE_URL}${caseStudyPath(slug)}`;
+  const url = caseStudyUrl(slug);
   const startYear = getYear(year);
 
   const jsonLd = [

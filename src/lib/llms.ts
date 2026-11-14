@@ -5,15 +5,14 @@ import {
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_ROLE,
-  SITE_URL,
 } from "@/lib/constants";
-import { caseStudyPath } from "@/lib/metadata";
+import { caseStudyUrl } from "@/lib/metadata";
 
 /** Plain-text summary for /llms.txt (https://llmstxt.org), built from the site's data. */
 export function buildLlmsTxt(): string {
   const studies = caseStudies.map(
     (project) =>
-      `- [${project.company}: ${project.title}, ${project.year}](${SITE_URL}${caseStudyPath(project.slug)}): ${project.description}`
+      `- [${project.company}: ${project.title}, ${project.year}](${caseStudyUrl(project.slug)}): ${project.description}`
   );
 
   return [

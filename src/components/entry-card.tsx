@@ -2,7 +2,6 @@ import type { CSSProperties, PointerEventHandler, ReactNode } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TagList } from "@/components/ui/tag-list";
-import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { cn, getYear } from "@/lib/utils";
 
 interface EntryCardProps {
@@ -11,7 +10,7 @@ interface EntryCardProps {
   /** External site; the whole card becomes a link to it. */
   cardHref?: string;
   className?: string;
-  color?: string;
+  color: string;
   company: string;
   /** Avatar fallback when there is no image. */
   fallback?: ReactNode;
@@ -62,7 +61,7 @@ export function EntryCard({
       >
         <Avatar
           className="size-12 rounded-xl bg-(--color)"
-          style={{ "--color": color || DEFAULT_PREVIEW_COLOR } as CSSProperties}
+          style={{ "--color": color } as CSSProperties}
         >
           <AvatarImage alt={`${company} logo`} src={image} />
           <AvatarFallback className="bg-transparent text-15 text-ink/20 -tracking-[0.02em]">

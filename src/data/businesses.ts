@@ -7,7 +7,8 @@ interface Preview {
 type Platform = "android" | "ios";
 
 interface BusinessButton {
-  href: string;
+  /** Omitted for the website button: it links to the business's `website`. */
+  href?: string;
   icon?: "appStore" | "playStore";
   label: string;
   platform?: Platform;
@@ -16,7 +17,6 @@ interface BusinessButton {
 
 interface Business {
   buttons: BusinessButton[];
-  cardHref?: string;
   color?: string;
   company: string;
   id: number;
@@ -24,6 +24,7 @@ interface Business {
   previewOnCardHover?: boolean;
   tags: string[];
   title: string;
+  website: string;
   year: string;
 }
 
@@ -33,7 +34,6 @@ export const businesses: Business[] = [
   {
     buttons: [
       {
-        href: "https://datreal.com",
         label: "Website",
         preview: {
           height: 140,
@@ -42,13 +42,13 @@ export const businesses: Business[] = [
         },
       },
     ],
-    cardHref: "https://datreal.com",
     color: "#003E2D",
     company: "DatReal",
     id: 3,
     image: "/images/datreal.svg",
     tags: ["Public Business Data"],
     title: "Co-Founder",
+    website: "https://datreal.com",
     year: "Since 2025",
   },
   {
@@ -76,7 +76,6 @@ export const businesses: Business[] = [
         },
       },
       {
-        href: "https://heywisp.com",
         label: "Website",
         preview: {
           height: 156,
@@ -85,19 +84,18 @@ export const businesses: Business[] = [
         },
       },
     ],
-    cardHref: "https://heywisp.com",
     color: "#44a1ff",
     company: "Wisp",
     id: 1,
     image: "/images/wisp.avif",
     tags: ["AI Dating"],
     title: "Co-Founder",
+    website: "https://heywisp.com",
     year: "Since 2025",
   },
   {
     buttons: [
       {
-        href: "https://eloking.com/",
         label: "Website",
         preview: {
           height: 200,
@@ -106,7 +104,6 @@ export const businesses: Business[] = [
         },
       },
     ],
-    cardHref: "https://eloking.com/",
     color: "#1d1d1d",
     company: "Eloking",
     id: 2,
@@ -114,6 +111,7 @@ export const businesses: Business[] = [
     previewOnCardHover: true,
     tags: ["eSports"],
     title: "Co-Founder",
+    website: "https://eloking.com/",
     year: "Since 2021",
   },
 ];

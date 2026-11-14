@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 
 import { getCaseStudy } from "@/data/projects";
-import { OG_IMAGE_SIZE, SITE_NAME, SITE_TITLE } from "@/lib/constants";
+import {
+  OG_IMAGE_SIZE,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/constants";
 
 // A page that sets its own `openGraph`/`twitter` replaces the root ones, which
 // drops the root file-based social card, so the card is listed here explicitly.
@@ -46,6 +51,11 @@ export function pageMetadata({
 
 export function caseStudyPath(slug: string): string {
   return `/projects/${slug}`;
+}
+
+/** Absolute URL of a case study page. */
+export function caseStudyUrl(slug: string): string {
+  return `${SITE_URL}${caseStudyPath(slug)}`;
 }
 
 export function caseStudyTitle(slug: string): string {

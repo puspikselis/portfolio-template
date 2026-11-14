@@ -53,3 +53,11 @@ describe("case study metadata", () => {
     expect(SITE_TITLE).toBe("Kristaps Krūze — Product Designer");
   });
 });
+
+describe("caseStudyUrl", () => {
+  test("is the site URL plus the case study path", async () => {
+    const { caseStudyPath, caseStudyUrl } = await import("@/lib/metadata");
+    const { SITE_URL } = await import("@/lib/constants");
+    expect(caseStudyUrl("chip")).toBe(`${SITE_URL}${caseStudyPath("chip")}`);
+  });
+});

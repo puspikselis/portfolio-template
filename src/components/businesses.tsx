@@ -106,7 +106,7 @@ function BusinessCard({
               variant="pill"
             >
               <a
-                href={button.href}
+                href={button.href ?? business.website}
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
                 rel="noopener noreferrer"
@@ -131,7 +131,7 @@ function BusinessCard({
   return (
     <EntryCard
       actions={actions}
-      cardHref={business.cardHref}
+      cardHref={business.website}
       className="not-first-of-type:before:my-7 not-first-of-type:before:block not-first-of-type:before:h-px not-first-of-type:before:w-full not-first-of-type:before:bg-nero-400 not-first-of-type:before:content-['']"
       color={previewColor}
       company={business.company}

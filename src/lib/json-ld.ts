@@ -49,7 +49,7 @@ export function buildPersonJsonLd() {
     worksFor: [
       ...current.map((project) => organization(project.company)),
       ...businesses.map((business) =>
-        organization(business.company, business.cardHref)
+        organization(business.company, business.website)
       ),
     ],
   });

@@ -109,7 +109,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
           </div>
         </DialogOverlay>
         <DialogContent
-          className="scrollbar-thin scrollbar-thumb-nero-100 scrollbar-track-transparent fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
+          className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
           onOpenAutoFocus={preventAutoFocus}
         >
           <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">

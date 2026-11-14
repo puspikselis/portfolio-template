@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { caseStudies } from "@/data/projects";
 import { getCommitISO } from "@/lib/commit-date";
 import { SITE_URL } from "@/lib/constants";
-import { caseStudyPath } from "@/lib/metadata";
+import { caseStudyUrl } from "@/lib/metadata";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly" as const,
       lastModified: new Date(project.lastModified),
       priority: 0.9,
-      url: `${SITE_URL}${caseStudyPath(project.slug)}`,
+      url: caseStudyUrl(project.slug),
     })),
   ];
 }
