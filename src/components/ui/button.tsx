@@ -4,8 +4,10 @@ import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// `inactive:` (globals.css) matches :disabled and [data-inactive], so a
+// non-interactive <span> label can share the disabled look.
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold outline-none transition-all disabled:cursor-not-allowed [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex cursor-pointer inactive:cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap font-semibold outline-none transition-all [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     defaultVariants: {
       variant: "unstyled",
@@ -13,18 +15,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         link: "text-12 text-nobel-100 hover:text-ink",
-        pill: "inset-shadow-0-1-0 inset-shadow-highlight/8 h-9 rounded-full bg-nero-100 px-4 text-12 text-ink hover:bg-nero-200 disabled:bg-nero-300 disabled:text-dim-gray-100",
+        outline:
+          "h-12 rounded-full border border-nero-400 px-6 text-13/4 text-nobel-100 hover:bg-nero-300 hover:text-ink focus-visible:bg-nero-300 focus-visible:text-ink",
+        pill: "inset-shadow-0-1-0 inset-shadow-highlight/8 h-9 rounded-full bg-nero-100 inactive:bg-nero-300 px-4 inactive:text-dim-gray-100 text-12 text-ink hover:bg-nero-200",
         pillLg:
-          "inset-shadow-0-1-0 inset-shadow-highlight/8 h-12 rounded-full bg-ink px-6 text-13/4 text-nero-100 hover:bg-ink/90 disabled:bg-nero-300 disabled:text-dim-gray-100 disabled:opacity-50",
+          "inset-shadow-0-1-0 inset-shadow-highlight/8 h-12 rounded-full bg-ink inactive:bg-nero-300 px-6 inactive:text-dim-gray-100 text-13/4 text-nero-100 inactive:opacity-50 hover:bg-ink/90",
         unstyled: "",
       },
     },
   }
 );
-
-type ButtonVariant = NonNullable<
-  VariantProps<typeof buttonVariants>["variant"]
->;
 
 type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -47,4 +47,4 @@ function Button({
   );
 }
 
-export { Button, type ButtonVariant, buttonVariants };
+export { Button };

@@ -2,16 +2,13 @@
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 
-import { cn } from "@/lib/utils";
-
 interface AnimatedTextProps {
-  className?: string;
   text: string;
 }
 
 const DURATION_MS = 250;
 const STAGGER_MS = 8;
-const EASE = "cubic-bezier(0.33,1,0.68,1)";
+const EASE = "var(--ease-out-cubic)";
 
 interface Leaving {
   text: string;
@@ -47,7 +44,7 @@ function Chars({ anim, text }: { anim: "in" | "none" | "out"; text: string }) {
   });
 }
 
-export function AnimatedText({ text, className }: AnimatedTextProps) {
+export function AnimatedText({ text }: AnimatedTextProps) {
   const [leaving, setLeaving] = useState<Leaving | null>(null);
   const outerRef = useRef<HTMLSpanElement>(null);
   const prevTextRef = useRef(text);
@@ -87,7 +84,7 @@ export function AnimatedText({ text, className }: AnimatedTextProps) {
   }
 
   return (
-    <span className={cn("relative inline-block", className)} ref={outerRef}>
+    <span className="relative inline-block" ref={outerRef}>
       <span className="inline-block" key={text}>
         <Chars anim={hasChangedRef.current ? "in" : "none"} text={text} />
       </span>

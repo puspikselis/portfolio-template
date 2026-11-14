@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
+@custom-variant inactive (&:disabled, &[data-inactive]);
+
 @theme inline {
-  /* Grays resolve per color-scheme via light-dark() — no dark: variants needed anywhere. */
-  --color-canvas: light-dark(#ffffff, #000000);
-  --color-ink: light-dark(#000000, #ffffff);
-  /* top-edge highlight on cards/buttons — dark mode only */
-  --color-highlight: light-dark(transparent, #ffffff);
+  --color-canvas: #000000;
+  --color-ink: #ffffff;
+  /* top-edge highlight on cards/buttons */
+  --color-highlight: #ffffff;
   --color-bulgarian-rose-100: #3f2320;
   --color-chip-100: #08ceb3;
-  --color-dim-gray-100: light-dark(#a3a3a3, #5f5f5f);
-  --color-nero-100: light-dark(#ececec, #262626);
-  --color-nero-200: light-dark(#e6e6e6, #2c2c2c);
-  --color-nero-300: light-dark(#fafafa, #151515);
-  --color-nero-400: light-dark(#f1f1f1, #1b1b1b);
-  --color-nero-500: light-dark(#f0f0f0, #1c1c1c);
-  --color-nobel-100: light-dark(#676767, #9a9a9a);
+  --color-dim-gray-100: #5f5f5f;
+  --color-nero-100: #262626;
+  --color-nero-200: #2c2c2c;
+  --color-nero-300: #151515;
+  --color-nero-400: #1b1b1b;
+  --color-nero-500: #1c1c1c;
+  --color-nobel-100: #9a9a9a;
   --color-orange-100: #ff7524;
   --color-paynt-100: #ebb5b1;
 
@@ -24,6 +25,9 @@
   --text-13: 0.8125rem;
   --text-15: 0.9375rem;
   --text-28: 1.75rem;
+
+  /* easeOutCubic: rolling and animated text */
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
 
   /* Spring curves sampled into linear() easings (formerly motion/react springs). */
   /* k=400 c=20 */
@@ -138,18 +142,7 @@
 
 @layer base {
   html {
-    color-scheme: light dark;
-  }
-  html.light {
-    color-scheme: light;
-  }
-  html.dark {
     color-scheme: dark;
-  }
-
-  html,
-  body {
-    scroll-behavior: auto;
   }
 
   body {

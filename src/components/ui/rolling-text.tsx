@@ -7,9 +7,9 @@ interface RollingTextProps {
   text: string;
 }
 
-// Matches the previous motion/react config: 0.3s, cubic-bezier(0.33,1,0.68,1), 15ms/char stagger.
+// 0.3s on --ease-out-cubic with a 15ms/char stagger.
 const CHAR_CLASSES =
-  "inline-block transition-[translate,opacity,filter] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]";
+  "inline-block transition-[translate,opacity,filter] duration-300 ease-out-cubic";
 
 export function RollingText({ className, text }: RollingTextProps) {
   return (

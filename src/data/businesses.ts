@@ -1,5 +1,3 @@
-import type { ButtonVariant } from "@/components/ui/button";
-
 interface Preview {
   height: number;
   image: string;
@@ -14,13 +12,13 @@ interface BusinessButton {
   label: string;
   platform?: Platform;
   preview?: Preview;
-  variant?: Extract<ButtonVariant, "link" | "pill">;
 }
 
 interface Business {
   buttons: BusinessButton[];
   cardHref?: string;
   color?: string;
+  company: string;
   id: number;
   image: string;
   previewOnCardHover?: boolean;
@@ -37,15 +35,21 @@ export const businesses: Business[] = [
       {
         href: "https://datreal.com",
         label: "Website",
+        preview: {
+          height: 140,
+          image: "/images/datreal/preview.webm",
+          width: 248,
+        },
       },
     ],
     cardHref: "https://datreal.com",
-    color: "#025333",
+    color: "#003E2D",
+    company: "DatReal",
     id: 3,
     image: "/images/datreal.svg",
-    tags: ["DatReal", "Public Business Data"],
+    tags: ["Public Business Data"],
     title: "Co-Founder",
-    year: "Since 2026",
+    year: "Since 2025",
   },
   {
     buttons: [
@@ -78,9 +82,10 @@ export const businesses: Business[] = [
     ],
     cardHref: "https://heywisp.com",
     color: "#44a1ff",
+    company: "Wisp",
     id: 1,
     image: "/images/wisp.avif",
-    tags: ["Wisp", "AI Dating"],
+    tags: ["AI Dating"],
     title: "Co-Founder",
     year: "Since 2025",
   },
@@ -98,10 +103,11 @@ export const businesses: Business[] = [
     ],
     cardHref: "https://eloking.com/",
     color: "#1d1d1d",
+    company: "Eloking",
     id: 2,
     image: "/images/eloking.avif",
     previewOnCardHover: true,
-    tags: ["Eloking", "eSports"],
+    tags: ["eSports"],
     title: "Co-Founder",
     year: "Since 2021",
   },

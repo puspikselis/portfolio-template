@@ -1,30 +1,17 @@
 import "server-only";
 
-import { execSync } from "node:child_process";
 import { RollingText } from "@/components/ui/rolling-text";
+import { getCommitISO } from "@/lib/commit-date";
+import { GITHUB_REPO_URL } from "@/lib/constants";
 
-const GITHUB_URL = "https://github.com/puspikselis/portfolio";
-
-function getCommitISO(): string {
-  try {
-    const iso = execSync("git log -1 --format=%cI", {
-      encoding: "utf8",
-    }).trim();
-    if (iso) {
-      return iso;
-    }
-  } catch {
-    // git not available (CI without history, edge runtime); fall through
-  }
-  return new Date().toISOString();
-}
-
-const commitISO = getCommitISO();
+// Both the attribute and the label are the UTC calendar date of the commit.
+const commitDate = new Date(getCommitISO());
 const lastUpdated = {
-  dateTime: commitISO.slice(0, 10),
-  label: new Date(commitISO).toLocaleDateString("en-US", {
+  dateTime: commitDate.toISOString().slice(0, 10),
+  label: commitDate.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
+    timeZone: "UTC",
     year: "numeric",
   }),
 };
@@ -40,7 +27,7 @@ export function Footer() {
         <a
           aria-label="View source code on GitHub"
           className="group text-nobel-100 transition-colors hover:text-ink"
-          href={GITHUB_URL}
+          href={GITHUB_REPO_URL}
           rel="noopener noreferrer"
           target="_blank"
         >

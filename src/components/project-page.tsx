@@ -6,12 +6,14 @@ import { JsonLd } from "@/components/inline-scripts";
 import { Projects } from "@/components/projects";
 import { TagChip } from "@/components/ui/tag-chip";
 import { Testimonial } from "@/components/ui/testimonial";
-import { SITE_URL } from "@/lib/constants";
-
-const YEAR_RE = /\d{4}/;
+import { getCaseStudy } from "@/data/projects";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { caseStudyPath } from "@/lib/metadata";
+import { getYear } from "@/lib/utils";
 
 interface ProjectImage {
   alt: string;
+  description: string;
   height: number;
   id: number | string;
   src: string;
@@ -29,11 +31,10 @@ interface ProjectPageProps {
   color: string;
   imageColor?: string;
   images: readonly ProjectImage[];
-  name: string;
+  /** Key into the projects data, which supplies the name and years. */
   slug: string;
   tags: readonly string[];
   testimonial?: TestimonialData;
-  year: string;
 }
 
 export function ProjectPage({
@@ -41,14 +42,13 @@ export function ProjectPage({
   color,
   imageColor,
   images,
-  name,
   slug,
   tags,
   testimonial,
-  year,
 }: ProjectPageProps) {
-  const url = `${SITE_URL}/projects/${slug}`;
-  const startYear = year.match(YEAR_RE)?.[0];
+  const { company: name, year } = getCaseStudy(slug);
+  const url = `${SITE_URL}${caseStudyPath(slug)}`;
+  const startYear = getYear(year);
 
   const jsonLd = [
     {
@@ -62,7 +62,7 @@ export function ProjectPage({
     {
       "@context": "https://schema.org",
       "@type": "CreativeWork",
-      author: { "@type": "Person", name: "Kristaps Krūze" },
+      author: { "@type": "Person", name: SITE_NAME },
       dateCreated: startYear,
       name,
       url,
@@ -113,7 +113,10 @@ export function ProjectPage({
                 src={image.src}
                 width={image.width}
               />
-              <figcaption className="sr-only">{image.title}</figcaption>
+              <figcaption className="mt-3 text-13/5 text-nobel-100">
+                <span className="sr-only">{image.title}: </span>
+                {image.description}
+              </figcaption>
             </figure>
           ))}
         </section>

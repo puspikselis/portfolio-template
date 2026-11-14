@@ -6,8 +6,9 @@ const basic =
   client_id && client_secret
     ? Buffer.from(`${client_id}:${client_secret}`).toString("base64")
     : "";
+// additional_types=episode: without it Spotify reports podcasts as item: null.
 const NOW_PLAYING_ENDPOINT =
-  "https://api.spotify.com/v1/me/player/currently-playing";
+  "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track,episode";
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
 
 const getAccessToken = async () => {
@@ -45,4 +46,34 @@ export interface SpotifyData {
   isPlaying: boolean;
   songUrl: string;
   title: string;
+}
+
+/** The parts of Spotify's currently-playing payload we read (tracks and podcast episodes). */
+export interface NowPlayingPayload {
+  is_playing?: boolean;
+  item?: {
+    artists?: { name: string }[];
+    external_urls?: { spotify?: string };
+    name: string;
+    show?: { name: string };
+  } | null;
+}
+
+/** Maps the payload to what the header shows; a track's artists, or an episode's show. */
+export function toSpotifyData(payload: NowPlayingPayload): SpotifyData | null {
+  const { item } = payload;
+  if (!item) {
+    return null;
+  }
+  // Episodes have no artists; their show stands in for the artist.
+  const { artists = [], show = { name: "" } } = item;
+  const artist =
+    artists.length > 0 ? artists.map(({ name }) => name).join(", ") : show.name;
+
+  return {
+    artist,
+    isPlaying: Boolean(payload.is_playing),
+    songUrl: item.external_urls?.spotify ?? "",
+    title: item.name,
+  };
 }

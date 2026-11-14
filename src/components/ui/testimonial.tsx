@@ -3,6 +3,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const IMAGE_EXT_RE = /\.(jpg|png|avif)$/;
 
+/** Splits a paragraph into lines; every line but the last ends in a <br>. */
+export function toLines(paragraph: string) {
+  const lines = paragraph.split("\n");
+  return lines.map((text, index) => ({
+    breakAfter: index < lines.length - 1,
+    key: `${index}-${text.slice(0, 30)}`,
+    text,
+  }));
+}
+
 interface TestimonialProps {
   author: {
     image: string;
@@ -25,30 +35,23 @@ export function Testimonial({ author, children }: TestimonialProps) {
         Reference
       </h2>
       <figure className="relative">
-        <div
-          aria-hidden="true"
-          className="mb-9 md:absolute md:top-2 md:-left-24 md:mb-0"
-        >
-          <QuoteIcon className="size-5 text-dim-gray-100" />
-        </div>
+        {/* Inline on purpose: it keeps the line box the old wrapper div had. */}
+        <QuoteIcon className="mb-9 size-5 text-dim-gray-100 md:absolute md:top-2 md:-left-24 md:mb-0" />
 
         <blockquote className="space-y-4">
-          {paragraphs.map((paragraph) => {
-            const lines = paragraph.split("\n");
-            return (
-              <p
-                className="font-medium not-first:text-15/7 not-first:text-nobel-100 text-28/10 text-ink -tracking-[0.01em] not-first:-tracking-[0.02em]"
-                key={paragraph.slice(0, 50)}
-              >
-                {lines.map((line) => (
-                  <span key={line.slice(0, 30)}>
-                    {line}
-                    {line === lines.at(-1) ? null : <br />}
-                  </span>
-                ))}
-              </p>
-            );
-          })}
+          {paragraphs.map((paragraph) => (
+            <p
+              className="font-medium not-first:text-15/7 not-first:text-nobel-100 text-28/10 text-ink -tracking-[0.01em] not-first:-tracking-[0.02em]"
+              key={paragraph.slice(0, 50)}
+            >
+              {toLines(paragraph).map((line) => (
+                <span key={line.key}>
+                  {line.text}
+                  {line.breakAfter ? <br /> : null}
+                </span>
+              ))}
+            </p>
+          ))}
         </blockquote>
 
         <figcaption className="mt-9 flex items-center gap-3 pb-2">

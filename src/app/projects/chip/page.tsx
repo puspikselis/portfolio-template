@@ -1,15 +1,9 @@
-import type { Metadata } from "next";
-
 import { ProjectPage } from "@/components/project-page";
+import { caseStudyMetadata } from "@/lib/metadata";
 
 import { images, tags } from "./data";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/projects/chip" },
-  description:
-    "Chip is an automated savings app that connects to your bank, analyzes spending, and moves affordable amounts into savings automatically. As Lead Designer, I led end-to-end product and brand work.",
-  title: "Chip - Lead Designer | Kristaps Krūze",
-};
+export const metadata = caseStudyMetadata("chip");
 
 export default function Chip() {
   return (
@@ -17,10 +11,8 @@ export default function Chip() {
       color="var(--color-chip-100)"
       imageColor="var(--color-chip-100)"
       images={images}
-      name="Chip"
       slug="chip"
       tags={tags}
-      year="2018"
     >
       <p>
         Chip is an automated savings app that connects to your bank, analyzes

@@ -17,6 +17,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/lib/constants";
 
 interface Props {
   isOpen: boolean;
@@ -65,7 +66,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
     fd.set("_subject", `Portfolio Contact from ${values.name}`);
 
     try {
-      const res = await fetch("https://formsubmit.co/ajax/kristaps@kruze.lv", {
+      const res = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
         body: fd,
         headers: { Accept: "application/json" },
         method: "POST",
@@ -83,7 +84,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
     } catch {
       showToast(
         "Couldn't send your message",
-        "Email me at kristaps@kruze.lv instead"
+        `Email me at ${CONTACT_EMAIL} instead`
       );
     }
   };
@@ -133,16 +134,16 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                     Fill out the form below. Or reach me directly at{" "}
                     <a
                       className="text-ink transition-opacity hover:opacity-80"
-                      href="mailto:kristaps@kruze.lv"
+                      href={`mailto:${CONTACT_EMAIL}`}
                     >
-                      kristaps@kruze.lv
+                      {CONTACT_EMAIL}
                     </a>{" "}
                     or{" "}
                     <a
                       className="text-ink transition-opacity hover:opacity-80"
-                      href="tel:+37129234926"
+                      href={CONTACT_PHONE.href}
                     >
-                      +371 292 34 926
+                      {CONTACT_PHONE.display}
                     </a>
                     .
                   </p>

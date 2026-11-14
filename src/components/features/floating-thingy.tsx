@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 
 interface Config {
   color: string;
-  description: string;
   title: string;
 }
 
@@ -74,7 +73,6 @@ function scrolledTarget(
 export function FloatingThingy() {
   const [config, setConfig] = useState<Config>({
     color: "",
-    description: "",
     title: "",
   });
 
@@ -134,7 +132,7 @@ export function FloatingThingy() {
     });
 
     mo.observe(document.body, {
-      attributeFilter: ["data-title", "data-description", "data-color"],
+      attributeFilter: ["data-title", "data-color"],
       attributes: true,
       childList: true,
       subtree: true,
@@ -158,18 +156,17 @@ export function FloatingThingy() {
       const ds = el.dataset as Record<string, string | undefined>;
       return {
         color: ds.color || "",
-        description: ds.description || "",
         title: ds.title || "",
       };
     };
 
     const updateConfig = (el: HTMLElement) => {
-      const { title, description, color } = readAttrs(el);
-      const sig = `${title}|${description}|${color}`;
+      const { title, color } = readAttrs(el);
+      const sig = `${title}|${color}`;
       if (lastSigRef.current === sig) {
         return;
       }
-      setConfig({ color, description, title });
+      setConfig({ color, title });
       lastSigRef.current = sig;
     };
 
@@ -182,7 +179,7 @@ export function FloatingThingy() {
 
       if (elements.length === 0) {
         if (lastSigRef.current !== "") {
-          setConfig({ color: "", description: "", title: "" });
+          setConfig({ color: "", title: "" });
           lastSigRef.current = "";
         }
         return;
@@ -256,31 +253,22 @@ export function FloatingThingy() {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-40 z-10 hidden md:block">
-      <div className="mx-auto max-w-404">
-        <div
-          aria-atomic="true"
-          aria-live="polite"
-          className={cn(
-            "translate-y-[var(--offset)] space-y-2 pl-24 transition-[translate] duration-200 ease-out",
-            config.title &&
-              'before:absolute before:top-2 before:left-0 before:block before:h-px before:w-8 before:bg-nero-500 before:content-[""]',
-            config.title &&
-              'after:absolute after:top-2 after:left-12 after:block after:h-px after:w-8 after:bg-[var(--dash-color)] after:transition-colors after:content-[""]'
-          )}
-          ref={floatingRef}
-          style={style}
-        >
-          {config.title ? (
-            <div className="font-medium text-13/4 text-ink">
-              <AnimatedText text={config.title} />
-            </div>
-          ) : null}
-          {config.description ? (
-            <p className="max-w-45 font-medium text-12/5 text-dim-gray-100 -tracking-[0.03em]">
-              <AnimatedText text={config.description} />
-            </p>
-          ) : null}
-        </div>
+      <div
+        className={cn(
+          "mx-auto max-w-404 translate-y-[var(--offset)] space-y-2 pl-24 transition-[translate] duration-200 ease-out",
+          config.title &&
+            'before:absolute before:top-2 before:left-0 before:block before:h-px before:w-8 before:bg-nero-500 before:content-[""]',
+          config.title &&
+            'after:absolute after:top-2 after:left-12 after:block after:h-px after:w-8 after:bg-[var(--dash-color)] after:transition-colors after:content-[""]'
+        )}
+        ref={floatingRef}
+        style={style}
+      >
+        {config.title ? (
+          <div className="font-medium text-13/4 text-ink">
+            <AnimatedText text={config.title} />
+          </div>
+        ) : null}
       </div>
     </div>
   );

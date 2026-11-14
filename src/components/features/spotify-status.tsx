@@ -1,16 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Note } from "@/components/icons/note";
-import { RollingText } from "@/components/ui/rolling-text";
 import type { SpotifyData } from "@/lib/spotify";
+import { cn } from "@/lib/utils";
 
-const NAME = "Kristaps Krūze";
 const POLL_INTERVAL_MS = 30_000;
 
-export function SpotifyStatus() {
+/** "Listening to …" while Spotify plays, otherwise the role line under the name. */
+export function SpotifyStatus({ className }: { className?: string }) {
   const [data, setData] = useState<SpotifyData | null>(null);
 
   useEffect(() => {
@@ -61,40 +60,41 @@ export function SpotifyStatus() {
     };
   }, []);
 
-  return (
-    <>
-      <Link href="/">
-        <RollingText className="font-semibold text-13/4 text-ink" text={NAME} />
-      </Link>
-      {data ? (
-        <a
-          aria-label={`Currently listening to ${data.title} by ${data.artist} on Spotify`}
-          className="flex items-center gap-1.5 transition-opacity hover:opacity-70"
-          href={data.songUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <div className="text-dim-gray-100">
-            <Note />
-          </div>
-          <div className="relative max-w-20 overflow-hidden">
-            <div className="animate-marquee whitespace-nowrap font-medium text-12/4 -tracking-[0.03em]">
-              {[0, 1].map((i) => (
-                <span className="pr-6" key={i}>
-                  <span className="text-nobel-100">Listening to </span>
-                  <span className="text-dim-gray-100">
-                    {data.title} - {data.artist}
-                  </span>
-                </span>
-              ))}
-            </div>
-          </div>
-        </a>
-      ) : (
-        <div className="font-medium text-12/4 text-dim-gray-100 -tracking-[0.03em]">
-          Designer
-        </div>
+  return data ? (
+    <a
+      aria-label={`Currently listening to ${data.title} by ${data.artist} on Spotify`}
+      className={cn(
+        "flex items-center gap-1.5 transition-opacity hover:opacity-70",
+        className
       )}
-    </>
+      href={data.songUrl}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <div className="text-dim-gray-100">
+        <Note />
+      </div>
+      <div className="relative max-w-20 overflow-hidden">
+        <div className="animate-marquee whitespace-nowrap font-medium text-12/4 -tracking-[0.03em]">
+          {[0, 1].map((i) => (
+            <span className="pr-6" key={i}>
+              <span className="text-nobel-100">Listening to </span>
+              <span className="text-dim-gray-100">
+                {data.title} - {data.artist}
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </a>
+  ) : (
+    <div
+      className={cn(
+        "font-medium text-12/4 text-dim-gray-100 -tracking-[0.03em]",
+        className
+      )}
+    >
+      Designer
+    </div>
   );
 }

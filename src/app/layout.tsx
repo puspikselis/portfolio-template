@@ -6,54 +6,47 @@ import { CursorPreviewProvider } from "@/components/features/cursor-preview";
 import { GridOverlay } from "@/components/features/grid-overlay";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { JsonLd, ThemeInitScript } from "@/components/inline-scripts";
+import { JsonLd } from "@/components/inline-scripts";
 import { ToastProvider } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SITE_URL } from "@/lib/constants";
+import { businesses } from "@/data/businesses";
+import { projects } from "@/data/projects";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/constants";
+import { buildPersonJsonLd } from "@/lib/json-ld";
+import { OPEN_GRAPH_BASE, TWITTER_BASE } from "@/lib/metadata";
 
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
-const SITE_TITLE = "Kristaps Krūze — Designer";
-const SITE_DESCRIPTION =
-  "Product designer with 10+ years of experience. I've built my own ventures and designed digital products for clients worldwide.";
 const GA_ID = "G-1BYJXYBJPS";
 
 export const viewport: Viewport = {
   initialScale: 1,
-  themeColor: [
-    { color: "#ffffff", media: "(prefers-color-scheme: light)" },
-    { color: "#000000", media: "(prefers-color-scheme: dark)" },
-  ],
+  themeColor: "#000000",
   width: "device-width",
 };
 
 export const metadata: Metadata = {
-  authors: [{ name: "Kristaps Krūze", url: SITE_URL }],
-  creator: "Kristaps Krūze",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
   description: SITE_DESCRIPTION,
   icons: {
     apple: "/favicon/apple-icon.png",
     icon: "/favicon/icon.png",
   },
-  keywords: [
-    "Product Designer",
-    "UX/UI Design",
-    "Kristaps Krūze",
-    "Digital Product Design",
-    "Latvia",
-    "Portfolio",
-  ],
   metadataBase: new URL(SITE_URL),
   openGraph: {
+    ...OPEN_GRAPH_BASE,
     description: SITE_DESCRIPTION,
-    locale: "en_US",
-    siteName: SITE_TITLE,
     title: SITE_TITLE,
-    type: "website",
     url: SITE_URL,
   },
-  publisher: "Kristaps Krūze",
+  publisher: SITE_NAME,
   robots: {
     follow: true,
     googleBot: {
@@ -67,43 +60,26 @@ export const metadata: Metadata = {
   },
   title: SITE_TITLE,
   twitter: {
-    card: "summary_large_image",
+    ...TWITTER_BASE,
     description: SITE_DESCRIPTION,
     title: SITE_TITLE,
   },
 };
 
-const personJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  description: SITE_DESCRIPTION,
-  image: `${SITE_URL}/images/KK.avif`,
-  jobTitle: "Designer",
-  knowsAbout: [
-    "Product Design",
-    "UX Design",
-    "UI Design",
-    "Digital Product Design",
-  ],
-  name: "Kristaps Krūze",
-  nationality: "Latvian",
-  sameAs: [
-    "https://www.linkedin.com/in/kristapskruze/",
-    "https://github.com/puspikselis",
-    "https://heywisp.com",
-    "https://datreal.com",
-  ],
-  url: SITE_URL,
-  worksFor: { "@type": "Organization", name: "Ubiquiti" },
-};
-
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  author: { "@type": "Person", name: "Kristaps Krūze" },
+  author: { "@type": "Person", name: SITE_NAME },
   name: SITE_TITLE,
   url: SITE_URL,
 };
+
+const VIDEO_PREVIEWS = [
+  ...projects.map((project) => project.preview),
+  ...businesses.flatMap((business) =>
+    business.buttons.map((button) => button.preview?.image)
+  ),
+].filter((src): src is string => Boolean(src?.endsWith(".webm")));
 
 export default function RootLayout({
   children,
@@ -118,11 +94,13 @@ export default function RootLayout({
           "--default-font-family": inter.style.fontFamily,
         } as React.CSSProperties
       }
-      suppressHydrationWarning
     >
       <body className="relative">
-        <ThemeInitScript />
-        <JsonLd data={[personJsonLd, websiteJsonLd]} />
+        {/* Hover previews mount on demand; prefetch videos so the first hover plays at once. */}
+        {VIDEO_PREVIEWS.map((href) => (
+          <link as="video" href={href} key={href} rel="prefetch" />
+        ))}
+        <JsonLd data={[buildPersonJsonLd(), websiteJsonLd]} />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"

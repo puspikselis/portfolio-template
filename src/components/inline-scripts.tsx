@@ -20,15 +20,3 @@ export function JsonLd({ data }: { data: JsonLdObject[] }) {
     </script>
   ));
 }
-
-const THEME_INIT =
-  "try{var t=localStorage.theme;if(t==='light'||t==='dark')document.documentElement.classList.add(t)}catch(e){}";
-
-/**
- * Applies the saved theme before first paint to avoid a flash. Must be a
- * synchronous inline script: an external file (even next/script
- * beforeInteractive) executes too late and the class is lost to hydration.
- */
-export function ThemeInitScript() {
-  return <script>{THEME_INIT}</script>;
-}

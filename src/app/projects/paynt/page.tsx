@@ -1,15 +1,9 @@
-import type { Metadata } from "next";
-
 import { ProjectPage } from "@/components/project-page";
+import { caseStudyMetadata } from "@/lib/metadata";
 
 import { images, tags, testimonial } from "./data";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/projects/paynt" },
-  description:
-    "Paydoo (now Paynt) is a European payments acquirer. As Lead Designer, I led end-to-end product and brand work, including the company's rebrand from Paydoo to Paynt.",
-  title: "Paynt - Lead Designer | Kristaps Krūze",
-};
+export const metadata = caseStudyMetadata("paynt");
 
 export default function Paynt() {
   return (
@@ -17,11 +11,9 @@ export default function Paynt() {
       color="var(--color-paynt-100)"
       imageColor="var(--color-paynt-100)"
       images={images}
-      name="Paynt"
       slug="paynt"
       tags={tags}
       testimonial={testimonial}
-      year="2018 - 2021"
     >
       <p>Paydoo (now Paynt) is a European payments acquirer.</p>
       <p>

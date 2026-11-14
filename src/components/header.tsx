@@ -5,7 +5,6 @@ import { type ChangeEvent, useCallback, useState } from "react";
 
 import { ContactDialog } from "@/components/dialogs/contact-dialog";
 import { SpotifyStatus } from "@/components/features/spotify-status";
-import { ThemeToggle } from "@/components/features/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { RollingText } from "@/components/ui/rolling-text";
@@ -14,6 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { LINKEDIN_URL, SITE_NAME } from "@/lib/constants";
 
 function handleLinksChange(e: ChangeEvent<HTMLSelectElement>) {
   if (e.target.value) {
@@ -30,20 +30,26 @@ export function Header() {
   return (
     <>
       <header className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between bg-canvas p-5 md:sticky md:top-0 md:bg-transparent md:px-12 md:py-8">
-        <div className="group flex items-center gap-3">
-          <Link className="focus:outline-none md:focus:outline-auto" href="/">
-            <Avatar className="size-9 rounded-xl transition-opacity hover:opacity-80">
+        {/* One home link covers avatar and name; the status sits over its empty top-right cell. */}
+        <div className="group grid grid-cols-[auto_auto] items-center gap-x-3">
+          <Link
+            className="col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid focus:outline-none md:focus:outline-auto"
+            href="/"
+          >
+            <Avatar className="row-span-2 size-9 rounded-xl transition-opacity hover:opacity-80">
               <AvatarImage
-                alt="Kristaps Krūze"
+                alt=""
                 className="rounded-none"
                 src="/images/KK.avif"
               />
               <AvatarFallback>KK</AvatarFallback>
             </Avatar>
+            <RollingText
+              className="col-start-2 row-start-2 self-start font-semibold text-13/4 text-ink"
+              text={SITE_NAME}
+            />
           </Link>
-          <div className="flex flex-col-reverse justify-center">
-            <SpotifyStatus />
-          </div>
+          <SpotifyStatus className="col-start-2 row-start-1 self-end" />
         </div>
         <nav aria-label="Primary" className="flex items-center md:gap-5">
           <select
@@ -55,9 +61,7 @@ export function Header() {
             <option value="/documents/kristaps-kruze-resume.pdf">
               Resume (updated October 5, 2025)
             </option>
-            <option value="https://www.linkedin.com/in/kristapskruze/">
-              LinkedIn
-            </option>
+            <option value={LINKEDIN_URL}>LinkedIn</option>
           </select>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -85,14 +89,13 @@ export function Header() {
           >
             <a
               aria-label="Visit LinkedIn profile"
-              href="https://www.linkedin.com/in/kristapskruze/"
+              href={LINKEDIN_URL}
               rel="noopener noreferrer"
               target="_blank"
             >
               <RollingText text="LinkedIn" />
             </a>
           </Button>
-          <ThemeToggle />
           <Button onClick={openContact} variant="pill">
             Contact
           </Button>

@@ -21,3 +21,15 @@ const twMerge = extendTailwindMerge({
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+const YEAR_RE = /\d{4}/g;
+
+/** Every four-digit year in a label such as "2018 - 2021" or "Since 2025". */
+export function getYears(text: string): string[] {
+  return text.match(YEAR_RE) ?? [];
+}
+
+/** The first four-digit year in a label, for `<time dateTime>`. */
+export function getYear(text: string): string | undefined {
+  return getYears(text)[0];
+}

@@ -1,7 +1,15 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Kristaps Krūze — Designer";
-export const size = { height: 630, width: 1200 };
+import {
+  OG_IMAGE_SIZE,
+  SITE_NAME,
+  SITE_ROLE,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/constants";
+
+export const alt = SITE_TITLE;
+export const size = OG_IMAGE_SIZE;
 export const contentType = "image/png";
 
 export default function OpengraphImage() {
@@ -26,7 +34,7 @@ export default function OpengraphImage() {
           fontWeight: 500,
         }}
       >
-        kristaps.kruze.lv
+        {new URL(SITE_URL).host}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <div
@@ -38,7 +46,7 @@ export default function OpengraphImage() {
             lineHeight: 1,
           }}
         >
-          Kristaps Krūze
+          {SITE_NAME}
         </div>
         <div
           style={{
@@ -48,7 +56,7 @@ export default function OpengraphImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          Designer · 10+ years · Latvia
+          {`${SITE_ROLE} · 10+ years · Latvia`}
         </div>
       </div>
     </div>,
