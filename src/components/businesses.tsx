@@ -67,7 +67,7 @@ function BusinessCard({
   const irrelevant: Platform | null =
     platform && (platform === "ios" ? "android" : "ios");
   const filteredButtons = business.buttons.filter(
-    (btn) => btn.platform !== irrelevant
+    (btn) => !btn.hidden && btn.platform !== irrelevant
   );
 
   const [primaryButton] = filteredButtons;

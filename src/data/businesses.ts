@@ -7,6 +7,8 @@ interface Preview {
 type Platform = "android" | "ios";
 
 interface BusinessButton {
+  /** Kept in the data but not rendered. */
+  hidden?: boolean;
   /** Omitted for the website button: it links to the business's `website`. */
   href?: string;
   icon?: "appStore" | "playStore";
@@ -54,6 +56,7 @@ export const businesses: Business[] = [
   {
     buttons: [
       {
+        hidden: true,
         href: "https://apps.apple.com/lv/app/ai-dating-reimagined-wisp/id6738913963",
         icon: "appStore",
         label: "App Store",
@@ -65,6 +68,7 @@ export const businesses: Business[] = [
         },
       },
       {
+        hidden: true,
         href: "https://play.google.com/store/apps/details?id=com.getwisp.wisp",
         icon: "playStore",
         label: "Google Play",
