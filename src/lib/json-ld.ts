@@ -43,7 +43,7 @@ export function buildPersonJsonLd() {
       "Digital Product Design",
     ],
     name: SITE_NAME,
-    nationality: "Latvian",
+    nationality: { "@type": "Country", name: "Latvia" },
     sameAs: [LINKEDIN_URL, GITHUB_PROFILE_URL],
     url: SITE_URL,
     worksFor: [

@@ -48,3 +48,12 @@ describe("schemaNode", () => {
     });
   });
 });
+
+describe("Person nationality", () => {
+  test("is a typed Country, not a plain string", () => {
+    expect(buildPersonJsonLd().nationality).toEqual({
+      "@type": "Country",
+      name: "Latvia",
+    });
+  });
+});

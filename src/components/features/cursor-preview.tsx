@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   createContext,
   type ReactNode,
@@ -12,7 +11,10 @@ import {
   useState,
 } from "react";
 
+import { businesses } from "@/data/businesses";
+import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
+import { densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
   color: string;
@@ -43,7 +45,13 @@ const DAMPING = 25;
 const DEFAULT_WIDTH = 248;
 const DEFAULT_HEIGHT = 156;
 const COARSE_POINTER_QUERY = "(pointer: coarse)";
-const FILE_EXT_RE = /(\.[a-z0-9]+)$/i;
+
+const VIDEO_PREVIEWS = [
+  ...projects.map((project) => project.preview),
+  ...businesses.flatMap((business) =>
+    business.buttons.map((button) => button.preview?.image)
+  ),
+].filter((src): src is string => Boolean(src?.endsWith(".webm")));
 
 export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CursorPreviewState>({
@@ -64,6 +72,18 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mql = window.matchMedia(COARSE_POINTER_QUERY);
     isCoarsePointerRef.current = mql.matches;
+    // Hover previews mount on demand; prefetch the videos so the first hover
+    // plays at once. Touch devices never show previews, so they skip this.
+    const prefetched = mql.matches
+      ? []
+      : VIDEO_PREVIEWS.map((href) => {
+          const link = document.createElement("link");
+          link.rel = "prefetch";
+          link.as = "video";
+          link.href = href;
+          document.head.append(link);
+          return link;
+        });
     const onChange = (e: MediaQueryListEvent) => {
       isCoarsePointerRef.current = e.matches;
       if (e.matches) {
@@ -71,7 +91,12 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
       }
     };
     mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
+    return () => {
+      mql.removeEventListener("change", onChange);
+      for (const link of prefetched) {
+        link.remove();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -169,19 +194,6 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
 
   const isVideo = state.image?.endsWith(".webm");
 
-  // Serves the hand-generated @2x/@3x density variants that live next to
-  // every 1x preview asset, bypassing the Next optimizer.
-  const previewLoader = useCallback(
-    ({ src, width }: { src: string; width: number }) => {
-      if (width <= state.width) {
-        return src;
-      }
-      const scale = width <= state.width * 2 ? "@2x" : "@3x";
-      return src.replace(FILE_EXT_RE, `${scale}$1`);
-    },
-    [state.width]
-  );
-
   let media: ReactNode = null;
   if (state.image) {
     media = isVideo ? (
@@ -194,12 +206,13 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         src={state.image}
       />
     ) : (
-      <Image
+      // biome-ignore lint/performance/noImgElement: hand-made @2x/@3x files, no optimizer needed
+      <img
         alt=""
         className="size-full object-cover"
         height={state.height}
-        loader={previewLoader}
         src={state.image}
+        srcSet={densitySrcSet(state.image)}
         width={state.width}
       />
     );

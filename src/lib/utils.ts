@@ -22,6 +22,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const FILE_EXT_RE = /(\.[a-z0-9]+)$/i;
+
+/** srcSet for an image with hand-made @2x/@3x siblings next to the 1x file. */
+export function densitySrcSet(src: string): string {
+  const at = (scale: string) => src.replace(FILE_EXT_RE, `@${scale}$1`);
+  return `${src} 1x, ${at("2x")} 2x, ${at("3x")} 3x`;
+}
+
 const YEAR_RE = /\d{4}/g;
 
 /** Every four-digit year in a label such as "2018 - 2021" or "Since 2025". */

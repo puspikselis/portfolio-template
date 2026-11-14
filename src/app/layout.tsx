@@ -9,8 +9,6 @@ import { Header } from "@/components/header";
 import { JsonLd } from "@/components/inline-scripts";
 import { ToastProvider } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { businesses } from "@/data/businesses";
-import { projects } from "@/data/projects";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -72,13 +70,6 @@ const websiteJsonLd = schemaNode("WebSite", {
   url: SITE_URL,
 });
 
-const VIDEO_PREVIEWS = [
-  ...projects.map((project) => project.preview),
-  ...businesses.flatMap((business) =>
-    business.buttons.map((button) => button.preview?.image)
-  ),
-].filter((src): src is string => Boolean(src?.endsWith(".webm")));
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -94,10 +85,6 @@ export default function RootLayout({
       }
     >
       <body className="relative">
-        {/* Hover previews mount on demand; prefetch videos so the first hover plays at once. */}
-        {VIDEO_PREVIEWS.map((href) => (
-          <link as="video" href={href} key={href} rel="prefetch" />
-        ))}
         <JsonLd data={[buildPersonJsonLd(), websiteJsonLd]} />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}

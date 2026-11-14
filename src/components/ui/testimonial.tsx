@@ -1,8 +1,6 @@
 import { QuoteIcon } from "@/components/icons/quote-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-
-const IMAGE_EXT_RE = /\.(jpg|png|avif)$/;
+import { cn, densitySrcSet } from "@/lib/utils";
 
 /** Splits a paragraph into lines; every line but the last ends in a <br>. */
 export function toLines(paragraph: string) {
@@ -61,7 +59,7 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
             <AvatarImage
               alt={author.name}
               src={author.image}
-              srcSet={`${author.image} 1x, ${author.image.replace(IMAGE_EXT_RE, "@2x.$1")} 2x, ${author.image.replace(IMAGE_EXT_RE, "@3x.$1")} 3x`}
+              srcSet={densitySrcSet(author.image)}
             />
             <AvatarFallback className="rounded-xl bg-dim-gray-100 text-ink">
               {author.name

@@ -9,9 +9,6 @@ import { cn } from "@/lib/utils";
 const buttonVariants = cva(
   "inline-flex cursor-pointer inactive:cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap font-semibold outline-none transition-all [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
-    defaultVariants: {
-      variant: "unstyled",
-    },
     variants: {
       variant: {
         link: "text-12 text-nobel-100 hover:text-ink",
@@ -20,7 +17,6 @@ const buttonVariants = cva(
         pill: "inset-shadow-0-1-0 inset-shadow-highlight/8 h-9 rounded-full bg-nero-100 inactive:bg-nero-300 px-4 inactive:text-dim-gray-100 text-12 text-ink hover:bg-nero-200",
         pillLg:
           "inset-shadow-0-1-0 inset-shadow-highlight/8 h-12 rounded-full bg-ink inactive:bg-nero-300 px-6 inactive:text-dim-gray-100 text-13/4 text-nero-100 inactive:opacity-50 hover:bg-ink/90",
-        unstyled: "",
       },
     },
   }

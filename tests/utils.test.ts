@@ -16,3 +16,12 @@ describe("getYear", () => {
     expect(getYears("2013 - 2015")).toEqual(["2013", "2015"]);
   });
 });
+
+describe("densitySrcSet", () => {
+  test("maps 1x, 2x and 3x to the matching files", async () => {
+    const { densitySrcSet } = await import("@/lib/utils");
+    expect(densitySrcSet("/images/wisp/website.avif")).toBe(
+      "/images/wisp/website.avif 1x, /images/wisp/website@2x.avif 2x, /images/wisp/website@3x.avif 3x"
+    );
+  });
+});
