@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/tooltip";
 import {
   LINKEDIN_URL,
+  OWNER_PHOTO_PATH,
   RESUME_PATH,
   RESUME_UPDATED,
   SITE_NAME,
@@ -38,14 +39,14 @@ export function Header() {
         {/* One home link covers avatar and name; the status sits over its empty top-right cell. */}
         <div className="group grid grid-cols-[auto_auto] items-center gap-x-3">
           <Link
-            className="col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid focus:outline-none md:focus:outline-auto"
+            className="focus-ring col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
             href="/"
           >
             <Avatar className="row-span-2 size-9 rounded-xl transition-opacity hover:opacity-80">
               <AvatarImage
                 alt=""
                 className="rounded-none"
-                src="/images/KK.avif"
+                src={OWNER_PHOTO_PATH}
               />
               <AvatarFallback>KK</AvatarFallback>
             </Avatar>
@@ -59,7 +60,7 @@ export function Header() {
         <nav aria-label="Primary" className="flex items-center md:gap-5">
           <select
             aria-label="Links"
-            className="appearance-none font-semibold text-12 text-nobel-100 focus:outline-none md:hidden"
+            className="focus-ring appearance-none font-semibold text-12 text-nobel-100 md:hidden"
             onChange={handleLinksChange}
           >
             <option value="">Links</option>

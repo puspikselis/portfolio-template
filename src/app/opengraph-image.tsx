@@ -6,6 +6,7 @@ import {
   SITE_ROLE,
   SITE_TITLE,
   SITE_URL,
+  YEARS_OF_EXPERIENCE,
 } from "@/lib/constants";
 
 export const alt = SITE_TITLE;
@@ -56,7 +57,7 @@ export default function OpengraphImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          {`${SITE_ROLE} · 10+ years · Latvia`}
+          {`${SITE_ROLE} · ${YEARS_OF_EXPERIENCE} years · Latvia`}
         </div>
       </div>
     </div>,

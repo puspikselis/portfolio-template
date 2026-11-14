@@ -16,6 +16,7 @@ interface Config {
   title: string;
 }
 
+// Matches the top-40 class until the real value is measured.
 const DEFAULT_STICKY_TOP_FALLBACK = 160;
 const DEFAULT_DASH = "var(--color-dim-gray-100)";
 const HYSTERESIS = 4;
@@ -92,9 +93,7 @@ export function FloatingThingy() {
     if (!el) {
       return;
     }
-    const topPx = Number.parseFloat(
-      getComputedStyle(el).top || `${DEFAULT_STICKY_TOP_FALLBACK}`
-    );
+    const topPx = Number.parseFloat(getComputedStyle(el).top);
     if (!Number.isNaN(topPx)) {
       stickyTopRef.current = topPx;
     }

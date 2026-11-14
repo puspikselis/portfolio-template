@@ -7,7 +7,7 @@ import { Projects } from "@/components/projects";
 import { TagChip } from "@/components/ui/tag-chip";
 import { Testimonial } from "@/components/ui/testimonial";
 import { getCaseStudy } from "@/data/projects";
-import { SITE_URL } from "@/lib/constants";
+import { MD_BREAKPOINT_QUERY, SITE_URL } from "@/lib/constants";
 import { AUTHOR, schemaNode } from "@/lib/json-ld";
 import { caseStudyUrl } from "@/lib/metadata";
 import { getYear } from "@/lib/utils";
@@ -106,7 +106,7 @@ export function ProjectPage({
                 data-title={image.title}
                 height={image.height}
                 priority={index === 0}
-                sizes="(min-width: 768px) 928px, 100vw"
+                sizes={`${MD_BREAKPOINT_QUERY} 928px, 100vw`}
                 src={image.src}
                 width={image.width}
               />

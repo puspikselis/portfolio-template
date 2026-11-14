@@ -3,6 +3,7 @@ import { isCurrentRole, projects } from "@/data/projects";
 import {
   GITHUB_PROFILE_URL,
   LINKEDIN_URL,
+  OWNER_PHOTO_PATH,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_ROLE,
@@ -34,7 +35,7 @@ export function buildPersonJsonLd() {
   return schemaNode("Person", {
     alumniOf: past.map((project) => organization(project.company)),
     description: SITE_DESCRIPTION,
-    image: `${SITE_URL}/images/KK.avif`,
+    image: `${SITE_URL}${OWNER_PHOTO_PATH}`,
     jobTitle: SITE_ROLE,
     knowsAbout: [
       "Product Design",

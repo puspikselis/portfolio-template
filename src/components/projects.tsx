@@ -8,6 +8,7 @@ import { useCursorPreview } from "@/components/features/cursor-preview";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
+import { caseStudyPath } from "@/lib/metadata";
 import { getYears } from "@/lib/utils";
 
 // Roles shown before "Show earlier roles"; the rest stay in the DOM (crawlable) but collapsed.
@@ -32,7 +33,7 @@ function ProjectAction({
   return (
     <Button asChild className="ml-auto" variant="pill">
       {slug ? (
-        <Link className="link-overlay" href={`/projects/${slug}`}>
+        <Link className="link-overlay" href={caseStudyPath(slug)}>
           {label}
           <span className="sr-only"> {company}</span>
         </Link>

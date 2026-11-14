@@ -33,8 +33,11 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-function preventAutoFocus(e: Event) {
+// Focus the dialog itself rather than the first field, so phones don't pop the
+// keyboard on open; focus must still leave the (now aria-hidden) trigger.
+function focusDialog(e: Event) {
   e.preventDefault();
+  (e.currentTarget as HTMLElement | null)?.focus();
 }
 
 export function ContactDialog({ isOpen, onClose }: Props) {
@@ -84,7 +87,8 @@ export function ContactDialog({ isOpen, onClose }: Props) {
     } catch {
       showToast(
         "Couldn't send your message",
-        `Email me at ${CONTACT_EMAIL} instead`
+        `Email me at ${CONTACT_EMAIL} instead`,
+        "error"
       );
     }
   };
@@ -110,7 +114,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
         </DialogOverlay>
         <DialogContent
           className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
-          onOpenAutoFocus={preventAutoFocus}
+          onOpenAutoFocus={focusDialog}
         >
           <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
             <DialogClose asChild>

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 // `inactive:` (globals.css) matches :disabled and [data-inactive], so a
 // non-interactive <span> label can share the disabled look.
 const buttonVariants = cva(
-  "inline-flex cursor-pointer inactive:cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap font-semibold outline-none transition-all focus-visible:outline-2 focus-visible:outline-ink/60 focus-visible:outline-offset-2 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "focus-ring inline-flex cursor-pointer inactive:cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {

@@ -2,6 +2,15 @@
 
 @custom-variant inactive (&:disabled, &[data-inactive]);
 
+/* The one keyboard focus style for controls. */
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-ink) 60%, transparent);
+    outline-offset: 2px;
+  }
+}
+
 @theme inline {
   --color-canvas: #000000;
   --color-ink: #ffffff;
@@ -250,4 +259,21 @@
   display: flex;
   width: max-content;
   animation: marquee 20s linear infinite;
+}
+
+/* Pause moving header text on hover/focus, and stop all motion for users who ask for less. */
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

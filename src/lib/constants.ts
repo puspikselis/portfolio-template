@@ -4,8 +4,9 @@ export const SITE_URL = "https://kristaps.kruze.lv";
 export const SITE_NAME = "Kristaps Krūze";
 export const SITE_ROLE = "Product Designer";
 export const SITE_TITLE = `${SITE_NAME} — ${SITE_ROLE}`;
-export const SITE_DESCRIPTION =
-  "Product designer with 10+ years of experience. I've built my own ventures and designed digital products for clients worldwide.";
+export const YEARS_OF_EXPERIENCE = "10+";
+export const OWNER_PHOTO_PATH = "/images/KK.avif";
+export const SITE_DESCRIPTION = `Product designer with ${YEARS_OF_EXPERIENCE} years of experience. I've built my own ventures and designed digital products for clients worldwide.`;
 
 /** Size of the generated social card (src/app/opengraph-image.tsx). */
 export const OG_IMAGE_SIZE = { height: 630, width: 1200 };

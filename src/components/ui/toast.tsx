@@ -18,8 +18,10 @@ import {
 import { CheckCircle } from "@/components/icons/check-circle";
 import { cn } from "@/lib/utils";
 
+type ToastTone = "error" | "success";
+
 interface ToastContextType {
-  showToast: (title: string, description?: string) => void;
+  showToast: (title: string, description?: string, tone?: ToastTone) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -33,23 +35,34 @@ export function useToast() {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toast, setToast] = useState({
+  const [toast, setToast] = useState<{
+    description: string;
+    open: boolean;
+    title: string;
+    tone: ToastTone;
+  }>({
     description: "",
     open: false,
     title: "",
+    tone: "success",
   });
-  const { description, open, title } = toast;
+  const { description, open, title, tone } = toast;
 
   const setOpen = useCallback(
     (nextOpen: boolean) => setToast((prev) => ({ ...prev, open: nextOpen })),
     []
   );
   const showToast = useCallback(
-    (newTitle: string, newDescription?: string) =>
+    (
+      newTitle: string,
+      newDescription?: string,
+      newTone: ToastTone = "success"
+    ) =>
       setToast({
         description: newDescription || "",
         open: true,
         title: newTitle,
+        tone: newTone,
       }),
     []
   );
@@ -69,9 +82,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 "data-[state=closed]:animate-[toast-out_250ms_ease-in_both] data-[state=open]:animate-[toast-in_600ms_var(--ease-spring-toast)_both]"
               )}
             >
-              <div className="inset-shadow-0-1-0 inset-shadow-highlight/8 flex size-8 items-center justify-center rounded-lg bg-nero-100">
-                <CheckCircle />
-              </div>
+              {tone === "success" ? (
+                <div className="inset-shadow-0-1-0 inset-shadow-highlight/8 flex size-8 items-center justify-center rounded-lg bg-nero-100">
+                  <CheckCircle />
+                </div>
+              ) : null}
               <div className="flex flex-1 flex-col gap-1">
                 <ToastTitle className="font-semibold text-12/4 text-ink -tracking-[0.03em]">
                   {title}

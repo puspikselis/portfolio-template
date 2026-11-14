@@ -46,12 +46,16 @@ const DEFAULT_WIDTH = 248;
 const DEFAULT_HEIGHT = 156;
 const COARSE_POINTER_QUERY = "(pointer: coarse)";
 
+function isVideoSrc(src: string | undefined): src is string {
+  return Boolean(src?.endsWith(".webm"));
+}
+
 const VIDEO_PREVIEWS = [
   ...projects.map((project) => project.preview),
   ...businesses.flatMap((business) =>
     business.buttons.map((button) => button.preview?.image)
   ),
-].filter((src): src is string => Boolean(src?.endsWith(".webm")));
+].filter((src): src is string => isVideoSrc(src));
 
 export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CursorPreviewState>({
@@ -192,7 +196,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     [hidePreview, showPreview]
   );
 
-  const isVideo = state.image?.endsWith(".webm");
+  const isVideo = isVideoSrc(state.image);
 
   let media: ReactNode = null;
   if (state.image) {
