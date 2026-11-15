@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { businesses } from "@/data/businesses";
+import { GITHUB_PROFILE_URL, LINKEDIN_URL } from "@/lib/constants";
 import { buildPersonJsonLd } from "@/lib/json-ld";
 
 describe("Person JSON-LD", () => {
@@ -8,10 +9,7 @@ describe("Person JSON-LD", () => {
   const names = (orgs: { name: string }[]) => orgs.map((org) => org.name);
 
   test("sameAs lists only profiles", () => {
-    expect(person.sameAs).toEqual([
-      "https://www.linkedin.com/in/kristapskruze/",
-      "https://github.com/puspikselis",
-    ]);
+    expect(person.sameAs).toEqual([LINKEDIN_URL, GITHUB_PROFILE_URL]);
   });
 
   test("worksFor: the current employer plus every venture with its URL", () => {

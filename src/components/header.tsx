@@ -21,6 +21,49 @@ import {
   SITE_NAME,
 } from "@/lib/constants";
 
+interface HeaderLink {
+  /** Accessible name of the desktop button. */
+  ariaLabel: string;
+  href: string;
+  label: string;
+  /** Extra detail: the mobile option's suffix and the desktop tooltip. */
+  updated?: string;
+}
+
+/** External links, shown as a menu on mobile and as buttons from `md`. */
+const LINKS: readonly HeaderLink[] = [
+  {
+    ariaLabel: "Download Resume PDF",
+    href: RESUME_PATH,
+    label: "Resume",
+    updated: RESUME_UPDATED,
+  },
+  {
+    ariaLabel: "Visit LinkedIn profile",
+    href: LINKEDIN_URL,
+    label: "LinkedIn",
+  },
+];
+
+function HeaderLinkButton({ link }: { link: HeaderLink }) {
+  const button = (
+    <Button asChild className="group hidden md:inline-flex" variant="link">
+      <AppLink aria-label={link.ariaLabel} external href={link.href}>
+        <RollingText text={link.label} />
+      </AppLink>
+    </Button>
+  );
+  if (!link.updated) {
+    return button;
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent>Updated {link.updated}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 function handleLinksChange(e: ChangeEvent<HTMLSelectElement>) {
   if (e.target.value) {
     window.open(e.target.value, "_blank");
@@ -64,42 +107,17 @@ export function Header() {
             onChange={handleLinksChange}
           >
             <option value="">Links</option>
-            <option value={RESUME_PATH}>
-              Resume (updated {RESUME_UPDATED})
-            </option>
-            <option value={LINKEDIN_URL}>LinkedIn</option>
+            {LINKS.map((link) => (
+              <option key={link.href} value={link.href}>
+                {link.updated
+                  ? `${link.label} (updated ${link.updated})`
+                  : link.label}
+              </option>
+            ))}
           </select>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                className="group hidden md:inline-flex"
-                variant="link"
-              >
-                <AppLink
-                  aria-label="Download Resume PDF"
-                  external
-                  href={RESUME_PATH}
-                >
-                  <RollingText text="Resume" />
-                </AppLink>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Updated {RESUME_UPDATED}</TooltipContent>
-          </Tooltip>
-          <Button
-            asChild
-            className="group hidden md:inline-flex"
-            variant="link"
-          >
-            <AppLink
-              aria-label="Visit LinkedIn profile"
-              external
-              href={LINKEDIN_URL}
-            >
-              <RollingText text="LinkedIn" />
-            </AppLink>
-          </Button>
+          {LINKS.map((link) => (
+            <HeaderLinkButton key={link.href} link={link} />
+          ))}
           <Button onClick={openContact} variant="pill">
             Contact
           </Button>

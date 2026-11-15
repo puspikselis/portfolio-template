@@ -6,7 +6,9 @@ import { useCursorPreview } from "@/components/features/cursor-preview";
 import { AppLink } from "@/components/ui/app-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TagList } from "@/components/ui/tag-list";
-import { cn, getYear } from "@/lib/utils";
+import { YearLabel } from "@/components/ui/year-label";
+import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export interface EntryPreview {
   height?: number;
@@ -20,7 +22,8 @@ interface EntryCardProps {
   /** The whole card becomes a link to it. */
   cardHref?: string;
   className?: string;
-  color: string;
+  /** Logo tile and hover preview colour. */
+  color?: string;
   company: string;
   /** `cardHref` is another site: open it in a new tab. */
   external?: boolean;
@@ -43,7 +46,7 @@ export function EntryCard({
   actions,
   cardHref,
   className,
-  color,
+  color = DEFAULT_PREVIEW_COLOR,
   company,
   external,
   fallback = "?",
@@ -66,12 +69,7 @@ export function EntryCard({
 
   return (
     <div className={cn("space-y-6", className)}>
-      <p
-        className="font-medium text-13/4 text-dim-gray-100"
-        data-align-target={isFirst ? "true" : undefined}
-      >
-        <time dateTime={getYear(year)}>{year}</time>
-      </p>
+      <YearLabel isAlignTarget={isFirst} year={year} />
       <div
         className={cn(
           "relative flex items-center gap-4",

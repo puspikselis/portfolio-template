@@ -16,6 +16,7 @@ import {
 } from "react";
 
 import { CheckCircle } from "@/components/icons/check-circle";
+import { TEXT_CAPTION } from "@/lib/typography";
 import { cn } from "@/lib/utils";
 
 type ToastTone = "error" | "success";
@@ -92,7 +93,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   {title}
                 </ToastTitle>
                 {description ? (
-                  <ToastDescription className="font-medium text-12/4 text-dim-gray-100 -tracking-[0.03em]">
+                  <ToastDescription className={TEXT_CAPTION}>
                     {description}
                   </ToastDescription>
                 ) : null}

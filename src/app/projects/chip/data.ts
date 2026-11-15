@@ -1,3 +1,5 @@
+import { caseStudyImage } from "@/components/project-page";
+
 export const tags = [
   "Product design",
   "UX/UI Design",
@@ -8,7 +10,7 @@ export const tags = [
 ];
 
 export const images = [
-  {
+  caseStudyImage({
     alt: "Chip onboarding experience",
     description:
       "Conversational onboarding that walks users through bank connection and first savings goal.",
@@ -16,48 +18,39 @@ export const images = [
     id: "onboarding",
     src: "/images/chip/1-onboarding@3x.avif",
     title: "Onboarding",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip main interface showing savings chips",
     description:
       'The signature "chips" interface that shows savings progress with playful animation.',
-    height: 1872,
     id: "chips-interface",
     src: "/images/chip/2-chips@3x.avif",
     title: "Chips Interface",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip balance overview",
     description:
       "Balance overview with spending insights and savings progress.",
-    height: 1872,
     id: "balance",
     src: "/images/chip/3-balance@3x.avif",
     title: "Balance Overview",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip manual save feature",
     description: "Manual save with suggested amounts and one-tap saving.",
-    height: 1872,
     id: "manual-save",
     src: "/images/chip/4-manualSave@3x.avif",
     title: "Manual Save",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip X premium features",
     description:
       "Chip X premium tier with deeper analytics and higher savings limits.",
-    height: 1872,
     id: "chip-x",
     src: "/images/chip/5-chipX@3x.avif",
     title: "Chip X",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip savings goals",
     description:
       "Savings goals users can define and track, with clear progress indicators.",
@@ -65,25 +58,20 @@ export const images = [
     id: "goals",
     src: "/images/chip/6-goals@3x.avif",
     title: "Savings Goals",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip profile views",
     description: "Profile and settings for account management and preferences.",
-    height: 1872,
     id: "profile",
     src: "/images/chip/7-someProfileViews@3x.avif",
     title: "Profile & Settings",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Chip Android App designs",
     description:
       "Android app designed with Material guidelines, matching the iOS experience.",
-    height: 1872,
     id: "android",
     src: "/images/chip/8-androidDesigns@3x.avif",
     title: "Android App",
-    width: 2784,
-  },
+  }),
 ];

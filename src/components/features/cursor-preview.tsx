@@ -14,6 +14,7 @@ import {
 import { businesses } from "@/data/businesses";
 import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
@@ -60,6 +61,62 @@ const VIDEO_PREVIEWS = [
   ),
 ].filter((src): src is string => isVideoSrc(src));
 
+function isMediaReady(el: HTMLImageElement | HTMLVideoElement): boolean {
+  return el instanceof HTMLVideoElement
+    ? el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    : el.complete && el.naturalWidth > 0;
+}
+
+interface PreviewMediaProps {
+  height: number;
+  /** Called with `src` once the media has a frame to show (at once if cached). */
+  onLoaded: (src: string) => void;
+  src: string;
+  width: number;
+}
+
+function PreviewMedia({ height, onLoaded, src, width }: PreviewMediaProps) {
+  const mediaRef = useCallback(
+    (el: HTMLImageElement | HTMLVideoElement | null) => {
+      if (!el) {
+        return;
+      }
+      const markLoaded = () => onLoaded(src);
+      if (isMediaReady(el)) {
+        markLoaded();
+        return;
+      }
+      const event = el instanceof HTMLVideoElement ? "loadeddata" : "load";
+      el.addEventListener(event, markLoaded, { once: true });
+      return () => el.removeEventListener(event, markLoaded);
+    },
+    [onLoaded, src]
+  );
+
+  return isVideoSrc(src) ? (
+    <video
+      autoPlay
+      className="size-full rounded-2xl object-cover"
+      loop
+      muted
+      playsInline
+      ref={mediaRef}
+      src={src}
+    />
+  ) : (
+    // biome-ignore lint/performance/noImgElement: hand-made @2x/@3x files, no optimizer needed
+    <img
+      alt=""
+      className="size-full rounded-2xl object-cover"
+      height={height}
+      ref={mediaRef}
+      src={src}
+      srcSet={densitySrcSet(src)}
+      width={width}
+    />
+  );
+}
+
 export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CursorPreviewState>({
     color: DEFAULT_PREVIEW_COLOR,
@@ -68,7 +125,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     width: DEFAULT_WIDTH,
   });
 
-  const isCoarsePointerRef = useRef(false);
+  const isCoarsePointerRef = useRef(true);
   const isVisibleRef = useRef(false);
   const positionRef = useRef<HTMLDivElement>(null);
   // Set by the spring effect: jumps the preview to the cursor with no travel.
@@ -78,35 +135,37 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     isVisibleRef.current = state.isVisible;
   }, [state.isVisible]);
 
+  // Touch devices never show previews: hide one that is up when the pointer
+  // turns coarse, and skip the prefetch below.
+  const isCoarsePointer = useMediaQuery(COARSE_POINTER_QUERY);
   useEffect(() => {
-    const mql = window.matchMedia(COARSE_POINTER_QUERY);
-    isCoarsePointerRef.current = mql.matches;
-    // Hover previews mount on demand; prefetch the videos so the first hover
-    // plays at once. Touch devices never show previews, so they skip this.
-    const prefetched = mql.matches
-      ? []
-      : VIDEO_PREVIEWS.map((href) => {
-          const link = document.createElement("link");
-          link.rel = "prefetch";
-          link.as = "video";
-          link.href = href;
-          document.head.append(link);
-          return link;
-        });
-    const onChange = (e: MediaQueryListEvent) => {
-      isCoarsePointerRef.current = e.matches;
-      if (e.matches) {
-        setState((prev) => ({ ...prev, isVisible: false }));
-      }
-    };
-    mql.addEventListener("change", onChange);
+    isCoarsePointerRef.current = isCoarsePointer !== false;
+    if (isCoarsePointer) {
+      isVisibleRef.current = false;
+      setState((prev) => ({ ...prev, isVisible: false }));
+    }
+  }, [isCoarsePointer]);
+
+  // Hover previews mount on demand; prefetch the videos so the first hover
+  // plays at once.
+  useEffect(() => {
+    if (isCoarsePointer !== false) {
+      return;
+    }
+    const prefetched = VIDEO_PREVIEWS.map((href) => {
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.as = "video";
+      link.href = href;
+      document.head.append(link);
+      return link;
+    });
     return () => {
-      mql.removeEventListener("change", onChange);
       for (const link of prefetched) {
         link.remove();
       }
     };
-  }, []);
+  }, [isCoarsePointer]);
 
   useEffect(() => {
     const target = { x: 0, y: 0 };
@@ -139,8 +198,10 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     };
 
     const render = () => {
+      // Whole pixels on a 3D layer: a fractional offset made Chrome composite
+      // the video apart from its box, showing a band of the box colour.
       if (positionRef.current) {
-        positionRef.current.style.translate = `${pos.x}px ${pos.y}px`;
+        positionRef.current.style.transform = `translate3d(${Math.round(pos.x)}px, ${Math.round(pos.y)}px, 0)`;
       }
     };
 
@@ -220,31 +281,21 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     [hidePreview, showPreview]
   );
 
-  const isVideo = isVideoSrc(state.image);
+  // The box colour is only a loading placeholder: once the media has a frame
+  // the box goes transparent, so no colour can show around it.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const isLoaded = state.image !== undefined && loadedSrc === state.image;
 
-  let media: ReactNode = null;
-  if (state.image) {
-    media = isVideo ? (
-      <video
-        autoPlay
-        className="size-full object-cover"
-        loop
-        muted
-        playsInline
-        src={state.image}
-      />
-    ) : (
-      // biome-ignore lint/performance/noImgElement: hand-made @2x/@3x files, no optimizer needed
-      <img
-        alt=""
-        className="size-full object-cover"
-        height={state.height}
-        src={state.image}
-        srcSet={densitySrcSet(state.image)}
-        width={state.width}
-      />
-    );
-  }
+  // key={src}: a new preview never shows the old frame at the new size.
+  const media = state.image ? (
+    <PreviewMedia
+      height={state.height}
+      key={state.image}
+      onLoaded={setLoadedSrc}
+      src={state.image}
+      width={state.width}
+    />
+  ) : null;
 
   return (
     <CursorPreviewContext.Provider value={contextValue}>
@@ -257,7 +308,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         <div
           className="origin-top-left overflow-hidden rounded-2xl shadow-2xl"
           style={{
-            backgroundColor: state.color,
+            backgroundColor: isLoaded ? "transparent" : state.color,
             height: state.height,
             opacity: state.isVisible ? 1 : 0,
             scale: state.isVisible ? "1" : "0.9",

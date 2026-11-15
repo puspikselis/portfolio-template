@@ -9,6 +9,12 @@ import {
   YEARS_OF_EXPERIENCE,
 } from "@/lib/constants";
 
+// ImageResponse cannot read CSS variables, so these mirror globals.css tokens.
+const INK = "#ffffff"; // --color-ink
+const MUTED = "#9a9a9a"; // --color-nobel-100
+const GRADIENT_FROM = "#151515"; // --color-nero-300
+const GRADIENT_TO = "#262626"; // --color-nero-100
+
 export const alt = SITE_TITLE;
 export const size = OG_IMAGE_SIZE;
 export const contentType = "image/png";
@@ -17,8 +23,8 @@ export default function OpengraphImage() {
   return new ImageResponse(
     <div
       style={{
-        background: "linear-gradient(135deg, #151515 0%, #262626 100%)",
-        color: "white",
+        background: `linear-gradient(135deg, ${GRADIENT_FROM} 0%, ${GRADIENT_TO} 100%)`,
+        color: INK,
         display: "flex",
         flexDirection: "column",
         height: "100%",
@@ -29,7 +35,7 @@ export default function OpengraphImage() {
     >
       <div
         style={{
-          color: "#9a9a9a",
+          color: MUTED,
           display: "flex",
           fontSize: 28,
           fontWeight: 500,
@@ -40,7 +46,7 @@ export default function OpengraphImage() {
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <div
           style={{
-            color: "white",
+            color: INK,
             fontSize: 96,
             fontWeight: 600,
             letterSpacing: "-0.04em",
@@ -51,7 +57,7 @@ export default function OpengraphImage() {
         </div>
         <div
           style={{
-            color: "#9a9a9a",
+            color: MUTED,
             fontSize: 40,
             fontWeight: 500,
             letterSpacing: "-0.02em",

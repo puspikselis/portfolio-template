@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/lib/constants";
+import { TEXT_DISPLAY } from "@/lib/typography";
 
 interface Props {
   isOpen: boolean;
@@ -129,9 +130,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
             <div className="w-full max-w-136 space-y-12 px-8 py-12">
               <div className="space-y-2">
                 <DialogTitle asChild>
-                  <h2 className="font-medium text-28/10 text-ink -tracking-[0.01em]">
-                    Get in Touch
-                  </h2>
+                  <h2 className={TEXT_DISPLAY}>Get in Touch</h2>
                 </DialogTitle>
                 <DialogDescription asChild>
                   <p className="text-15/7 text-nobel-100 -tracking-[0.02em]">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Note } from "@/components/icons/note";
 import { AppLink } from "@/components/ui/app-link";
 import type { SpotifyData } from "@/lib/spotify";
+import { TEXT_CAPTION } from "@/lib/typography";
 import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL_MS = 30_000;
@@ -87,13 +88,6 @@ export function SpotifyStatus({ className }: { className?: string }) {
       </div>
     </AppLink>
   ) : (
-    <div
-      className={cn(
-        "font-medium text-12/4 text-dim-gray-100 -tracking-[0.03em]",
-        className
-      )}
-    >
-      Designer
-    </div>
+    <div className={cn(TEXT_CAPTION, className)}>Designer</div>
   );
 }

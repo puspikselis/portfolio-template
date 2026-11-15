@@ -1,6 +1,11 @@
 export const DEFAULT_PREVIEW_COLOR = "#1d1d1d";
 export const SITE_URL = "https://kristaps.kruze.lv";
 
+/** A site-relative path ("/sitemap.xml") as an absolute URL on SITE_URL. */
+export function absoluteUrl(path: string): string {
+  return `${SITE_URL}${path}`;
+}
+
 export const SITE_NAME = "Kristaps Krūze";
 export const SITE_ROLE = "Product Designer";
 export const SITE_TITLE = `${SITE_NAME} — ${SITE_ROLE}`;

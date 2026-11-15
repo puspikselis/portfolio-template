@@ -49,7 +49,7 @@ export interface SpotifyData {
 }
 
 /** The parts of Spotify's currently-playing payload we read (tracks and podcast episodes). */
-export interface NowPlayingPayload {
+interface NowPlayingPayload {
   is_playing?: boolean;
   item?: {
     artists?: { name: string }[];

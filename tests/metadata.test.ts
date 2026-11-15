@@ -1,8 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
 import { caseStudies } from "@/data/projects";
-import { SITE_TITLE } from "@/lib/constants";
-import { caseStudyMetadata, pageMetadata } from "@/lib/metadata";
+import { absoluteUrl, SITE_ROLE, SITE_TITLE } from "@/lib/constants";
+import {
+  caseStudyMetadata,
+  caseStudyPath,
+  caseStudyUrl,
+  pageMetadata,
+} from "@/lib/metadata";
 
 describe("pageMetadata", () => {
   const meta = pageMetadata({
@@ -35,7 +40,7 @@ describe("case study metadata", () => {
   test("every case study gets its own og:url and title", () => {
     for (const { company, slug } of caseStudies) {
       const meta = caseStudyMetadata(slug);
-      expect(meta.openGraph?.url).toBe(`/projects/${slug}`);
+      expect(meta.openGraph?.url).toBe(caseStudyPath(slug));
       expect(String(meta.openGraph?.title)).toStartWith(company);
       expect(meta.openGraph?.title).not.toBe(SITE_TITLE);
     }
@@ -50,14 +55,12 @@ describe("case study metadata", () => {
   });
 
   test("site title names the role", () => {
-    expect(SITE_TITLE).toBe("Kristaps Krūze — Product Designer");
+    expect(SITE_TITLE).toContain(SITE_ROLE);
   });
 });
 
 describe("caseStudyUrl", () => {
-  test("is the site URL plus the case study path", async () => {
-    const { caseStudyPath, caseStudyUrl } = await import("@/lib/metadata");
-    const { SITE_URL } = await import("@/lib/constants");
-    expect(caseStudyUrl("chip")).toBe(`${SITE_URL}${caseStudyPath("chip")}`);
+  test("is the case study path on the site URL", () => {
+    expect(caseStudyUrl("chip")).toBe(absoluteUrl(caseStudyPath("chip")));
   });
 });

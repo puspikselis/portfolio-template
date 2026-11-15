@@ -5,8 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EntryAction } from "@/components/entry-action";
 import { EntryCard } from "@/components/entry-card";
 import { Button } from "@/components/ui/button";
+import { Section } from "@/components/ui/section";
 import { projects } from "@/data/projects";
-import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { caseStudyPath } from "@/lib/metadata";
 import { getYears } from "@/lib/utils";
 
@@ -27,7 +27,6 @@ function ProjectCard({
   project: (typeof projects)[number];
   isFirst?: boolean;
 }) {
-  const previewColor = project.color || DEFAULT_PREVIEW_COLOR;
   const buttonLabel =
     project.buttonLabel ??
     fallbackButtonLabel(Boolean(project.slug), project.comingSoon);
@@ -45,7 +44,7 @@ function ProjectCard({
         ) : null
       }
       cardHref={href}
-      color={previewColor}
+      color={project.color}
       company={project.company}
       fallback={project.Icon ? <project.Icon /> : undefined}
       image={project.image}
@@ -81,15 +80,12 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
   const latestEarlierYear = Math.max(...earlierYears.map(Number));
 
   return (
-    <section
-      aria-labelledby="projects-heading"
+    <Section
       className="narrow-container"
-      data-color="var(--color-orange-100)"
-      data-title={title}
+      color="var(--color-orange-100)"
+      headingId="projects-heading"
+      title={title}
     >
-      <h2 className="sr-only" id="projects-heading">
-        {title}
-      </h2>
       <div className="space-y-14">
         {recent.map((project, index) => (
           <ProjectCard
@@ -130,6 +126,6 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
           )}
         </>
       )}
-    </section>
+    </Section>
   );
 }

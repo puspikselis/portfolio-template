@@ -1,3 +1,5 @@
+import { caseStudyImage } from "@/components/project-page";
+
 export const tags = [
   "Product design",
   "Design leadership",
@@ -26,17 +28,15 @@ Kristaps was an engaged and valued team member during his time at Paynt and I am
 };
 
 export const images = [
-  {
+  caseStudyImage({
     alt: "Paynt marketing website",
     description:
       "Marketing website presenting Paynt's payment solutions to prospective merchants.",
-    height: 1872,
     id: "website",
     src: "/images/paynt/1-website@3x.avif",
     title: "Marketing Website",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Paynt POS Application interface",
     description:
       "Point-of-sale app for merchants, built for fast, error-free transactions.",
@@ -44,9 +44,8 @@ export const images = [
     id: "pos-app",
     src: "/images/paynt/2-posApplication@3x.avif",
     title: "POS Application",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Paynt product screenshots",
     description:
       "Merchant dashboards and transaction flows for the payment platform.",
@@ -54,9 +53,8 @@ export const images = [
     id: "product-screens",
     src: "/images/paynt/3-someImages@3x.avif",
     title: "Product Interfaces",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Paynt merchant onboarding portal",
     description:
       "Internal portal that streamlines bringing new merchants onto the platform.",
@@ -64,19 +62,16 @@ export const images = [
     id: "onboarding-portal",
     src: "/images/paynt/4-merchantOnboardingPortal@3x.avif",
     title: "Merchant Onboarding Portal",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Paynt design system",
     description:
       "Design system keeping Paynt products and marketing materials consistent.",
-    height: 1872,
     id: "design-system",
     src: "/images/paynt/5-designSystem@3x.avif",
     title: "Design System",
-    width: 2784,
-  },
-  {
+  }),
+  caseStudyImage({
     alt: "Paynt merchant onboarding form",
     description:
       "Merchant onboarding form with clear structure and forgiving validation.",
@@ -84,6 +79,5 @@ export const images = [
     id: "onboarding-form",
     src: "/images/paynt/6-merchantOnboardingForm@3x.avif",
     title: "Merchant Onboarding Form",
-    width: 2784,
-  },
+  }),
 ];

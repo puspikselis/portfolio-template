@@ -1,12 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-
 import { EntryAction } from "@/components/entry-action";
 import { EntryCard } from "@/components/entry-card";
 import { AppStoreIcon, PlayStoreIcon } from "@/components/icons/store-icons";
+import { Section } from "@/components/ui/section";
 import { businesses, type Platform } from "@/data/businesses";
-import { DEFAULT_PREVIEW_COLOR, MD_BREAKPOINT_QUERY } from "@/lib/constants";
+import { MD_BREAKPOINT_QUERY } from "@/lib/constants";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 const STORE_ICONS = {
   appStore: AppStoreIcon,
@@ -16,17 +16,7 @@ const STORE_ICONS = {
 const IOS_RE = /iphone|ipad|ipod/;
 const ANDROID_RE = /android/;
 
-function subscribeToBreakpoint(onChange: () => void) {
-  const mql = window.matchMedia(MD_BREAKPOINT_QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-// Below `md`, phones only see their own store's button.
 function detectPlatform(): Platform | null {
-  if (window.matchMedia(MD_BREAKPOINT_QUERY).matches) {
-    return null;
-  }
   const ua = window.navigator.userAgent.toLowerCase();
   if (IOS_RE.test(ua)) {
     return "ios";
@@ -37,18 +27,12 @@ function detectPlatform(): Platform | null {
   return null;
 }
 
-// The server and the hydrating client both render every button; the
-// platform filter applies right after hydration.
-function noPlatform(): Platform | null {
-  return null;
-}
-
-function usePlatform() {
-  return useSyncExternalStore(
-    subscribeToBreakpoint,
-    detectPlatform,
-    noPlatform
-  );
+// Below `md`, phones only see their own store's button. The server and the
+// hydrating client (isDesktop null) render every button; the filter applies
+// right after hydration.
+function usePlatform(): Platform | null {
+  const isDesktop = useMediaQuery(MD_BREAKPOINT_QUERY);
+  return isDesktop === false ? detectPlatform() : null;
 }
 
 function BusinessCard({
@@ -58,8 +42,6 @@ function BusinessCard({
   business: (typeof businesses)[number];
   isFirst?: boolean;
 }) {
-  const previewColor = business.color || DEFAULT_PREVIEW_COLOR;
-
   const platform = usePlatform();
   const irrelevant: Platform | null =
     platform && (platform === "ios" ? "android" : "ios");
@@ -85,7 +67,7 @@ function BusinessCard({
       actions={actions.length > 0 ? actions : null}
       cardHref={business.website}
       className="not-first-of-type:before:my-7 not-first-of-type:before:block not-first-of-type:before:h-px not-first-of-type:before:w-full not-first-of-type:before:bg-nero-400 not-first-of-type:before:content-['']"
-      color={previewColor}
+      color={business.color}
       company={business.company}
       external
       image={business.image}
@@ -100,15 +82,12 @@ function BusinessCard({
 
 export function Businesses() {
   return (
-    <section
-      aria-labelledby="businesses-heading"
+    <Section
       className="inset-shadow-0-1-0 inset-shadow-highlight/4 mx-auto max-w-152 bg-nero-300 px-8 py-8 md:rounded-3xl md:px-8"
-      data-color="var(--color-orange-100)"
-      data-title="Ventures"
+      color="var(--color-orange-100)"
+      headingId="businesses-heading"
+      title="Ventures"
     >
-      <h2 className="sr-only" id="businesses-heading">
-        Ventures
-      </h2>
       {businesses.map((business, index) => (
         <BusinessCard
           business={business}
@@ -116,6 +95,6 @@ export function Businesses() {
           key={business.id}
         />
       ))}
-    </section>
+    </Section>
   );
 }

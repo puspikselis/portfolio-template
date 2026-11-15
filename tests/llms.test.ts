@@ -6,9 +6,9 @@ import {
   LINKEDIN_URL,
   SITE_NAME,
   SITE_ROLE,
-  SITE_URL,
 } from "@/lib/constants";
 import { buildLlmsTxt } from "@/lib/llms";
+import { caseStudyUrl } from "@/lib/metadata";
 
 describe("llms.txt", () => {
   const text = buildLlmsTxt();
@@ -21,7 +21,7 @@ describe("llms.txt", () => {
   test("links every case study and both profiles", () => {
     expect(caseStudies.length).toBe(3);
     for (const { slug } of caseStudies) {
-      expect(text).toContain(`${SITE_URL}/projects/${slug}`);
+      expect(text).toContain(caseStudyUrl(slug));
     }
     expect(text).toContain(LINKEDIN_URL);
     expect(text).toContain(GITHUB_PROFILE_URL);

@@ -107,7 +107,6 @@ export const businesses: Business[] = [
         },
       },
     ],
-    color: "#1d1d1d",
     company: "Eloking",
     id: 2,
     image: "/images/eloking.avif",

@@ -1,17 +1,22 @@
 import { type ClassValue, clsx } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
+// Must list every --text-* and --inset-shadow-* token in globals.css
+// (tests/utils.test.ts checks), or tailwind-merge misreads them as colours.
+export const FONT_SIZE_TOKENS = ["12", "13", "15", "28"];
+export const INSET_SHADOW_TOKENS = ["0-1-0"];
+
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       "font-size": [
         {
-          text: ["12", "13", "15", "28"],
+          text: FONT_SIZE_TOKENS,
         },
       ],
       "inset-shadow": [
         {
-          "inset-shadow": ["0-1-0"],
+          "inset-shadow": INSET_SHADOW_TOKENS,
         },
       ],
     },

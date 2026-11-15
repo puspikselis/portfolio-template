@@ -1,5 +1,7 @@
 import { QuoteIcon } from "@/components/icons/quote-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Section } from "@/components/ui/section";
+import { TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
 import { cn, densitySrcSet } from "@/lib/utils";
 
 /** Splits a paragraph into lines; every line but the last ends in a <br>. */
@@ -26,14 +28,11 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
   const paragraphs = children.split("\n\n").filter(Boolean);
 
   return (
-    <section
-      aria-labelledby="testimonial-heading"
+    <Section
       className={cn("narrow-container", className)}
-      data-title="Reference"
+      headingId="testimonial-heading"
+      title="Reference"
     >
-      <h2 className="sr-only" id="testimonial-heading">
-        Reference
-      </h2>
       <figure className="relative">
         {/* Inline on purpose: it keeps the line box the old wrapper div had. */}
         <QuoteIcon className="mb-9 size-5 text-dim-gray-100 md:absolute md:top-2 md:-left-24 md:mb-0" />
@@ -41,7 +40,10 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
         <blockquote className="space-y-4">
           {paragraphs.map((paragraph) => (
             <p
-              className="font-medium not-first:text-15/7 not-first:text-nobel-100 text-28/10 text-ink -tracking-[0.01em] not-first:-tracking-[0.02em]"
+              className={cn(
+                TEXT_DISPLAY,
+                "not-first:text-15/7 not-first:text-nobel-100 not-first:-tracking-[0.02em]"
+              )}
               key={paragraph.slice(0, 50)}
             >
               {toLines(paragraph).map((line) => (
@@ -72,12 +74,10 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
             <p className="font-semibold text-13/4 text-ink -tracking-[0.03em]">
               {author.name}
             </p>
-            <p className="font-medium text-12/4 text-dim-gray-100 -tracking-[0.03em]">
-              {author.title}
-            </p>
+            <p className={TEXT_CAPTION}>{author.title}</p>
           </div>
         </figcaption>
       </figure>
-    </section>
+    </Section>
   );
 }

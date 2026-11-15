@@ -16,7 +16,7 @@ import {
   SITE_URL,
 } from "@/lib/constants";
 import { AUTHOR, buildPersonJsonLd, schemaNode } from "@/lib/json-ld";
-import { OPEN_GRAPH_BASE, TWITTER_BASE } from "@/lib/metadata";
+import { socialMetadata } from "@/lib/metadata";
 
 import "./globals.css";
 
@@ -38,12 +38,6 @@ export const metadata: Metadata = {
     icon: "/favicon/icon.png",
   },
   metadataBase: new URL(SITE_URL),
-  openGraph: {
-    ...OPEN_GRAPH_BASE,
-    description: SITE_DESCRIPTION,
-    title: SITE_TITLE,
-    url: SITE_URL,
-  },
   publisher: SITE_NAME,
   robots: {
     follow: true,
@@ -57,11 +51,11 @@ export const metadata: Metadata = {
     index: true,
   },
   title: SITE_TITLE,
-  twitter: {
-    ...TWITTER_BASE,
+  ...socialMetadata({
     description: SITE_DESCRIPTION,
     title: SITE_TITLE,
-  },
+    url: SITE_URL,
+  }),
 };
 
 const websiteJsonLd = schemaNode("WebSite", {

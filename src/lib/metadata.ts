@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 import { getCaseStudy } from "@/data/projects";
 import {
+  absoluteUrl,
   OG_IMAGE_SIZE,
   SITE_NAME,
   SITE_TITLE,
-  SITE_URL,
 } from "@/lib/constants";
 
 // A page that sets its own `openGraph`/`twitter` replaces the root ones, which
@@ -15,17 +15,36 @@ function socialCard(url: string) {
 }
 
 /** Open Graph fields every page shares; pages add their own title, description and URL. */
-export const OPEN_GRAPH_BASE = {
+const OPEN_GRAPH_BASE = {
   images: socialCard("/opengraph-image"),
   locale: "en_US",
   siteName: SITE_TITLE,
   type: "website",
 } as const;
 
-export const TWITTER_BASE = {
+const TWITTER_BASE = {
   card: "summary_large_image",
   images: socialCard("/twitter-image"),
 } as const;
+
+interface SocialInput {
+  description: string;
+  title: string;
+  /** og:url; a path is resolved against metadataBase. */
+  url: string;
+}
+
+/** Open Graph and Twitter tags, the one place social fields are built. */
+export function socialMetadata({
+  description,
+  title,
+  url,
+}: SocialInput): Pick<Metadata, "openGraph" | "twitter"> {
+  return {
+    openGraph: { ...OPEN_GRAPH_BASE, description, title, url },
+    twitter: { ...TWITTER_BASE, description, title },
+  };
+}
 
 interface PageMetadataInput {
   description: string;
@@ -43,9 +62,8 @@ export function pageMetadata({
   return {
     alternates: { canonical: path },
     description,
-    openGraph: { ...OPEN_GRAPH_BASE, description, title, url: path },
     title,
-    twitter: { ...TWITTER_BASE, description, title },
+    ...socialMetadata({ description, title, url: path }),
   };
 }
 
@@ -55,10 +73,10 @@ export function caseStudyPath(slug: string): string {
 
 /** Absolute URL of a case study page. */
 export function caseStudyUrl(slug: string): string {
-  return `${SITE_URL}${caseStudyPath(slug)}`;
+  return absoluteUrl(caseStudyPath(slug));
 }
 
-export function caseStudyTitle(slug: string): string {
+function caseStudyTitle(slug: string): string {
   const { company, title } = getCaseStudy(slug);
   return `${company} - ${title} | ${SITE_NAME}`;
 }

@@ -9,7 +9,8 @@ import {
 
 interface Project {
   buttonLabel?: string;
-  color: string;
+  /** Logo tile and hover preview colour; defaults to DEFAULT_PREVIEW_COLOR. */
+  color?: string;
   comingSoon?: boolean;
   company: string;
   /** Meta description of the case study page (140-155 characters). */
@@ -46,7 +47,6 @@ export const projects: Project[] = [
     year: "Since 2025",
   },
   {
-    color: "#1d1d1d",
     company: "Centus",
     description:
       "Centus is a localization platform that helps teams ship multilingual products faster. As Lead Designer I led its product work from concept to launch.",
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     year: "2022 - 2023",
   },
   {
-    color: "#ebb5b1",
+    color: "var(--color-paynt-100)",
     company: "Paynt",
     description:
       "Paydoo, now Paynt, is a European payments acquirer. As Lead Designer I led product and brand work, including the company rebrand from Paydoo to Paynt.",
@@ -84,7 +84,7 @@ export const projects: Project[] = [
     year: "2018 - 2021",
   },
   {
-    color: "#1bceae",
+    color: "var(--color-chip-100)",
     company: "Chip",
     description:
       "Chip is an automated savings app that analyzes spending and moves affordable amounts into savings. As Lead Designer I led its product and brand work.",
@@ -98,7 +98,6 @@ export const projects: Project[] = [
     year: "2018",
   },
   {
-    color: "#1d1d1d",
     company: "Showroom",
     id: 5,
     image: "/images/showroom.avif",
@@ -125,7 +124,6 @@ export const projects: Project[] = [
     year: "2013",
   },
   {
-    color: "#1d1d1d",
     company: "Draugiem Group",
     id: 8,
     image: "/images/draugiem-group.avif",

@@ -4,13 +4,16 @@ import type { ReactNode } from "react";
 import { FloatingThingy } from "@/components/features/floating-thingy";
 import { JsonLd } from "@/components/inline-scripts";
 import { Projects } from "@/components/projects";
+import { Section } from "@/components/ui/section";
 import { TagChip } from "@/components/ui/tag-chip";
 import { Testimonial } from "@/components/ui/testimonial";
+import { YearLabel } from "@/components/ui/year-label";
 import { getCaseStudy } from "@/data/projects";
 import { MD_BREAKPOINT_QUERY, SITE_URL } from "@/lib/constants";
 import { AUTHOR, schemaNode } from "@/lib/json-ld";
 import { caseStudyUrl } from "@/lib/metadata";
-import { getYear } from "@/lib/utils";
+import { TEXT_DISPLAY } from "@/lib/typography";
+import { cn, getYear } from "@/lib/utils";
 
 interface ProjectImage {
   alt: string;
@@ -20,6 +23,16 @@ interface ProjectImage {
   src: string;
   title: string;
   width: number;
+}
+
+// Case study screenshots are exported at 2784x1872 (928x624 @3x); tall ones override the height.
+const CASE_STUDY_IMAGE_SIZE = { height: 1872, width: 2784 };
+
+/** One gallery image at the default export size, unless it sets its own height. */
+export function caseStudyImage(
+  image: Omit<ProjectImage, "height" | "width"> & { height?: number }
+): ProjectImage {
+  return { ...CASE_STUDY_IMAGE_SIZE, ...image };
 }
 
 interface TestimonialData {
@@ -71,18 +84,10 @@ export function ProjectPage({
       <FloatingThingy />
       <JsonLd data={jsonLd} />
       <main className="pt-15 pb-42">
-        <section
-          className="narrow-container"
-          data-color={color}
-          data-title="Intro"
-        >
+        <Section className="narrow-container" color={color} title="Intro">
           <div>
-            <p className="font-medium text-13/4 text-dim-gray-100">
-              <time dateTime={startYear}>{year}</time>
-            </p>
-            <h1 className="mt-2 font-medium text-28/10 text-ink -tracking-[0.01em]">
-              {name}
-            </h1>
+            <YearLabel year={year} />
+            <h1 className={cn("mt-2", TEXT_DISPLAY)}>{name}</h1>
             <div className="mt-4 space-y-4 *:text-15/7 *:text-nobel-100 *:-tracking-[0.02em]">
               {children}
             </div>
@@ -92,7 +97,7 @@ export function ProjectPage({
               <TagChip key={tag}>{tag}</TagChip>
             ))}
           </ul>
-        </section>
+        </Section>
         <section
           aria-label="Project Gallery"
           className="mt-20 space-y-3 px-5 md:mx-auto md:mt-37 md:max-w-232 md:px-0"
