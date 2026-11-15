@@ -84,8 +84,9 @@ describe("shared type styles survive cn", () => {
   });
 
   test("an override colour replaces the display ink", () => {
+    const withoutInk = TEXT_DISPLAY.split(" ").filter((c) => c !== "text-ink");
     expect(cn(TEXT_DISPLAY, "text-nobel-100")).toBe(
-      "font-medium text-28/10 -tracking-[0.01em] text-nobel-100"
+      [...withoutInk, "text-nobel-100"].join(" ")
     );
   });
 });

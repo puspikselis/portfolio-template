@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { type ChangeEvent, useCallback, useState } from "react";
 import { ContactDialog } from "@/components/dialogs/contact-dialog";
 import { SpotifyStatus } from "@/components/features/spotify-status";
@@ -81,7 +80,7 @@ export function Header() {
       <header className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between bg-canvas p-5 md:sticky md:top-0 md:bg-transparent md:px-12 md:py-8">
         {/* One home link covers avatar and name; the status sits over its empty top-right cell. */}
         <div className="group grid grid-cols-[auto_auto] items-center gap-x-3">
-          <Link
+          <AppLink
             className="focus-ring col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
             href="/"
           >
@@ -97,7 +96,7 @@ export function Header() {
               className="col-start-2 row-start-2 self-start font-semibold text-13/4 text-ink"
               text={SITE_NAME}
             />
-          </Link>
+          </AppLink>
           <SpotifyStatus className="col-start-2 row-start-1 self-end" />
         </div>
         <nav aria-label="Primary" className="flex items-center md:gap-5">

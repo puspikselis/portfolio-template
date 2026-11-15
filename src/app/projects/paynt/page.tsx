@@ -9,8 +9,6 @@ export const metadata = caseStudyMetadata("paynt");
 export default function Paynt() {
   return (
     <ProjectPage
-      color="var(--color-paynt-100)"
-      imageColor="var(--color-paynt-100)"
       images={images}
       slug="paynt"
       tags={tags}

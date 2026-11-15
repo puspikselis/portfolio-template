@@ -14,9 +14,9 @@ const buttonVariants = cva(
         link: "text-12 text-nobel-100 hover:text-ink",
         outline:
           "h-12 rounded-full border border-nero-400 px-6 text-13/4 text-nobel-100 hover:bg-nero-300 hover:text-ink focus-visible:bg-nero-300 focus-visible:text-ink",
-        pill: "inset-shadow-0-1-0 inset-shadow-highlight/8 h-9 rounded-full bg-nero-100 inactive:bg-nero-300 px-4 inactive:text-dim-gray-100 text-12 text-ink hover:bg-nero-200",
+        pill: "inset-highlight h-9 rounded-full bg-nero-100 inactive:bg-nero-300 px-4 inactive:text-dim-gray-100 text-12 text-ink hover:bg-nero-200",
         pillLg:
-          "inset-shadow-0-1-0 inset-shadow-highlight/8 h-12 rounded-full bg-ink inactive:bg-nero-300 px-6 inactive:text-dim-gray-100 text-13/4 text-nero-100 inactive:opacity-50 hover:bg-ink/90",
+          "inset-highlight h-12 rounded-full bg-ink inactive:bg-nero-300 px-6 inactive:text-dim-gray-100 text-13/4 text-nero-100 inactive:opacity-50 hover:bg-ink/90",
       },
     },
   }

@@ -17,11 +17,13 @@ describe("Person JSON-LD", () => {
       "Ubiquiti",
       ...businesses.map((business) => business.company),
     ]);
-    expect(person.worksFor).toContainEqual({
-      "@type": "Organization",
-      name: "Wisp",
-      url: "https://heywisp.com",
-    });
+    for (const business of businesses) {
+      expect(person.worksFor).toContainEqual({
+        "@type": "Organization",
+        name: business.company,
+        url: business.website,
+      });
+    }
   });
 
   test("alumniOf: past employers only", () => {

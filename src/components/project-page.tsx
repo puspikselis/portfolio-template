@@ -12,7 +12,7 @@ import { getCaseStudy } from "@/data/projects";
 import { MD_BREAKPOINT_QUERY, SITE_URL } from "@/lib/constants";
 import { AUTHOR, schemaNode } from "@/lib/json-ld";
 import { caseStudyUrl } from "@/lib/metadata";
-import { TEXT_DISPLAY } from "@/lib/typography";
+import { TEXT_BODY, TEXT_DISPLAY } from "@/lib/typography";
 import { cn, getYear } from "@/lib/utils";
 
 interface ProjectImage {
@@ -42,7 +42,9 @@ interface TestimonialData {
 
 interface ProjectPageProps {
   children: ReactNode;
-  color: string;
+  /** Floating label colour of the intro; defaults to the project's colour. */
+  color?: string;
+  /** Floating label colour over the gallery; defaults to the project's colour. */
   imageColor?: string;
   images: readonly ProjectImage[];
   /** Key into the projects data, which supplies the name and years. */
@@ -53,14 +55,17 @@ interface ProjectPageProps {
 
 export function ProjectPage({
   children,
-  color,
-  imageColor,
+  color: colorProp,
+  imageColor: imageColorProp,
   images,
   slug,
   tags,
   testimonial,
 }: ProjectPageProps) {
-  const { company: name, year } = getCaseStudy(slug);
+  const project = getCaseStudy(slug);
+  const { company: name, year } = project;
+  const color = colorProp ?? project.color;
+  const imageColor = imageColorProp ?? project.color;
   const url = caseStudyUrl(slug);
   const startYear = getYear(year);
 
@@ -88,9 +93,8 @@ export function ProjectPage({
           <div>
             <YearLabel year={year} />
             <h1 className={cn("mt-2", TEXT_DISPLAY)}>{name}</h1>
-            <div className="mt-4 space-y-4 *:text-15/7 *:text-nobel-100 *:-tracking-[0.02em]">
-              {children}
-            </div>
+            {/* Body copy is inherited by every paragraph the page passes in. */}
+            <div className={cn("mt-4 space-y-4", TEXT_BODY)}>{children}</div>
           </div>
           <ul className="mt-11 flex flex-wrap gap-2">
             {tags.map((tag) => (

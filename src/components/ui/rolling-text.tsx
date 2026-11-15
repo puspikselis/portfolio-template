@@ -8,7 +8,8 @@ interface RollingTextProps {
   text: string;
 }
 
-// 0.3s on --ease-out-cubic with a 15ms/char stagger.
+const STAGGER_MS = 15;
+// 0.3s on --ease-out-cubic, staggered STAGGER_MS per character.
 const CHAR_CLASSES =
   "inline-block transition-[translate,opacity,filter] duration-300 ease-out-cubic";
 
@@ -21,7 +22,7 @@ export function RollingText({ className, text }: RollingTextProps) {
         {toCharItems(text).map(({ char, id, position }) => {
           const shown = displayChar(char);
           const style: CSSProperties = {
-            transitionDelay: `${position * 15}ms`,
+            transitionDelay: `${position * STAGGER_MS}ms`,
           };
           return (
             <CharSlot key={id}>

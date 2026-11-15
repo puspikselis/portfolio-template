@@ -11,6 +11,11 @@
   }
 }
 
+/* The 1px top-edge highlight on raised controls; works under variants (after:). */
+@utility inset-highlight {
+  @apply inset-shadow-0-1-0 inset-shadow-highlight/8;
+}
+
 @theme inline {
   --color-canvas: #000000;
   --color-ink: #ffffff;

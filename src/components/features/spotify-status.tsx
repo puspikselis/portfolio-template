@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Note } from "@/components/icons/note";
 import { AppLink } from "@/components/ui/app-link";
 import type { SpotifyData } from "@/lib/spotify";
-import { TEXT_CAPTION } from "@/lib/typography";
+import { TEXT_CAPTION, TEXT_CAPTION_BASE } from "@/lib/typography";
 import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL_MS = 30_000;
@@ -75,7 +75,9 @@ export function SpotifyStatus({ className }: { className?: string }) {
         <Note />
       </div>
       <div className="relative max-w-20 overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap font-medium text-12/4 -tracking-[0.03em]">
+        <div
+          className={cn("animate-marquee whitespace-nowrap", TEXT_CAPTION_BASE)}
+        >
           {[0, 1].map((i) => (
             <span aria-hidden={i > 0 || undefined} className="pr-6" key={i}>
               <span className="text-nobel-100">Listening to </span>

@@ -16,7 +16,7 @@ function Avatar({
   return (
     <AvatarRootPrimitive
       className={cn(
-        'relative flex size-8 shrink-0 overflow-hidden rounded-full after:pointer-events-none after:absolute after:inset-0 after:inset-shadow-0-1-0 after:inset-shadow-highlight/8 after:rounded-[inherit] after:content-[""]',
+        'relative flex size-8 shrink-0 overflow-hidden rounded-full after:pointer-events-none after:absolute after:inset-0 after:inset-highlight after:rounded-[inherit] after:content-[""]',
         className
       )}
       data-slot="avatar"

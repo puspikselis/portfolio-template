@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 
 interface SectionProps extends Omit<ComponentProps<"section">, "title"> {
-  /** `data-color` for the floating label while this section is in view. */
+  /** `data-color` for the floating label while this section is in view; the orange accent by default. */
   color?: string;
   /** Renders `title` as a visually hidden h2 with this id and labels the section with it. */
   headingId?: string;
@@ -12,7 +12,7 @@ interface SectionProps extends Omit<ComponentProps<"section">, "title"> {
 /** A page section the floating label tracks, optionally with a screen-reader heading. */
 export function Section({
   children,
-  color,
+  color = "var(--color-orange-100)",
   headingId,
   title,
   ...props

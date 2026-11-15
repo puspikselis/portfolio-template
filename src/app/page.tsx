@@ -17,11 +17,7 @@ export default function Home() {
     <>
       <FloatingThingy />
       <main className="pt-13 pb-42">
-        <Section
-          className="narrow-container space-y-4"
-          color="var(--color-orange-100)"
-          title="Intro"
-        >
+        <Section className="narrow-container space-y-4" title="Intro">
           <h1 className={TEXT_DISPLAY}>
             Product designer with {YEARS_OF_EXPERIENCE} years of experience
             based in Latvia. I design digital products people enjoy using.

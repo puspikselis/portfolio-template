@@ -1,7 +1,7 @@
 import { QuoteIcon } from "@/components/icons/quote-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Section } from "@/components/ui/section";
-import { TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
+import { TEXT_BODY, TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
 import { cn, densitySrcSet } from "@/lib/utils";
 
 /** Splits a paragraph into lines; every line but the last ends in a <br>. */
@@ -30,6 +30,7 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
   return (
     <Section
       className={cn("narrow-container", className)}
+      color="var(--color-dim-gray-100)"
       headingId="testimonial-heading"
       title="Reference"
     >
@@ -38,12 +39,11 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
         <QuoteIcon className="mb-9 size-5 text-dim-gray-100 md:absolute md:top-2 md:-left-24 md:mb-0" />
 
         <blockquote className="space-y-4">
-          {paragraphs.map((paragraph) => (
+          {paragraphs.map((paragraph, index) => (
             <p
-              className={cn(
-                TEXT_DISPLAY,
-                "not-first:text-15/7 not-first:text-nobel-100 not-first:-tracking-[0.02em]"
-              )}
+              className={
+                index === 0 ? TEXT_DISPLAY : cn("font-medium", TEXT_BODY)
+              }
               key={paragraph.slice(0, 50)}
             >
               {toLines(paragraph).map((line) => (

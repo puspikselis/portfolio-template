@@ -46,9 +46,13 @@ const DAMPING = 2 * Math.sqrt(STIFFNESS);
 // Gap between the cursor tip and the preview's top-left corner.
 const CURSOR_OFFSET = 12;
 
+// Previews without their own size in the data use these.
 const DEFAULT_WIDTH = 248;
 const DEFAULT_HEIGHT = 156;
 const COARSE_POINTER_QUERY = "(pointer: coarse)";
+const MEDIA_CLASSES = "size-full rounded-2xl object-cover";
+// easeOutQuint for the show/hide fade and scale.
+const EASE = "cubic-bezier(0.22,1,0.36,1)";
 
 function isVideoSrc(src: string | undefined): src is string {
   return Boolean(src?.endsWith(".webm"));
@@ -96,7 +100,7 @@ function PreviewMedia({ height, onLoaded, src, width }: PreviewMediaProps) {
   return isVideoSrc(src) ? (
     <video
       autoPlay
-      className="size-full rounded-2xl object-cover"
+      className={MEDIA_CLASSES}
       loop
       muted
       playsInline
@@ -107,7 +111,7 @@ function PreviewMedia({ height, onLoaded, src, width }: PreviewMediaProps) {
     // biome-ignore lint/performance/noImgElement: hand-made @2x/@3x files, no optimizer needed
     <img
       alt=""
-      className="size-full rounded-2xl object-cover"
+      className={MEDIA_CLASSES}
       height={height}
       ref={mediaRef}
       src={src}
@@ -314,8 +318,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
             scale: state.isVisible ? "1" : "0.9",
             // No blur filter: filtering a playing <video> made Chrome draw it
             // shifted inside its box during the transition.
-            transition:
-              "opacity 200ms cubic-bezier(0.22,1,0.36,1), scale 200ms cubic-bezier(0.22,1,0.36,1)",
+            transition: `opacity 200ms ${EASE}, scale 200ms ${EASE}`,
             width: state.width,
           }}
         >

@@ -16,6 +16,7 @@ import {
 } from "react";
 
 import { CheckCircle } from "@/components/icons/check-circle";
+import { CORNER_INSET } from "@/lib/styles";
 import { TEXT_CAPTION } from "@/lib/typography";
 import { cn } from "@/lib/utils";
 
@@ -77,14 +78,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <ToastRoot asChild duration={4000} onOpenChange={setOpen} open={open}>
             <div
               className={cn(
-                "inset-shadow-0-1-0 inset-shadow-highlight/8",
-                "fixed top-5 right-5 z-50 flex h-15 w-76 items-center justify-center gap-3 rounded-2xl bg-nero-300 p-3",
-                "md:top-8 md:right-12",
+                "fixed inset-highlight z-50 flex h-15 w-76 items-center justify-center gap-3 rounded-2xl bg-nero-300 p-3",
+                CORNER_INSET,
                 "data-[state=closed]:animate-[toast-out_250ms_ease-in_both] data-[state=open]:animate-[toast-in_600ms_var(--ease-spring-toast)_both]"
               )}
             >
               {tone === "success" ? (
-                <div className="inset-shadow-0-1-0 inset-shadow-highlight/8 flex size-8 items-center justify-center rounded-lg bg-nero-100">
+                <div className="inset-highlight flex size-8 items-center justify-center rounded-lg bg-nero-100">
                   <CheckCircle />
                 </div>
               ) : null}

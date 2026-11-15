@@ -12,6 +12,7 @@ import { getYears } from "@/lib/utils";
 
 // Roles shown before "Show earlier roles"; the rest stay in the DOM (crawlable) but collapsed.
 const VISIBLE_ROLES = 5;
+const EARLIER_ROLES_ID = "earlier-roles";
 
 function fallbackButtonLabel(hasDetailPage: boolean, comingSoon?: boolean) {
   if (hasDetailPage) {
@@ -82,7 +83,6 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
   return (
     <Section
       className="narrow-container"
-      color="var(--color-orange-100)"
       headingId="projects-heading"
       title={title}
     >
@@ -99,7 +99,7 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
         <>
           <div
             className="grid outline-none transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
-            id="earlier-roles"
+            id={EARLIER_ROLES_ID}
             inert={!isExpanded}
             ref={earlierRef}
             style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
@@ -115,7 +115,7 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
           </div>
           {!isExpanded && (
             <Button
-              aria-controls="earlier-roles"
+              aria-controls={EARLIER_ROLES_ID}
               className="mt-14 w-full"
               onClick={expand}
               variant="outline"

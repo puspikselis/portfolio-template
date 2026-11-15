@@ -83,8 +83,7 @@ function BusinessCard({
 export function Businesses() {
   return (
     <Section
-      className="inset-shadow-0-1-0 inset-shadow-highlight/4 mx-auto max-w-152 bg-nero-300 px-8 py-8 md:rounded-3xl md:px-8"
-      color="var(--color-orange-100)"
+      className="inset-shadow-0-1-0 inset-shadow-highlight/4 mx-auto max-w-152 bg-nero-300 px-8 py-8 md:rounded-3xl"
       headingId="businesses-heading"
       title="Ventures"
     >

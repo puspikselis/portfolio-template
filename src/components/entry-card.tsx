@@ -10,7 +10,7 @@ import { YearLabel } from "@/components/ui/year-label";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export interface EntryPreview {
+interface EntryPreview {
   height?: number;
   image: string;
   width?: number;

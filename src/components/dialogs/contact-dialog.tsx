@@ -18,7 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/lib/constants";
-import { TEXT_DISPLAY } from "@/lib/typography";
+import { CORNER_INSET } from "@/lib/styles";
+import { TEXT_BODY, TEXT_DISPLAY } from "@/lib/typography";
+import { cn } from "@/lib/utils";
 
 interface Props {
   isOpen: boolean;
@@ -120,7 +122,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
           <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
             <DialogClose asChild>
               <Button
-                className="absolute top-5 right-5 z-60 md:top-8 md:right-12"
+                className={cn("absolute z-60", CORNER_INSET)}
                 variant="pill"
               >
                 Close
@@ -133,7 +135,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                   <h2 className={TEXT_DISPLAY}>Get in Touch</h2>
                 </DialogTitle>
                 <DialogDescription asChild>
-                  <p className="text-15/7 text-nobel-100 -tracking-[0.02em]">
+                  <p className={TEXT_BODY}>
                     Fill out the form below. Or reach me directly at{" "}
                     <a
                       className="text-ink transition-opacity hover:opacity-80"

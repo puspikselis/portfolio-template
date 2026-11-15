@@ -1,7 +1,8 @@
+/** Hover preview media; the cursor preview's default size fills in what is omitted. */
 interface Preview {
-  height: number;
+  height?: number;
   image: string;
-  width: number;
+  width?: number;
 }
 
 type Platform = "android" | "ios";
@@ -39,7 +40,6 @@ export const businesses: Business[] = [
         preview: {
           height: 140,
           image: "/images/datreal/preview.webm",
-          width: 248,
         },
       },
     ],
@@ -63,7 +63,6 @@ export const businesses: Business[] = [
         preview: {
           height: 200,
           image: "/images/wisp/appstore.avif",
-          width: 248,
         },
       },
       {
@@ -75,15 +74,12 @@ export const businesses: Business[] = [
         preview: {
           height: 200,
           image: "/images/wisp/playstore.avif",
-          width: 248,
         },
       },
       {
         label: "Website",
         preview: {
-          height: 156,
           image: "/images/wisp/preview.webm",
-          width: 248,
         },
       },
     ],
@@ -103,7 +99,6 @@ export const businesses: Business[] = [
         preview: {
           height: 200,
           image: "/images/eloking/preview.webm",
-          width: 248,
         },
       },
     ],

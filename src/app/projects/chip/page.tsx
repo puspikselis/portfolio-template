@@ -7,13 +7,7 @@ export const metadata = caseStudyMetadata("chip");
 
 export default function Chip() {
   return (
-    <ProjectPage
-      color="var(--color-chip-100)"
-      imageColor="var(--color-chip-100)"
-      images={images}
-      slug="chip"
-      tags={tags}
-    >
+    <ProjectPage images={images} slug="chip" tags={tags}>
       <p>
         Chip is an automated savings app that connects to your bank, analyzes
         spending, and moves affordable amounts into savings automatically.

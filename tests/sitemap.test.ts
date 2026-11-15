@@ -24,10 +24,12 @@ describe("sitemap", () => {
 
   test("case study dates come from the data", () => {
     const byUrl = new Map(entries.map((entry) => [entry.url, entry]));
-    expect(
-      new Date(byUrl.get(caseStudyUrl("centus"))?.lastModified ?? "")
-        .toISOString()
-        .slice(0, 10)
-    ).toBe("2025-01-15");
+    for (const project of caseStudies) {
+      expect(
+        new Date(byUrl.get(caseStudyUrl(project.slug))?.lastModified ?? "")
+          .toISOString()
+          .slice(0, 10)
+      ).toBe(project.lastModified);
+    }
   });
 });

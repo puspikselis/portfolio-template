@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+// 12 columns of 64px plus 11 gutters of 32px.
+const GRID_WIDTH = "1120px";
+
 export function GridOverlay() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -36,11 +39,11 @@ export function GridOverlay() {
       {/* 12 columns (64px width, 32px gutter) - red 10% centered */}
       <div className="absolute inset-0 flex min-h-full justify-center">
         <div
-          className="h-full bg-[length:1120px_100%]"
+          className="h-full"
           style={{
             backgroundImage:
               "repeating-linear-gradient(90deg, rgb(239 68 68 / 0.1) 0px, rgb(239 68 68 / 0.1) 64px, transparent 64px, transparent 96px)",
-            width: "1120px",
+            width: GRID_WIDTH,
           }}
         />
       </div>
