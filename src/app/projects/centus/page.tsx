@@ -1,6 +1,6 @@
 import { ProjectPage } from "@/components/project-page";
 import { caseStudyMetadata } from "@/lib/metadata";
-
+import { MUTED_ACCENT } from "@/lib/styles";
 import { images, tags, testimonial } from "./data";
 
 const SLUG = "centus";
@@ -10,7 +10,7 @@ export const metadata = caseStudyMetadata(SLUG);
 export default function Centus() {
   return (
     <ProjectPage
-      color="var(--color-dim-gray-100)"
+      color={MUTED_ACCENT}
       images={images}
       slug={SLUG}
       tags={tags}

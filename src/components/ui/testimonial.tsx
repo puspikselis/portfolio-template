@@ -1,6 +1,7 @@
 import { QuoteIcon } from "@/components/icons/quote-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Section } from "@/components/ui/section";
+import { MUTED_ACCENT } from "@/lib/styles";
 import { TEXT_BODY, TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
 import { cn, densitySrcSet } from "@/lib/utils";
 
@@ -30,7 +31,7 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
   return (
     <Section
       className={cn("narrow-container", className)}
-      color="var(--color-dim-gray-100)"
+      color={MUTED_ACCENT}
       headingId="testimonial-heading"
       title="Reference"
     >

@@ -140,16 +140,23 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     isVisibleRef.current = state.isVisible;
   }, [state.isVisible]);
 
+  const hidePreview = useCallback(() => {
+    if (!isVisibleRef.current) {
+      return;
+    }
+    isVisibleRef.current = false;
+    setState((prev) => ({ ...prev, isVisible: false }));
+  }, []);
+
   // Touch devices never show previews: hide one that is up when the pointer
   // turns coarse, and skip the prefetch below.
   const isCoarsePointer = useMediaQuery(COARSE_POINTER_QUERY);
   useEffect(() => {
     isCoarsePointerRef.current = isCoarsePointer !== false;
     if (isCoarsePointer) {
-      isVisibleRef.current = false;
-      setState((prev) => ({ ...prev, isVisible: false }));
+      hidePreview();
     }
-  }, [isCoarsePointer]);
+  }, [hidePreview, isCoarsePointer]);
 
   // Hover previews mount on demand; prefetch the videos so the first hover
   // plays at once.
@@ -231,26 +238,18 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
       target.y = e.clientY + CURSOR_OFFSET;
       ensureLoop();
     };
-    const dismiss = () => {
-      if (!isVisibleRef.current) {
-        return;
-      }
-      isVisibleRef.current = false;
-      setState((prev) => ({ ...prev, isVisible: false }));
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", dismiss);
-    window.addEventListener("scroll", dismiss, true);
+    window.addEventListener("click", hidePreview);
+    window.addEventListener("scroll", hidePreview, true);
     return () => {
       if (raf !== null) {
         cancelAnimationFrame(raf);
       }
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("click", dismiss);
-      window.removeEventListener("scroll", dismiss, true);
+      window.removeEventListener("click", hidePreview);
+      window.removeEventListener("scroll", hidePreview, true);
     };
-  }, []);
+  }, [hidePreview]);
 
   const showPreview = useCallback<CursorPreviewContextValue["showPreview"]>(
     (color, image, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT) => {
@@ -272,14 +271,6 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     },
     []
   );
-
-  const hidePreview = useCallback(() => {
-    if (!isVisibleRef.current) {
-      return;
-    }
-    isVisibleRef.current = false;
-    setState((prev) => ({ ...prev, isVisible: false }));
-  }, []);
 
   const contextValue = useMemo(
     () => ({ hidePreview, showPreview }),

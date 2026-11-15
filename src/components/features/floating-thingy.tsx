@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { AnimatedText } from "@/components/ui/animated-text";
+import { MUTED_ACCENT } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 interface Config {
@@ -18,7 +19,7 @@ interface Config {
 
 // Matches the top-40 class until the real value is measured.
 const DEFAULT_STICKY_TOP_FALLBACK = 160;
-const DEFAULT_DASH = "var(--color-dim-gray-100)";
+const DEFAULT_DASH = MUTED_ACCENT;
 const HYSTERESIS = 4;
 const BOTTOM_THRESHOLD_PX = 100; // Fixed pixel threshold instead of percentage
 
@@ -214,24 +215,18 @@ export function FloatingThingy() {
 
     updateActiveElementRef.current = updateActiveElement;
 
-    const onResize = () => {
+    // One pending frame at a time for resize and scroll.
+    const scheduleUpdate = (beforeUpdate?: () => void) => {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
       rafRef.current = requestAnimationFrame(() => {
-        readStickyTop();
-        updateActiveElement();
+        beforeUpdate?.();
+        updateActiveElementRef.current?.();
       });
     };
-
-    const onScroll = () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      rafRef.current = requestAnimationFrame(() =>
-        updateActiveElementRef.current?.()
-      );
-    };
+    const onResize = () => scheduleUpdate(readStickyTop);
+    const onScroll = () => scheduleUpdate();
 
     updateActiveElement();
     window.addEventListener("resize", onResize);
