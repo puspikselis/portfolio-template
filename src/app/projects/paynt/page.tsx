@@ -22,7 +22,7 @@ export default function Paynt() {
         marketing materials, documents, and other collateral. I also led the
         company's rebrand from Paydoo to Paynt in partnership with{" "}
         <AppLink
-          className="no-underline transition-opacity hover:opacity-80"
+          className="hover-fade no-underline"
           external
           href="https://www.asketic.com"
         >

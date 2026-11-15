@@ -5,6 +5,7 @@ import {
   GITHUB_PROFILE_URL,
   LINKEDIN_URL,
   OWNER_PHOTO_PATH,
+  SITE_COUNTRY,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_ROLE,
@@ -45,7 +46,7 @@ export function buildPersonJsonLd() {
       "Digital Product Design",
     ],
     name: SITE_NAME,
-    nationality: { "@type": "Country", name: "Latvia" },
+    nationality: { "@type": "Country", name: SITE_COUNTRY },
     sameAs: [LINKEDIN_URL, GITHUB_PROFILE_URL],
     url: SITE_URL,
     worksFor: [

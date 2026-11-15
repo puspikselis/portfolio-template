@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 
 import {
   OG_IMAGE_SIZE,
+  SITE_COUNTRY,
   SITE_NAME,
   SITE_ROLE,
   SITE_TITLE,
@@ -63,7 +64,7 @@ export default function OpengraphImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          {`${SITE_ROLE} · ${YEARS_OF_EXPERIENCE} years · Latvia`}
+          {`${SITE_ROLE} · ${YEARS_OF_EXPERIENCE} years · ${SITE_COUNTRY}`}
         </div>
       </div>
     </div>,

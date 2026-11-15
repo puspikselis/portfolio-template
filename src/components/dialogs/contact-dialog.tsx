@@ -138,14 +138,14 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                   <p className={TEXT_BODY}>
                     Fill out the form below. Or reach me directly at{" "}
                     <a
-                      className="text-ink transition-opacity hover:opacity-80"
+                      className="hover-fade text-ink"
                       href={`mailto:${CONTACT_EMAIL}`}
                     >
                       {CONTACT_EMAIL}
                     </a>{" "}
                     or{" "}
                     <a
-                      className="text-ink transition-opacity hover:opacity-80"
+                      className="hover-fade text-ink"
                       href={CONTACT_PHONE.href}
                     >
                       {CONTACT_PHONE.display}

@@ -8,6 +8,7 @@ export function absoluteUrl(path: string): string {
 
 export const SITE_NAME = "Kristaps Krūze";
 export const SITE_ROLE = "Product Designer";
+export const SITE_COUNTRY = "Latvia";
 export const SITE_TITLE = `${SITE_NAME} — ${SITE_ROLE}`;
 export const YEARS_OF_EXPERIENCE = "10+";
 export const OWNER_PHOTO_PATH = "/images/KK.avif";

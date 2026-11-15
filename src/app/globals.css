@@ -16,6 +16,16 @@
   @apply inset-shadow-0-1-0 inset-shadow-highlight/8;
 }
 
+/* Fainter edge for surfaces that sit on the page, not on a control. */
+@utility inset-highlight-soft {
+  @apply inset-shadow-0-1-0 inset-shadow-highlight/4;
+}
+
+/* Dims a link or image slightly on hover. */
+@utility hover-fade {
+  @apply transition-opacity hover:opacity-80;
+}
+
 @theme inline {
   --color-canvas: #000000;
   --color-ink: #ffffff;

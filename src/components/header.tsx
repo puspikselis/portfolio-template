@@ -65,7 +65,7 @@ function HeaderLinkButton({ link }: { link: HeaderLink }) {
 
 function handleLinksChange(e: ChangeEvent<HTMLSelectElement>) {
   if (e.target.value) {
-    window.open(e.target.value, "_blank");
+    window.open(e.target.value, "_blank", "noopener,noreferrer");
   }
   e.target.value = "";
 }
@@ -84,7 +84,7 @@ export function Header() {
             className="focus-ring col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
             href="/"
           >
-            <Avatar className="row-span-2 size-9 rounded-xl transition-opacity hover:opacity-80">
+            <Avatar className="hover-fade row-span-2 size-9 rounded-xl">
               <AvatarImage
                 alt=""
                 className="rounded-none"
