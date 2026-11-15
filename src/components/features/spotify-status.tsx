@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Note } from "@/components/icons/note";
 import { AppLink } from "@/components/ui/app-link";
+import { SITE_ROLE } from "@/lib/constants";
 import type { SpotifyData } from "@/lib/spotify";
 import { TEXT_CAPTION, TEXT_CAPTION_BASE } from "@/lib/typography";
 import { cn } from "@/lib/utils";
@@ -87,6 +88,6 @@ export function SpotifyStatus({ className }: { className?: string }) {
       </div>
     </AppLink>
   ) : (
-    <div className={cn(TEXT_CAPTION, className)}>Designer</div>
+    <div className={cn(TEXT_CAPTION, className)}>{SITE_ROLE}</div>
   );
 }
