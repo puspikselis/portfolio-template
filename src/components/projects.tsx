@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { EntryAction } from "@/components/entry-action";
 import { EntryCard } from "@/components/entry-card";
-import { useCursorPreview } from "@/components/features/cursor-preview";
 import { Button } from "@/components/ui/button";
 import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
@@ -21,29 +20,6 @@ function fallbackButtonLabel(hasDetailPage: boolean, comingSoon?: boolean) {
   return comingSoon ? null : "Archive";
 }
 
-function ProjectAction({
-  company,
-  label,
-  slug,
-}: {
-  company: string;
-  label: string;
-  slug?: string;
-}) {
-  return (
-    <Button asChild className="ml-auto" variant="pill">
-      {slug ? (
-        <Link className="link-overlay" href={caseStudyPath(slug)}>
-          {label}
-          <span className="sr-only"> {company}</span>
-        </Link>
-      ) : (
-        <span data-inactive="">{label}</span>
-      )}
-    </Button>
-  );
-}
-
 function ProjectCard({
   project,
   isFirst,
@@ -51,38 +27,31 @@ function ProjectCard({
   project: (typeof projects)[number];
   isFirst?: boolean;
 }) {
-  const { hidePreview, showPreview } = useCursorPreview();
-
   const previewColor = project.color || DEFAULT_PREVIEW_COLOR;
   const buttonLabel =
     project.buttonLabel ??
     fallbackButtonLabel(Boolean(project.slug), project.comingSoon);
-
-  const handlePointerEnter = useCallback(() => {
-    if (!project.preview) {
-      return;
-    }
-    showPreview(previewColor, project.preview);
-  }, [project.preview, previewColor, showPreview]);
+  const href = project.slug ? caseStudyPath(project.slug) : undefined;
 
   return (
     <EntryCard
       actions={
         buttonLabel ? (
-          <ProjectAction
+          <EntryAction
             company={project.company}
+            href={href}
             label={buttonLabel}
-            slug={project.slug}
+            preview={project.preview ? { image: project.preview } : undefined}
+            previewColor={previewColor}
           />
         ) : null
       }
+      cardHref={href}
       color={previewColor}
       company={project.company}
       fallback={project.Icon ? <project.Icon /> : undefined}
       image={project.image}
       isFirst={isFirst}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={hidePreview}
       tags={project.tags}
       title={project.title}
       truncate

@@ -38,9 +38,12 @@ const CursorPreviewContext = createContext<CursorPreviewContextValue | null>(
   null
 );
 
-// Spring constants matching the previous motion/react config ({ stiffness: 800, damping: 25 }).
+// Critically damped (damping = 2 * sqrt(stiffness)): follows the cursor
+// tightly with no overshoot or wobble.
 const STIFFNESS = 800;
-const DAMPING = 25;
+const DAMPING = 2 * Math.sqrt(STIFFNESS);
+// Gap between the cursor tip and the preview's top-left corner.
+const CURSOR_OFFSET = 12;
 
 const DEFAULT_WIDTH = 248;
 const DEFAULT_HEIGHT = 156;
@@ -68,6 +71,8 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   const isCoarsePointerRef = useRef(false);
   const isVisibleRef = useRef(false);
   const positionRef = useRef<HTMLDivElement>(null);
+  // Set by the spring effect: jumps the preview to the cursor with no travel.
+  const snapRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     isVisibleRef.current = state.isVisible;
@@ -129,10 +134,23 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         pos.vy = 0;
       }
 
+      render();
+      raf = settled ? null : requestAnimationFrame(step);
+    };
+
+    const render = () => {
       if (positionRef.current) {
         positionRef.current.style.translate = `${pos.x}px ${pos.y}px`;
       }
-      raf = settled ? null : requestAnimationFrame(step);
+    };
+
+    // A hidden preview must not fly in from wherever it was last shown.
+    snapRef.current = () => {
+      pos.x = target.x;
+      pos.y = target.y;
+      pos.vx = 0;
+      pos.vy = 0;
+      render();
     };
 
     const ensureLoop = () => {
@@ -143,14 +161,15 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      target.x = e.clientX + 12;
-      target.y = e.clientY + 12;
+      target.x = e.clientX + CURSOR_OFFSET;
+      target.y = e.clientY + CURSOR_OFFSET;
       ensureLoop();
     };
     const dismiss = () => {
       if (!isVisibleRef.current) {
         return;
       }
+      isVisibleRef.current = false;
       setState((prev) => ({ ...prev, isVisible: false }));
     };
 
@@ -172,6 +191,10 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
       if (isCoarsePointerRef.current) {
         return;
       }
+      if (!isVisibleRef.current) {
+        snapRef.current();
+      }
+      isVisibleRef.current = true;
       setState((prev) => ({
         ...prev,
         color,
@@ -188,6 +211,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
     if (!isVisibleRef.current) {
       return;
     }
+    isVisibleRef.current = false;
     setState((prev) => ({ ...prev, isVisible: false }));
   }, []);
 
@@ -231,14 +255,16 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         ref={positionRef}
       >
         <div
-          className="overflow-hidden rounded-2xl shadow-2xl"
+          className="origin-top-left overflow-hidden rounded-2xl shadow-2xl"
           style={{
             backgroundColor: state.color,
-            filter: state.isVisible ? "blur(0px)" : "blur(8px)",
             height: state.height,
             opacity: state.isVisible ? 1 : 0,
-            scale: state.isVisible ? "1" : "0.85",
-            transition: `opacity 250ms cubic-bezier(0.22,1,0.36,1), scale 250ms cubic-bezier(0.22,1,0.36,1), filter 250ms cubic-bezier(0.22,1,0.36,1) ${state.isVisible ? 30 : 0}ms`,
+            scale: state.isVisible ? "1" : "0.9",
+            // No blur filter: filtering a playing <video> made Chrome draw it
+            // shifted inside its box during the transition.
+            transition:
+              "opacity 200ms cubic-bezier(0.22,1,0.36,1), scale 200ms cubic-bezier(0.22,1,0.36,1)",
             width: state.width,
           }}
         >

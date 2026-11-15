@@ -1,4 +1,5 @@
-import type { CSSProperties, PointerEventHandler, ReactNode } from "react";
+import Link from "next/link";
+import type { CSSProperties, ReactNode } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TagList } from "@/components/ui/tag-list";
@@ -7,18 +8,18 @@ import { cn, getYear } from "@/lib/utils";
 interface EntryCardProps {
   /** Right-side buttons or labels. */
   actions?: ReactNode;
-  /** External site; the whole card becomes a link to it. */
+  /** The whole card becomes a link to it. */
   cardHref?: string;
   className?: string;
   color: string;
   company: string;
+  /** `cardHref` is another site: open it in a new tab. */
+  external?: boolean;
   /** Avatar fallback when there is no image. */
   fallback?: ReactNode;
   image?: string;
   /** Marks the year line as the floating label's alignment target. */
   isFirst?: boolean;
-  onPointerEnter?: PointerEventHandler<HTMLDivElement>;
-  onPointerLeave?: PointerEventHandler<HTMLDivElement>;
   tags: readonly string[];
   title: string;
   /** Truncate title and tags to one line (employment history). */
@@ -33,11 +34,10 @@ export function EntryCard({
   className,
   color,
   company,
+  external,
   fallback = "?",
   image,
   isFirst,
-  onPointerEnter,
-  onPointerLeave,
   tags,
   title,
   truncate,
@@ -56,8 +56,6 @@ export function EntryCard({
           "relative flex items-center gap-4",
           cardHref && "cursor-pointer"
         )}
-        onPointerEnter={onPointerEnter}
-        onPointerLeave={onPointerLeave}
       >
         <Avatar
           className="size-12 rounded-xl bg-(--color)"
@@ -80,7 +78,7 @@ export function EntryCard({
           </h3>
           <TagList tags={[company, ...tags]} truncate={truncate} />
         </div>
-        {cardHref ? (
+        {cardHref && external ? (
           <a
             className="link-overlay"
             href={cardHref}
@@ -90,7 +88,14 @@ export function EntryCard({
             <span className="sr-only">Visit {company} website</span>
           </a>
         ) : null}
-        {actions}
+        {cardHref && !external ? (
+          <Link className="link-overlay" href={cardHref} tabIndex={-1}>
+            <span className="sr-only">{company}</span>
+          </Link>
+        ) : null}
+        {actions ? (
+          <div className="ml-auto flex items-center gap-1">{actions}</div>
+        ) : null}
       </div>
     </div>
   );

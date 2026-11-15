@@ -2,13 +2,11 @@
 
 import { useSyncExternalStore } from "react";
 
+import { EntryAction } from "@/components/entry-action";
 import { EntryCard } from "@/components/entry-card";
-import { useCursorPreview } from "@/components/features/cursor-preview";
 import { AppStoreIcon, PlayStoreIcon } from "@/components/icons/store-icons";
-import { Button } from "@/components/ui/button";
 import { businesses, type Platform } from "@/data/businesses";
 import { DEFAULT_PREVIEW_COLOR, MD_BREAKPOINT_QUERY } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 
 const STORE_ICONS = {
   appStore: AppStoreIcon,
@@ -60,87 +58,39 @@ function BusinessCard({
   business: (typeof businesses)[number];
   isFirst?: boolean;
 }) {
-  const { hidePreview, showPreview } = useCursorPreview();
   const previewColor = business.color || DEFAULT_PREVIEW_COLOR;
 
   const platform = usePlatform();
   const irrelevant: Platform | null =
     platform && (platform === "ios" ? "android" : "ios");
-  const filteredButtons = business.buttons.filter(
-    (btn) => !btn.hidden && btn.platform !== irrelevant
-  );
-
-  const [primaryButton] = filteredButtons;
-
-  const handleCardPointerEnter = () => {
-    if (!(business.previewOnCardHover && primaryButton?.preview)) {
-      return;
-    }
-    const { image, width, height } = primaryButton.preview;
-    showPreview(previewColor, image, width, height);
-  };
-
-  const actions =
-    filteredButtons.length > 0 ? (
-      <div className="ml-auto flex items-center gap-1">
-        {filteredButtons.map((button) => {
-          const { preview } = button;
-          const Icon = button.icon ? STORE_ICONS[button.icon] : null;
-          const onPointerEnter = preview
-            ? () =>
-                showPreview(
-                  previewColor,
-                  preview.image,
-                  preview.width,
-                  preview.height
-                )
-            : undefined;
-          const onPointerLeave =
-            preview && !business.previewOnCardHover ? hidePreview : undefined;
-
-          return (
-            <Button
-              asChild
-              className={cn("group relative z-10", Icon && "w-9 px-0")}
-              key={button.label}
-              variant="pill"
-            >
-              <a
-                href={button.href ?? business.website}
-                onPointerEnter={onPointerEnter}
-                onPointerLeave={onPointerLeave}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {Icon ? (
-                  <>
-                    <Icon className="size-3.5" />
-                    <span className="sr-only">{button.label}</span>
-                  </>
-                ) : (
-                  button.label
-                )}
-                <span className="sr-only"> {business.company}</span>
-              </a>
-            </Button>
-          );
-        })}
-      </div>
-    ) : null;
+  const actions = business.buttons
+    .filter((btn) => !btn.hidden && btn.platform !== irrelevant)
+    .map((button) => {
+      const Icon = button.icon ? STORE_ICONS[button.icon] : null;
+      return (
+        <EntryAction
+          company={business.company}
+          external
+          href={button.href ?? business.website}
+          icon={Icon ? <Icon className="size-3.5" /> : undefined}
+          key={button.label}
+          label={button.label}
+          preview={button.preview}
+          previewColor={previewColor}
+        />
+      );
+    });
 
   return (
     <EntryCard
-      actions={actions}
+      actions={actions.length > 0 ? actions : null}
       cardHref={business.website}
       className="not-first-of-type:before:my-7 not-first-of-type:before:block not-first-of-type:before:h-px not-first-of-type:before:w-full not-first-of-type:before:bg-nero-400 not-first-of-type:before:content-['']"
       color={previewColor}
       company={business.company}
+      external
       image={business.image}
       isFirst={isFirst}
-      onPointerEnter={
-        business.previewOnCardHover ? handleCardPointerEnter : undefined
-      }
-      onPointerLeave={business.previewOnCardHover ? hidePreview : undefined}
       tags={business.tags}
       title={business.title}
       year={business.year}

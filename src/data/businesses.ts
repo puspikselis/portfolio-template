@@ -23,7 +23,6 @@ interface Business {
   company: string;
   id: number;
   image: string;
-  previewOnCardHover?: boolean;
   tags: string[];
   title: string;
   website: string;
@@ -112,7 +111,6 @@ export const businesses: Business[] = [
     company: "Eloking",
     id: 2,
     image: "/images/eloking.avif",
-    previewOnCardHover: true,
     tags: ["eSports"],
     title: "Co-Founder",
     website: "https://eloking.com/",
