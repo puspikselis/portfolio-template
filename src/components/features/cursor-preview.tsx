@@ -12,13 +12,11 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { businesses } from "@/data/businesses";
 import { projects } from "@/data/projects";
-import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useRequiredContext } from "@/lib/use-required-context";
 import { cn, densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
-  color: string;
   height: number;
   image?: string;
   isVisible: boolean;
@@ -27,12 +25,7 @@ interface CursorPreviewState {
 
 interface CursorPreviewContextValue {
   hidePreview: () => void;
-  showPreview: (
-    color: string,
-    image?: string,
-    width?: number,
-    height?: number
-  ) => void;
+  showPreview: (image?: string, width?: number, height?: number) => void;
 }
 
 const CursorPreviewContext = createContext<CursorPreviewContextValue | null>(
@@ -94,17 +87,7 @@ const PreviewMedia = ({ height, onLoaded, src, width }: PreviewMediaProps) => {
     [onLoaded, src]
   );
 
-  return isVideoSrc(src) ? (
-    <video
-      autoPlay
-      className={MEDIA_CLASSES}
-      loop
-      muted
-      playsInline
-      ref={mediaRef}
-      src={src}
-    />
-  ) : (
+  return (
     // <picture>: the hand-made @2x/@3x files are the sources; no optimizer needed.
     <picture>
       <img
@@ -126,7 +109,6 @@ export const CursorPreviewProvider = ({
   children: ReactNode;
 }) => {
   const [state, setState] = useState<CursorPreviewState>({
-    color: DEFAULT_PREVIEW_COLOR,
     height: DEFAULT_HEIGHT,
     isVisible: false,
     width: DEFAULT_WIDTH,
@@ -151,7 +133,7 @@ export const CursorPreviewProvider = ({
   }, []);
 
   // Touch devices never show previews: hide one that is up when the pointer
-  // turns coarse, and skip the prefetch below.
+  // turns coarse, and never load the preview videos.
   const isCoarsePointer = useMediaQuery(COARSE_POINTER_QUERY);
   useEffect(() => {
     isCoarsePointerRef.current = isCoarsePointer !== false;
@@ -159,27 +141,6 @@ export const CursorPreviewProvider = ({
       hidePreview();
     }
   }, [hidePreview, isCoarsePointer]);
-
-  // Hover previews mount on demand; prefetch the videos so the first hover
-  // plays at once.
-  useEffect(() => {
-    if (isCoarsePointer !== false) {
-      return;
-    }
-    const prefetched = VIDEO_PREVIEWS.map((href) => {
-      const link = document.createElement("link");
-      link.rel = "prefetch";
-      link.as = "video";
-      link.href = href;
-      document.head.append(link);
-      return link;
-    });
-    return () => {
-      for (const link of prefetched) {
-        link.remove();
-      }
-    };
-  }, [isCoarsePointer]);
 
   useEffect(() => {
     const target = { x: 0, y: 0 };
@@ -254,7 +215,7 @@ export const CursorPreviewProvider = ({
   }, [hidePreview]);
 
   const showPreview = useCallback<CursorPreviewContextValue["showPreview"]>(
-    (color, image, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT) => {
+    (image, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT) => {
       if (isCoarsePointerRef.current) {
         return;
       }
@@ -264,7 +225,6 @@ export const CursorPreviewProvider = ({
       isVisibleRef.current = true;
       setState((prev) => ({
         ...prev,
-        color,
         height,
         image,
         isVisible: true,
@@ -279,21 +239,70 @@ export const CursorPreviewProvider = ({
     [hidePreview, showPreview]
   );
 
-  // The box colour is only a loading placeholder: once the media has a frame
-  // the box goes transparent, so no colour can show around it.
-  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-  const isLoaded = state.image !== undefined && loadedSrc === state.image;
+  // Media that has a frame to show. The box stays hidden until its media is
+  // ready, so a hover never flashes an empty box.
+  const [readySrcs, setReadySrcs] = useState<ReadonlySet<string>>(new Set());
+  const markReady = useCallback((src: string) => {
+    setReadySrcs((prev) => (prev.has(src) ? prev : new Set(prev).add(src)));
+  }, []);
+  const isReady = state.image !== undefined && readySrcs.has(state.image);
+  const isShown = state.isVisible && isReady;
 
-  // key={src}: a new preview never shows the old frame at the new size.
-  const media = state.image ? (
-    <PreviewMedia
-      height={state.height}
-      key={state.image}
-      onLoaded={setLoadedSrc}
-      src={state.image}
-      width={state.width}
-    />
-  ) : null;
+  // Every preview video stays mounted and buffered (fine pointers only), so a
+  // hover only switches which one plays: no new player, no blank first frame.
+  const videosRef = useRef(new Map<string, HTMLVideoElement>());
+  useEffect(() => {
+    for (const [src, video] of videosRef.current) {
+      if (state.isVisible && src === state.image) {
+        // play() rejects if the tab is hidden: stay paused; the next hover retries.
+        video.play().catch(() => video.pause());
+      } else {
+        video.pause();
+      }
+    }
+  }, [state.image, state.isVisible]);
+
+  const videos =
+    isCoarsePointer === false
+      ? VIDEO_PREVIEWS.map((src) => (
+          <video
+            className={cn(
+              MEDIA_CLASSES,
+              "absolute inset-0",
+              src !== state.image && "invisible"
+            )}
+            key={src}
+            loop
+            muted
+            onLoadedData={() => markReady(src)}
+            playsInline
+            preload="auto"
+            ref={(el) => {
+              if (el) {
+                videosRef.current.set(src, el);
+                if (isMediaReady(el)) {
+                  markReady(src);
+                }
+              } else {
+                videosRef.current.delete(src);
+              }
+            }}
+            src={src}
+          />
+        ))
+      : null;
+
+  // key={src}: a new image never shows the old one at the new size.
+  const image =
+    state.image && !isVideoSrc(state.image) ? (
+      <PreviewMedia
+        height={state.height}
+        key={state.image}
+        onLoaded={markReady}
+        src={state.image}
+        width={state.width}
+      />
+    ) : null;
 
   return (
     <CursorPreviewContext.Provider value={contextValue}>
@@ -308,18 +317,18 @@ export const CursorPreviewProvider = ({
         <div
           className={cn(
             "h-(--preview-height) w-(--preview-width) origin-top-left overflow-hidden rounded-2xl shadow-2xl transition-fade-scale duration-200 ease-out-quint",
-            state.isVisible ? "scale-100 opacity-100" : "scale-90 opacity-0",
-            isLoaded ? "bg-transparent" : "bg-(--preview-color)"
+            "relative",
+            isShown ? "scale-100 opacity-100" : "scale-90 opacity-0"
           )}
           style={
             {
-              "--preview-color": state.color,
               "--preview-height": `${state.height}px`,
               "--preview-width": `${state.width}px`,
             } as CSSProperties
           }
         >
-          {media}
+          {videos}
+          {image}
         </div>
       </div>
     </CursorPreviewContext.Provider>

@@ -62,7 +62,7 @@ export const EntryCard = ({
   const previewHandlers = preview
     ? {
         onPointerEnter: () =>
-          showPreview(color, preview.image, preview.width, preview.height),
+          showPreview(preview.image, preview.width, preview.height),
         onPointerLeave: hidePreview,
       }
     : {};
