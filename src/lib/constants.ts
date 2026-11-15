@@ -12,7 +12,8 @@ export const YEARS_OF_EXPERIENCE = "10+";
 export const OWNER_PHOTO_PATH = "/images/KK.avif";
 export const SITE_DESCRIPTION = `Product designer with ${YEARS_OF_EXPERIENCE} years of experience. I've built my own ventures and designed digital products for clients worldwide.`;
 
-/** Size of the generated social card (src/app/opengraph-image.tsx). */
+/** Static social card for Open Graph and Twitter; redraw it if the role or years change. */
+export const OG_IMAGE_PATH = "/og-image.png";
 export const OG_IMAGE_SIZE = { height: 630, width: 1200 };
 
 export const LINKEDIN_URL = "https://www.linkedin.com/in/kristapskruze/";

@@ -3,20 +3,20 @@ import type { Metadata } from "next";
 import { getCaseStudy } from "@/data/projects";
 import {
   absoluteUrl,
+  OG_IMAGE_PATH,
   OG_IMAGE_SIZE,
   SITE_NAME,
   SITE_TITLE,
 } from "@/lib/constants";
 
-// A page that sets its own `openGraph`/`twitter` replaces the root ones, which
-// drops the root file-based social card, so the card is listed here explicitly.
-const socialCard = (url: string) => [
-  { alt: SITE_TITLE, ...OG_IMAGE_SIZE, type: "image/png", url },
+// One static social card (public/og-image.png) for Open Graph and Twitter.
+const SOCIAL_CARD = [
+  { alt: SITE_TITLE, ...OG_IMAGE_SIZE, type: "image/png", url: OG_IMAGE_PATH },
 ];
 
 /** Open Graph fields every page shares; pages add their own title, description and URL. */
 const OPEN_GRAPH_BASE = {
-  images: socialCard("/opengraph-image"),
+  images: SOCIAL_CARD,
   locale: "en_US",
   siteName: SITE_TITLE,
   type: "website",
@@ -24,7 +24,7 @@ const OPEN_GRAPH_BASE = {
 
 const TWITTER_BASE = {
   card: "summary_large_image",
-  images: socialCard("/twitter-image"),
+  images: SOCIAL_CARD,
 } as const;
 
 interface SocialInput {
