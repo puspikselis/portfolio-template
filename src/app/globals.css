@@ -26,9 +26,53 @@
   @apply transition-opacity hover:opacity-80;
 }
 
+/* Transitions on just the properties that move; pair with duration-* and ease-*. */
+@utility transition-translate {
+  transition-property: translate;
+}
+@utility transition-fade-scale {
+  transition-property: opacity, scale;
+}
+@utility transition-roll {
+  transition-property: translate, opacity, filter;
+}
+@utility transition-grid-rows {
+  transition-property: grid-template-rows;
+}
+
+/* Collapsible row: animate between these with transition-grid-rows. */
+@utility grid-rows-collapsed {
+  grid-template-rows: 0fr;
+}
+@utility grid-rows-expanded {
+  grid-template-rows: 1fr;
+}
+
+/* Cmd+G layout grid: 4px red rows, and 64px columns with 32px gutters. */
+@utility bg-grid-rows {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(239 68 68 / 0.1) 0px,
+    rgb(239 68 68 / 0.1) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+@utility bg-grid-columns {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgb(239 68 68 / 0.1) 0px,
+    rgb(239 68 68 / 0.1) 64px,
+    transparent 64px,
+    transparent 96px
+  );
+}
+
 @theme inline {
   /* Width of the page frame (layout, floating label, contact dialog). */
   --container-page: 101rem;
+  /* The Cmd+G layout grid: 12 columns of 64px plus 11 gutters of 32px. */
+  --container-grid: 70rem;
   --color-canvas: #000000;
   --color-ink: #ffffff;
   /* top-edge highlight on cards/buttons */
@@ -44,6 +88,9 @@
   --color-nobel-100: #9a9a9a;
   --color-orange-100: #ff7524;
   --color-paynt-100: #ebb5b1;
+  /* Form errors (Tailwind red-500) and the success toast's check. */
+  --color-error: oklch(63.7% 0.237 25.331);
+  --color-success: #24b258;
 
   --inset-shadow-0-1-0: inset 0 1px 0 transparent;
 
@@ -52,8 +99,34 @@
   --text-15: 0.9375rem;
   --text-28: 1.75rem;
 
+  --tracking-tight-1: -0.01em;
+  --tracking-tight-2: -0.02em;
+  --tracking-tight-3: -0.03em;
+
+  /* Text fields' drop shadow under the inset highlight. */
+  --shadow-input: 0 1px 2px rgba(0, 0, 0, 0.48);
+
+  --animate-fade-in: fade-in 200ms ease-in-out both;
+  --animate-fade-out: fade-out 200ms ease-in-out both;
+  --animate-dialog-in:
+    dialog-in 600ms var(--ease-spring-dialog) both,
+    blur-in 600ms var(--ease-spring-dialog) 50ms both;
+  --animate-dialog-out:
+    dialog-out 600ms var(--ease-spring-dialog) both,
+    blur-out 600ms var(--ease-spring-dialog) 50ms both;
+  --animate-toast-in: toast-in 600ms var(--ease-spring-toast) both;
+  --animate-toast-out: toast-out 250ms ease-in both;
+  --animate-tooltip-in: tooltip-in 480ms var(--ease-spring-tooltip) both;
+  /* AnimatedText sets --char-duration on the text and --char-delay per character. */
+  --animate-char-in: char-in var(--char-duration) var(--ease-out-cubic)
+    var(--char-delay) both;
+  --animate-char-out: char-out var(--char-duration) var(--ease-out-cubic)
+    var(--char-delay) both;
+
   /* easeOutCubic: rolling and animated text */
   --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  /* easeOutQuint: the cursor preview's show/hide fade and scale */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Spring curves sampled into linear() easings (formerly motion/react springs). */
   /* k=400 c=20 */
@@ -172,7 +245,7 @@
   }
 
   body {
-    @apply bg-canvas text-nobel-100 -tracking-[0.03em] antialiased;
+    @apply bg-canvas tracking-tight-3 text-nobel-100 antialiased;
   }
 }
 

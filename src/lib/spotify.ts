@@ -60,7 +60,9 @@ interface NowPlayingPayload {
 }
 
 /** Maps the payload to what the header shows; a track's artists, or an episode's show. */
-export function toSpotifyData(payload: NowPlayingPayload): SpotifyData | null {
+export const toSpotifyData = (
+  payload: NowPlayingPayload
+): SpotifyData | null => {
   const { item } = payload;
   if (!item) {
     return null;
@@ -76,4 +78,4 @@ export function toSpotifyData(payload: NowPlayingPayload): SpotifyData | null {
     songUrl: item.external_urls?.spotify ?? "",
     title: item.name,
   };
-}
+};

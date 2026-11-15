@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Close as DialogClose,
   Content as DialogContent,
@@ -10,90 +9,149 @@ import {
   Root as DialogRoot,
   Title as DialogTitle,
 } from "@radix-ui/react-dialog";
-import { useCallback, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useCallback, useRef, useState } from "react";
+import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/lib/constants";
-import { CORNER_INSET } from "@/lib/styles";
 import { TEXT_BODY, TEXT_DISPLAY } from "@/lib/typography";
-import { cn } from "@/lib/utils";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const schema = z.object({
-  email: z.string().email("Enter a valid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().optional(),
-});
+// Native constraints (required, minLength, type="email") on each field decide
+// validity; these are the messages shown under an invalid field.
+const ERRORS = {
+  email: "Enter a valid email address",
+  message: "Message must be at least 10 characters",
+  name: "Name must be at least 2 characters",
+} as const;
 
-type FormValues = z.infer<typeof schema>;
+type ValidatedField = keyof typeof ERRORS;
+type Errors = Partial<Record<ValidatedField, string>>;
+type FieldElement = HTMLInputElement | HTMLTextAreaElement;
+
+const isValidated = (name: string): name is ValidatedField => name in ERRORS;
+
+/** The message for every invalid validated control in the form. */
+const collectErrors = (form: HTMLFormElement): Errors => {
+  const errors: Errors = {};
+  for (const name of Object.keys(ERRORS)) {
+    const control = form.elements.namedItem(name);
+    if (
+      isValidated(name) &&
+      (control instanceof HTMLInputElement ||
+        control instanceof HTMLTextAreaElement) &&
+      !control.validity.valid
+    ) {
+      errors[name] = ERRORS[name];
+    }
+  }
+  return errors;
+};
+
+const formString = (data: FormData, key: string) => {
+  const value = data.get(key);
+  return typeof value === "string" ? value : "";
+};
 
 // Focus the dialog itself rather than the first field, so phones don't pop the
 // keyboard on open; focus must still leave the (now aria-hidden) trigger.
-function focusDialog(e: Event) {
+const focusDialog = (e: Event) => {
   e.preventDefault();
   (e.currentTarget as HTMLElement | null)?.focus();
-}
+};
 
-export function ContactDialog({ isOpen, onClose }: Props) {
+export const ContactDialog = ({ isOpen, onClose }: Props) => {
   const { showToast } = useToast();
-  const honeyRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [errors, setErrors] = useState<Errors>({});
+  const [isValid, setIsValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // After the first submit, leaving a field re-checks it too.
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isValid },
-  } = useForm<FormValues>({
-    defaultValues: { email: "", message: "", name: "", phone: "" },
-    mode: "onChange",
-    resolver: zodResolver(schema),
-  });
+  const reset = useCallback(() => {
+    formRef.current?.reset();
+    setErrors({});
+    setIsValid(false);
+    setHasSubmitted(false);
+  }, []);
 
-  const onSubmit = async (values: FormValues) => {
-    if (honeyRef.current?.value) {
-      return;
+  const checkField = (el: FieldElement) => {
+    const { name } = el;
+    if (isValidated(name)) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: el.validity.valid ? undefined : ERRORS[name],
+      }));
     }
+  };
 
+  // Every keystroke re-checks its field and the Send button's enabled state.
+  const handleInput = (e: FormEvent<FieldElement>) => {
+    checkField(e.currentTarget);
+    setIsValid(e.currentTarget.form?.checkValidity() ?? false);
+  };
+
+  const handleBlur = (e: FormEvent<FieldElement>) => {
+    if (hasSubmitted) {
+      checkField(e.currentTarget);
+    }
+  };
+
+  const send = async (data: FormData) => {
+    const name = formString(data, "name");
+    const email = formString(data, "email");
     const fd = new FormData();
-    fd.set("name", values.name);
-    fd.set("email", values.email);
-    fd.set("phone", values.phone ?? "");
-    fd.set("message", values.message);
-    fd.set("_replyto", values.email);
-    fd.set("_subject", `Portfolio Contact from ${values.name}`);
+    fd.set("name", name);
+    fd.set("email", email);
+    fd.set("phone", formString(data, "phone"));
+    fd.set("message", formString(data, "message"));
+    fd.set("_replyto", email);
+    fd.set("_subject", `Portfolio Contact from ${name}`);
 
-    try {
-      const res = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
-        body: fd,
-        headers: { Accept: "application/json" },
-        method: "POST",
-      });
-      if (!res.ok) {
-        throw new Error("send failed");
-      }
-
-      new Audio("/audio/mail-sent.mp3").play().catch(() => {
-        // autoplay blocked — the toast is confirmation enough
-      });
-      reset();
-      onClose();
-      showToast("Message sent", "I'll get back to you as soon as possible.");
-    } catch {
+    const res = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
+      body: fd,
+      headers: { Accept: "application/json" },
+      method: "POST",
+    }).catch(() => null);
+    if (!res?.ok) {
       showToast(
         "Couldn't send your message",
         `Email me at ${CONTACT_EMAIL} instead`,
         "error"
       );
+      return;
     }
+
+    new Audio("/audio/mail-sent.mp3").play().catch(() => {
+      // autoplay blocked — the toast is confirmation enough
+    });
+    reset();
+    onClose();
+    showToast("Message sent", "I'll get back to you as soon as possible.");
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setHasSubmitted(true);
+    if (!form.checkValidity()) {
+      setErrors(collectErrors(form));
+      return;
+    }
+    const data = new FormData(form);
+    if (formString(data, "_honey")) {
+      return;
+    }
+    setIsSubmitting(true);
+    await send(data);
+    setIsSubmitting(false);
   };
 
   const handleOpenChange = useCallback(
@@ -110,21 +168,18 @@ export function ContactDialog({ isOpen, onClose }: Props) {
   return (
     <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
       <DialogPortal>
-        <DialogOverlay className="fixed inset-0 z-30 data-[state=closed]:animate-[fade-out_200ms_ease-in-out_both] data-[state=open]:animate-[fade-in_200ms_ease-in-out_both]">
+        <DialogOverlay className="fixed inset-0 z-30 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in">
           <div className="fixed inset-y-0 left-1/2 w-full max-w-page -translate-x-1/2">
             <div className="mx-px h-full bg-canvas/95 backdrop-blur-sm" />
           </div>
         </DialogOverlay>
         <DialogContent
-          className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
+          className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-dialog-out data-[state=open]:animate-dialog-in"
           onOpenAutoFocus={focusDialog}
         >
           <div className="relative mx-auto flex min-h-screen max-w-page items-center justify-center">
             <DialogClose asChild>
-              <Button
-                className={cn("absolute z-60", CORNER_INSET)}
-                variant="pill"
-              >
+              <Button className="z-60" placement="corner" variant="pill">
                 Close
               </Button>
             </DialogClose>
@@ -138,14 +193,14 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                   <p className={TEXT_BODY}>
                     Fill out the form below. Or reach me directly at{" "}
                     <a
-                      className="hover-fade text-ink"
+                      className="text-ink hover-fade"
                       href={`mailto:${CONTACT_EMAIL}`}
                     >
                       {CONTACT_EMAIL}
                     </a>{" "}
                     or{" "}
                     <a
-                      className="hover-fade text-ink"
+                      className="text-ink hover-fade"
                       href={CONTACT_PHONE.href}
                     >
                       {CONTACT_PHONE.display}
@@ -158,22 +213,30 @@ export function ContactDialog({ isOpen, onClose }: Props) {
               <form
                 className="space-y-5"
                 noValidate
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit}
+                ref={formRef}
               >
                 <div className="flex gap-4">
                   <Field
                     error={errors.name}
                     id="name"
                     label="Name"
+                    minLength={2}
+                    onBlur={handleBlur}
+                    onInput={handleInput}
                     placeholder="John Doe"
-                    register={register("name")}
+                    required
                   />
                   <Field
                     error={errors.email}
                     id="email"
                     label="Email"
+                    onBlur={handleBlur}
+                    onInput={handleInput}
+                    // Stricter than type="email" alone: needs a dot in the domain.
+                    pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
                     placeholder="your@email.com"
-                    register={register("email")}
+                    required
                     type="email"
                   />
                 </div>
@@ -185,8 +248,9 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                     }
                     id="phone"
                     label="Phone"
+                    onBlur={handleBlur}
+                    onInput={handleInput}
                     placeholder="+1 (555) 000-0000"
-                    register={register("phone")}
                     type="tel"
                   />
                   <div className="flex-1" />
@@ -196,9 +260,12 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                   error={errors.message}
                   id="message"
                   label="Message"
+                  minLength={10}
                   multiline
+                  onBlur={handleBlur}
+                  onInput={handleInput}
                   placeholder="I'm looking for help with..."
-                  register={register("message")}
+                  required
                 />
 
                 <input
@@ -206,7 +273,6 @@ export function ContactDialog({ isOpen, onClose }: Props) {
                   autoComplete="off"
                   className="hidden"
                   name="_honey"
-                  ref={honeyRef}
                   tabIndex={-1}
                   type="text"
                 />
@@ -225,4 +291,4 @@ export function ContactDialog({ isOpen, onClose }: Props) {
       </DialogPortal>
     </DialogRoot>
   );
-}
+};

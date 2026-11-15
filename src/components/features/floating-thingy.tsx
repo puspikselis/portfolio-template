@@ -21,16 +21,17 @@ interface Config {
 const DEFAULT_STICKY_TOP_FALLBACK = 160;
 const DEFAULT_DASH = MUTED_ACCENT;
 const HYSTERESIS = 4;
-const BOTTOM_THRESHOLD_PX = 100; // Fixed pixel threshold instead of percentage
+// Fixed pixel threshold instead of percentage.
+const BOTTOM_THRESHOLD_PX = 100;
 
 // Walking from the last section up, pick the first one visible in the
 // viewport and compute how far the floating label must shift down to align
 // with it (or its explicit [data-align-target]).
-function nearBottomTarget(
+const nearBottomTarget = (
   elements: HTMLElement[],
   viewportH: number,
   stickyTop: number
-): { activeEl: HTMLElement | null; offset: number } {
+): { activeEl: HTMLElement | null; offset: number } => {
   for (let i = elements.length - 1; i >= 0; i -= 1) {
     const rect = elements[i].getBoundingClientRect();
     if (rect.top < viewportH && rect.bottom > 0) {
@@ -44,14 +45,14 @@ function nearBottomTarget(
     }
   }
   return { activeEl: null, offset: 0 };
-}
+};
 
 // Normal scrolling: the section whose band straddles the floating label wins;
 // otherwise the last section that has scrolled past it.
-function scrolledTarget(
+const scrolledTarget = (
   elements: HTMLElement[],
   floatingTop: number
-): HTMLElement | null {
+): HTMLElement | null => {
   for (const el of elements) {
     const rect = el.getBoundingClientRect();
     if (
@@ -70,9 +71,9 @@ function scrolledTarget(
     }
   }
   return lastPassed;
-}
+};
 
-export function FloatingThingy() {
+export const FloatingThingy = () => {
   const [config, setConfig] = useState<Config>({
     color: "",
     title: "",
@@ -83,9 +84,8 @@ export function FloatingThingy() {
   const lastSigRef = useRef("");
   const stickyTopRef = useRef<number>(DEFAULT_STICKY_TOP_FALLBACK);
   const elementsRef = useRef<HTMLElement[]>([]);
-  const updateActiveElementRef = useRef<() => void>(() => {
-    // replaced with the real handler once the effect below runs
-  });
+  // Set to the real handler once the effect below runs.
+  const updateActiveElementRef = useRef<(() => void) | null>(null);
 
   const offsetRef = useRef(0);
 
@@ -94,16 +94,17 @@ export function FloatingThingy() {
     if (!el) {
       return;
     }
-    const topPx = Number.parseFloat(getComputedStyle(el).top);
-    if (!Number.isNaN(topPx)) {
-      stickyTopRef.current = topPx;
+    // Only a resolved pixel length counts; "auto" keeps the fallback.
+    const { top } = getComputedStyle(el);
+    if (top.endsWith("px")) {
+      stickyTopRef.current = Number(top.slice(0, -2));
     }
   }, []);
 
   const collectElements = useCallback(() => {
-    elementsRef.current = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-title]")
-    );
+    elementsRef.current = [
+      ...document.querySelectorAll<HTMLElement>("[data-title]"),
+    ];
   }, []);
 
   // Write the CSS var directly to avoid a React re-render per update;
@@ -192,20 +193,16 @@ export function FloatingThingy() {
       // Use fixed pixel threshold instead of percentage - more reliable across different page heights
       const nearBottom = docH - scrollBottom <= BOTTOM_THRESHOLD_PX;
 
-      let activeEl: HTMLElement | null;
-      let offset = 0;
-
-      if (nearBottom) {
-        ({ activeEl, offset } = nearBottomTarget(
-          elements,
-          viewportH,
-          stickyTop
-        ));
-      } else {
-        activeEl = scrolledTarget(elements, host.getBoundingClientRect().top);
-      }
-
-      activeEl = activeEl || elements[0];
+      const { activeEl: found, offset } = nearBottom
+        ? nearBottomTarget(elements, viewportH, stickyTop)
+        : {
+            activeEl: scrolledTarget(
+              elements,
+              host.getBoundingClientRect().top
+            ),
+            offset: 0,
+          };
+      const activeEl = found ?? elements[0];
 
       setOffset(offset);
       if (activeEl) {
@@ -249,21 +246,21 @@ export function FloatingThingy() {
     <div className="pointer-events-none fixed inset-x-0 top-40 z-10 hidden md:block">
       <div
         className={cn(
-          "mx-auto max-w-page translate-y-[var(--offset)] space-y-2 pl-24 transition-[translate] duration-200 ease-out",
+          "mx-auto max-w-page translate-y-(--offset) space-y-2 pl-24 transition-translate duration-200 ease-out",
           config.title &&
             'before:absolute before:top-2 before:left-0 before:block before:h-px before:w-8 before:bg-nero-500 before:content-[""]',
           config.title &&
-            'after:absolute after:top-2 after:left-12 after:block after:h-px after:w-8 after:bg-[var(--dash-color)] after:transition-colors after:content-[""]'
+            'after:absolute after:top-2 after:left-12 after:block after:h-px after:w-8 after:bg-(--dash-color) after:transition-colors after:content-[""]'
         )}
         ref={floatingRef}
         style={style}
       >
         {config.title ? (
-          <div className="font-medium text-13/4 text-ink">
+          <div className="text-13/4 font-medium text-ink">
             <AnimatedText text={config.title} />
           </div>
         ) : null}
       </div>
     </div>
   );
-}
+};

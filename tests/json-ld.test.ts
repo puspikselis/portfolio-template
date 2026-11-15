@@ -4,9 +4,10 @@ import { businesses } from "@/data/businesses";
 import { GITHUB_PROFILE_URL, LINKEDIN_URL } from "@/lib/constants";
 import { buildPersonJsonLd } from "@/lib/json-ld";
 
+const names = (orgs: { name: string }[]) => orgs.map((org) => org.name);
+
 describe("Person JSON-LD", () => {
   const person = buildPersonJsonLd();
-  const names = (orgs: { name: string }[]) => orgs.map((org) => org.name);
 
   test("sameAs lists only profiles", () => {
     expect(person.sameAs).toEqual([LINKEDIN_URL, GITHUB_PROFILE_URL]);

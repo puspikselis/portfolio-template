@@ -1,42 +1,59 @@
 "use client";
 
-import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import type { FormEventHandler, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 const inputClasses =
-  "inset-highlight h-11 w-full rounded-xl bg-nero-100 px-4 py-3 text-15/6 text-ink shadow-[0_1px_2px_rgba(0,0,0,.48)] transition-all placeholder:text-dim-gray-100 focus:placeholder:opacity-50 focus:outline-none focus:ring-1 focus:ring-orange-100";
-const labelClasses = "block font-medium text-15 text-ink -tracking-[0.01em]";
-const errorClasses = "text-12/4 text-red-500 -tracking-[0.01em]";
+  "inset-highlight h-11 w-full rounded-xl bg-nero-100 px-4 py-3 text-15/6 text-ink shadow-input transition-all placeholder:text-dim-gray-100 focus:placeholder:opacity-50 focus:outline-none focus:ring-1 focus:ring-orange-100";
+const labelClasses = "block font-medium text-15 text-ink tracking-tight-1";
+const errorClasses = "text-12/4 text-error tracking-tight-1";
+
+type FieldElement = HTMLInputElement | HTMLTextAreaElement;
 
 interface FieldProps {
-  error?: FieldError;
-  hint?: React.ReactNode;
+  /** Message shown under the field; also marks it aria-invalid. */
+  error?: string;
+  hint?: ReactNode;
+  /** Also the control's `name` in the submitted FormData. */
   id: string;
   label: string;
+  minLength?: number;
   multiline?: boolean;
+  onBlur?: FormEventHandler<FieldElement>;
+  onInput?: FormEventHandler<FieldElement>;
+  /** Regex the value must match (inputs only). */
+  pattern?: string;
   placeholder: string;
-  register: UseFormRegisterReturn;
+  required?: boolean;
   type?: "email" | "tel" | "text";
 }
 
-export function Field({
+export const Field = ({
   error,
   hint,
   id,
   label,
+  minLength,
   multiline,
+  onBlur,
+  onInput,
+  pattern,
   placeholder,
-  register,
+  required,
   type = "text",
-}: FieldProps) {
+}: FieldProps) => {
   const errorId = error ? `${id}-error` : undefined;
   const sharedProps = {
     "aria-describedby": errorId,
     "aria-invalid": error ? true : undefined,
     id,
+    minLength,
+    name: id,
+    onBlur,
+    onInput,
     placeholder,
-    ...register,
+    required,
   };
 
   return (
@@ -51,13 +68,18 @@ export function Field({
           className={cn(inputClasses, "h-auto min-h-24 resize-y")}
         />
       ) : (
-        <input {...sharedProps} className={inputClasses} type={type} />
+        <input
+          {...sharedProps}
+          className={inputClasses}
+          pattern={pattern}
+          type={type}
+        />
       )}
       {error ? (
         <p className={errorClasses} id={errorId}>
-          {error.message}
+          {error}
         </p>
       ) : null}
     </div>
   );
-}
+};

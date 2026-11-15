@@ -8,13 +8,11 @@ interface YearLabelProps {
 }
 
 /** The small year line above an entry or case study title. */
-export function YearLabel({ isAlignTarget, year }: YearLabelProps) {
-  return (
-    <p
-      className="font-medium text-13/4 text-dim-gray-100"
-      data-align-target={isAlignTarget ? "true" : undefined}
-    >
-      <time dateTime={getYear(year)}>{year}</time>
-    </p>
-  );
-}
+export const YearLabel = ({ isAlignTarget, year }: YearLabelProps) => (
+  <p
+    className="text-13/4 font-medium text-dim-gray-100"
+    data-align-target={isAlignTarget ? "true" : undefined}
+  >
+    <time dateTime={getYear(year)}>{year}</time>
+  </p>
+);

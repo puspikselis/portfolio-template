@@ -13,24 +13,21 @@ import {
 } from "@/lib/constants";
 
 /** A top-level schema.org node: adds the shared @context. */
-export function schemaNode<T extends Record<string, unknown>>(
+export const schemaNode = <T extends Record<string, unknown>>(
   type: string,
   props: T
-) {
-  return { "@context": "https://schema.org", "@type": type, ...props };
-}
+) => ({ "@context": "https://schema.org", "@type": type, ...props });
 
 /** The site owner as a schema.org author reference. */
 export const AUTHOR = { "@type": "Person", name: SITE_NAME } as const;
 
-function organization(name: string, url?: string) {
-  return url
+const organization = (name: string, url?: string) =>
+  url
     ? { "@type": "Organization", name, url }
     : { "@type": "Organization", name };
-}
 
 /** schema.org Person for the site owner, derived from the projects and ventures data. */
-export function buildPersonJsonLd() {
+export const buildPersonJsonLd = () => {
   const current = projects.filter((project) => isCurrentRole(project.year));
   const past = projects.filter((project) => !isCurrentRole(project.year));
 
@@ -56,4 +53,4 @@ export function buildPersonJsonLd() {
       ),
     ],
   });
-}
+};

@@ -17,8 +17,8 @@ export default function Home() {
     <>
       <FloatingThingy />
       <main className="pt-13 pb-42">
-        <Section className="narrow-container space-y-4" title="Intro">
-          <h1 className={TEXT_DISPLAY}>
+        <Section title="Intro" variant="narrow">
+          <h1 className={cn("mb-4", TEXT_DISPLAY)}>
             Product designer with {YEARS_OF_EXPERIENCE} years of experience
             based in Latvia. I design digital products people enjoy using.
           </h1>

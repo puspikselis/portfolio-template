@@ -8,26 +8,26 @@ import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { projects } from "@/data/projects";
 import { caseStudyPath } from "@/lib/metadata";
-import { getYears } from "@/lib/utils";
+import { cn, getYears } from "@/lib/utils";
 
 // Roles shown before "Show earlier roles"; the rest stay in the DOM (crawlable) but collapsed.
 const VISIBLE_ROLES = 5;
 const EARLIER_ROLES_ID = "earlier-roles";
 
-function fallbackButtonLabel(hasDetailPage: boolean, comingSoon?: boolean) {
+const fallbackButtonLabel = (hasDetailPage: boolean, comingSoon?: boolean) => {
   if (hasDetailPage) {
     return "View";
   }
   return comingSoon ? null : "Archive";
-}
+};
 
-function ProjectCard({
+const ProjectCard = ({
   project,
   isFirst,
 }: {
   project: (typeof projects)[number];
   isFirst?: boolean;
-}) {
+}) => {
   const buttonLabel =
     project.buttonLabel ??
     fallbackButtonLabel(Boolean(project.slug), project.comingSoon);
@@ -57,9 +57,9 @@ function ProjectCard({
       year={project.year}
     />
   );
-}
+};
 
-export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
+export const Projects = ({ excludeSlug }: { excludeSlug?: string } = {}) => {
   const filteredProjects = excludeSlug
     ? projects.filter((project) => project.slug && project.slug !== excludeSlug)
     : projects;
@@ -81,11 +81,7 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
   const latestEarlierYear = Math.max(...earlierYears.map(Number));
 
   return (
-    <Section
-      className="narrow-container"
-      headingId="projects-heading"
-      title={title}
-    >
+    <Section headingId="projects-heading" title={title} variant="narrow">
       <div className="space-y-14">
         {recent.map((project, index) => (
           <ProjectCard
@@ -98,11 +94,13 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
       {earlier.length > 0 && (
         <>
           <div
-            className="grid outline-none transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
+            className={cn(
+              "grid transition-grid-rows duration-500 ease-out outline-none motion-reduce:transition-none",
+              isExpanded ? "grid-rows-expanded" : "grid-rows-collapsed"
+            )}
             id={EARLIER_ROLES_ID}
             inert={!isExpanded}
             ref={earlierRef}
-            style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
             tabIndex={-1}
           >
             <div className="overflow-hidden">
@@ -128,4 +126,4 @@ export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
       )}
     </Section>
   );
-}
+};

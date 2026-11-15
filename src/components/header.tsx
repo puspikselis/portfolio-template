@@ -1,6 +1,8 @@
 "use client";
 
-import { type ChangeEvent, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
+import type { ChangeEvent } from "react";
+
 import { ContactDialog } from "@/components/dialogs/contact-dialog";
 import { SpotifyStatus } from "@/components/features/spotify-status";
 import { AppLink } from "@/components/ui/app-link";
@@ -44,7 +46,7 @@ const LINKS: readonly HeaderLink[] = [
   },
 ];
 
-function HeaderLinkButton({ link }: { link: HeaderLink }) {
+const HeaderLinkButton = ({ link }: { link: HeaderLink }) => {
   const button = (
     <Button asChild className="group hidden md:inline-flex" variant="link">
       <AppLink aria-label={link.ariaLabel} external href={link.href}>
@@ -61,16 +63,16 @@ function HeaderLinkButton({ link }: { link: HeaderLink }) {
       <TooltipContent>Updated {link.updated}</TooltipContent>
     </Tooltip>
   );
-}
+};
 
-function handleLinksChange(e: ChangeEvent<HTMLSelectElement>) {
+const handleLinksChange = (e: ChangeEvent<HTMLSelectElement>) => {
   if (e.target.value) {
     window.open(e.target.value, "_blank", "noopener,noreferrer");
   }
   e.target.value = "";
-}
+};
 
-export function Header() {
+export const Header = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const openContact = useCallback(() => setIsContactOpen(true), []);
   const closeContact = useCallback(() => setIsContactOpen(false), []);
@@ -81,20 +83,18 @@ export function Header() {
         {/* One home link covers avatar and name; the status sits over its empty top-right cell. */}
         <div className="group grid grid-cols-[auto_auto] items-center gap-x-3">
           <AppLink
-            className="focus-ring col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
+            className="col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
+            focusRing
             href="/"
           >
-            <Avatar className="hover-fade row-span-2 size-9 rounded-xl">
-              <AvatarImage
-                alt=""
-                className="rounded-none"
-                src={OWNER_PHOTO_PATH}
-              />
+            <Avatar className="row-span-2 size-9" fade shape="tile">
+              <AvatarImage alt="" src={OWNER_PHOTO_PATH} />
               <AvatarFallback>KK</AvatarFallback>
             </Avatar>
             <RollingText
-              className="col-start-2 row-start-2 self-start font-semibold text-13/4 text-ink"
+              className="col-start-2 row-start-2 self-start"
               text={SITE_NAME}
+              tone="title"
             />
           </AppLink>
           <SpotifyStatus className="col-start-2 row-start-1 self-end" />
@@ -102,7 +102,7 @@ export function Header() {
         <nav aria-label="Primary" className="flex items-center md:gap-5">
           <select
             aria-label="Links"
-            className="focus-ring appearance-none font-semibold text-12 text-nobel-100 md:hidden"
+            className="appearance-none text-12 font-semibold text-nobel-100 focus-ring md:hidden"
             onChange={handleLinksChange}
           >
             <option value="">Links</option>
@@ -125,4 +125,4 @@ export function Header() {
       <ContactDialog isOpen={isContactOpen} onClose={closeContact} />
     </>
   );
-}
+};

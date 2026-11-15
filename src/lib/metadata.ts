@@ -10,9 +10,9 @@ import {
 
 // A page that sets its own `openGraph`/`twitter` replaces the root ones, which
 // drops the root file-based social card, so the card is listed here explicitly.
-function socialCard(url: string) {
-  return [{ alt: SITE_TITLE, ...OG_IMAGE_SIZE, type: "image/png", url }];
-}
+const socialCard = (url: string) => [
+  { alt: SITE_TITLE, ...OG_IMAGE_SIZE, type: "image/png", url },
+];
 
 /** Open Graph fields every page shares; pages add their own title, description and URL. */
 const OPEN_GRAPH_BASE = {
@@ -35,16 +35,14 @@ interface SocialInput {
 }
 
 /** Open Graph and Twitter tags, the one place social fields are built. */
-export function socialMetadata({
+export const socialMetadata = ({
   description,
   title,
   url,
-}: SocialInput): Pick<Metadata, "openGraph" | "twitter"> {
-  return {
-    openGraph: { ...OPEN_GRAPH_BASE, description, title, url },
-    twitter: { ...TWITTER_BASE, description, title },
-  };
-}
+}: SocialInput): Pick<Metadata, "openGraph" | "twitter"> => ({
+  openGraph: { ...OPEN_GRAPH_BASE, description, title, url },
+  twitter: { ...TWITTER_BASE, description, title },
+});
 
 interface PageMetadataInput {
   description: string;
@@ -54,38 +52,32 @@ interface PageMetadataInput {
 }
 
 /** Title, description, canonical and social tags for one page, all from the same values. */
-export function pageMetadata({
+export const pageMetadata = ({
   description,
   path,
   title,
-}: PageMetadataInput): Metadata {
-  return {
-    alternates: { canonical: path },
-    description,
-    title,
-    ...socialMetadata({ description, title, url: path }),
-  };
-}
+}: PageMetadataInput): Metadata => ({
+  alternates: { canonical: path },
+  description,
+  title,
+  ...socialMetadata({ description, title, url: path }),
+});
 
-export function caseStudyPath(slug: string): string {
-  return `/projects/${slug}`;
-}
+export const caseStudyPath = (slug: string): string => `/projects/${slug}`;
 
 /** Absolute URL of a case study page. */
-export function caseStudyUrl(slug: string): string {
-  return absoluteUrl(caseStudyPath(slug));
-}
+export const caseStudyUrl = (slug: string): string =>
+  absoluteUrl(caseStudyPath(slug));
 
-function caseStudyTitle(slug: string): string {
+const caseStudyTitle = (slug: string): string => {
   const { company, title } = getCaseStudy(slug);
   return `${company} - ${title} | ${SITE_NAME}`;
-}
+};
 
 /** Metadata for a /projects/[slug] page, from the projects data. */
-export function caseStudyMetadata(slug: string): Metadata {
-  return pageMetadata({
+export const caseStudyMetadata = (slug: string): Metadata =>
+  pageMetadata({
     description: getCaseStudy(slug).description,
     path: caseStudyPath(slug),
     title: caseStudyTitle(slug),
   });
-}

@@ -2,20 +2,20 @@
 
 import {
   createContext,
-  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { businesses } from "@/data/businesses";
 import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useRequiredContext } from "@/lib/use-required-context";
-import { densitySrcSet } from "@/lib/utils";
+import { cn, densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
   color: string;
@@ -52,12 +52,9 @@ const DEFAULT_WIDTH = 248;
 const DEFAULT_HEIGHT = 156;
 const COARSE_POINTER_QUERY = "(pointer: coarse)";
 const MEDIA_CLASSES = "size-full rounded-2xl object-cover";
-// easeOutQuint for the show/hide fade and scale.
-const EASE = "cubic-bezier(0.22,1,0.36,1)";
 
-function isVideoSrc(src: string | undefined): src is string {
-  return Boolean(src?.endsWith(".webm"));
-}
+const isVideoSrc = (src: string | undefined): src is string =>
+  Boolean(src?.endsWith(".webm"));
 
 const VIDEO_PREVIEWS = [
   ...projects.map((project) => project.preview),
@@ -66,11 +63,10 @@ const VIDEO_PREVIEWS = [
   ),
 ].filter((src): src is string => isVideoSrc(src));
 
-function isMediaReady(el: HTMLImageElement | HTMLVideoElement): boolean {
-  return el instanceof HTMLVideoElement
+const isMediaReady = (el: HTMLImageElement | HTMLVideoElement): boolean =>
+  el instanceof HTMLVideoElement
     ? el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
     : el.complete && el.naturalWidth > 0;
-}
 
 interface PreviewMediaProps {
   height: number;
@@ -80,7 +76,7 @@ interface PreviewMediaProps {
   width: number;
 }
 
-function PreviewMedia({ height, onLoaded, src, width }: PreviewMediaProps) {
+const PreviewMedia = ({ height, onLoaded, src, width }: PreviewMediaProps) => {
   const mediaRef = useCallback(
     (el: HTMLImageElement | HTMLVideoElement | null) => {
       if (!el) {
@@ -109,20 +105,26 @@ function PreviewMedia({ height, onLoaded, src, width }: PreviewMediaProps) {
       src={src}
     />
   ) : (
-    // biome-ignore lint/performance/noImgElement: hand-made @2x/@3x files, no optimizer needed
-    <img
-      alt=""
-      className={MEDIA_CLASSES}
-      height={height}
-      ref={mediaRef}
-      src={src}
-      srcSet={densitySrcSet(src)}
-      width={width}
-    />
+    // <picture>: the hand-made @2x/@3x files are the sources; no optimizer needed.
+    <picture>
+      <img
+        alt=""
+        className={MEDIA_CLASSES}
+        height={height}
+        ref={mediaRef}
+        src={src}
+        srcSet={densitySrcSet(src)}
+        width={width}
+      />
+    </picture>
   );
-}
+};
 
-export function CursorPreviewProvider({ children }: { children: ReactNode }) {
+export const CursorPreviewProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [state, setState] = useState<CursorPreviewState>({
     color: DEFAULT_PREVIEW_COLOR,
     height: DEFAULT_HEIGHT,
@@ -134,7 +136,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
   const isVisibleRef = useRef(false);
   const positionRef = useRef<HTMLDivElement>(null);
   // Set by the spring effect: jumps the preview to the cursor with no travel.
-  const snapRef = useRef<() => void>(() => undefined);
+  const snapRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     isVisibleRef.current = state.isVisible;
@@ -257,7 +259,7 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         return;
       }
       if (!isVisibleRef.current) {
-        snapRef.current();
+        snapRef.current?.();
       }
       isVisibleRef.current = true;
       setState((prev) => ({
@@ -301,26 +303,28 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
         className="pointer-events-none fixed top-0 left-0 z-50"
         ref={positionRef}
       >
+        {/* No blur filter: filtering a playing <video> made Chrome draw it
+            shifted inside its box during the transition. */}
         <div
-          className="origin-top-left overflow-hidden rounded-2xl shadow-2xl"
-          style={{
-            backgroundColor: isLoaded ? "transparent" : state.color,
-            height: state.height,
-            opacity: state.isVisible ? 1 : 0,
-            scale: state.isVisible ? "1" : "0.9",
-            // No blur filter: filtering a playing <video> made Chrome draw it
-            // shifted inside its box during the transition.
-            transition: `opacity 200ms ${EASE}, scale 200ms ${EASE}`,
-            width: state.width,
-          }}
+          className={cn(
+            "h-(--preview-height) w-(--preview-width) origin-top-left overflow-hidden rounded-2xl shadow-2xl transition-fade-scale duration-200 ease-out-quint",
+            state.isVisible ? "scale-100 opacity-100" : "scale-90 opacity-0",
+            isLoaded ? "bg-transparent" : "bg-(--preview-color)"
+          )}
+          style={
+            {
+              "--preview-color": state.color,
+              "--preview-height": `${state.height}px`,
+              "--preview-width": `${state.width}px`,
+            } as CSSProperties
+          }
         >
           {media}
         </div>
       </div>
     </CursorPreviewContext.Provider>
   );
-}
+};
 
-export function useCursorPreview() {
-  return useRequiredContext(CursorPreviewContext, "useCursorPreview");
-}
+export const useCursorPreview = () =>
+  useRequiredContext(CursorPreviewContext, "useCursorPreview");

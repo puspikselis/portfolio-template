@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 const NOT_PLAYING = { isPlaying: false } as const;
 
-export async function GET() {
+export const GET = async () => {
   try {
     const response = await getNowPlaying();
 
@@ -21,4 +21,4 @@ export async function GET() {
     console.error("Error fetching Spotify data:", error);
     return NextResponse.json(NOT_PLAYING);
   }
-}
+};

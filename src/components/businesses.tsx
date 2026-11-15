@@ -4,7 +4,8 @@ import { EntryAction } from "@/components/entry-action";
 import { EntryCard } from "@/components/entry-card";
 import { AppStoreIcon, PlayStoreIcon } from "@/components/icons/store-icons";
 import { Section } from "@/components/ui/section";
-import { businesses, type Platform } from "@/data/businesses";
+import { businesses } from "@/data/businesses";
+import type { Platform } from "@/data/businesses";
 import { MD_BREAKPOINT_QUERY } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/use-media-query";
 
@@ -13,10 +14,10 @@ const STORE_ICONS = {
   playStore: PlayStoreIcon,
 };
 
-const IOS_RE = /iphone|ipad|ipod/;
-const ANDROID_RE = /android/;
+const IOS_RE = /iphone|ipad|ipod/u;
+const ANDROID_RE = /android/u;
 
-function detectPlatform(): Platform | null {
+const detectPlatform = (): Platform | null => {
   const ua = window.navigator.userAgent.toLowerCase();
   if (IOS_RE.test(ua)) {
     return "ios";
@@ -25,23 +26,23 @@ function detectPlatform(): Platform | null {
     return "android";
   }
   return null;
-}
+};
 
 // Below `md`, phones only see their own store's button. The server and the
 // hydrating client (isDesktop null) render every button; the filter applies
 // right after hydration.
-function usePlatform(): Platform | null {
+const usePlatform = (): Platform | null => {
   const isDesktop = useMediaQuery(MD_BREAKPOINT_QUERY);
   return isDesktop === false ? detectPlatform() : null;
-}
+};
 
-function BusinessCard({
+const BusinessCard = ({
   business,
   isFirst,
 }: {
   business: (typeof businesses)[number];
   isFirst?: boolean;
-}) {
+}) => {
   const platform = usePlatform();
   const irrelevant: Platform | null =
     platform && (platform === "ios" ? "android" : "ios");
@@ -78,22 +79,21 @@ function BusinessCard({
       year={business.year}
     />
   );
-}
+};
 
-export function Businesses() {
-  return (
-    <Section
-      className="inset-highlight-soft mx-auto max-w-152 bg-nero-300 px-8 py-8 md:rounded-3xl"
-      headingId="businesses-heading"
-      title="Ventures"
-    >
-      {businesses.map((business, index) => (
-        <BusinessCard
-          business={business}
-          isFirst={index === 0}
-          key={business.id}
-        />
-      ))}
-    </Section>
-  );
-}
+export const Businesses = () => (
+  <Section
+    className="mx-auto max-w-152"
+    headingId="businesses-heading"
+    title="Ventures"
+    variant="panel"
+  >
+    {businesses.map((business, index) => (
+      <BusinessCard
+        business={business}
+        isFirst={index === 0}
+        key={business.id}
+      />
+    ))}
+  </Section>
+);

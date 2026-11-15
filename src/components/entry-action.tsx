@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import { AppLink } from "@/components/ui/app-link";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface EntryActionProps {
   /** Hidden from sight, read after the label: "View Centus". */
@@ -17,13 +16,13 @@ interface EntryActionProps {
 }
 
 /** The pill on the right of an employment or venture row. */
-export function EntryAction({
+export const EntryAction = ({
   company,
   external,
   href,
   icon,
   label,
-}: EntryActionProps) {
+}: EntryActionProps) => {
   const content = (
     <>
       {icon ?? label}
@@ -36,7 +35,8 @@ export function EntryAction({
   return (
     <Button
       asChild
-      className={cn("relative z-10", icon && "w-9 px-0")}
+      className="relative z-10"
+      size={icon ? "icon" : undefined}
       variant="pill"
     >
       {href ? (
@@ -48,4 +48,4 @@ export function EntryAction({
       )}
     </Button>
   );
-}
+};

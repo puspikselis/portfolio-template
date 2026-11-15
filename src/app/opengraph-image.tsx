@@ -1,3 +1,4 @@
+/* oxlint-disable shadcn/no-inline-styles -- ImageResponse (satori) renders only inline styles: no stylesheet, no CSS variables. */
 import { ImageResponse } from "next/og";
 
 import {
@@ -11,10 +12,14 @@ import {
 } from "@/lib/constants";
 
 // ImageResponse cannot read CSS variables, so these mirror globals.css tokens.
-const INK = "#ffffff"; // --color-ink
-const MUTED = "#9a9a9a"; // --color-nobel-100
-const GRADIENT_FROM = "#151515"; // --color-nero-300
-const GRADIENT_TO = "#262626"; // --color-nero-100
+// --color-ink
+const INK = "#ffffff";
+// --color-nobel-100
+const MUTED = "#9a9a9a";
+// --color-nero-300
+const GRADIENT_FROM = "#151515";
+// --color-nero-100
+const GRADIENT_TO = "#262626";
 
 export const alt = SITE_TITLE;
 export const size = OG_IMAGE_SIZE;

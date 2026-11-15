@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { Note } from "@/components/icons/note";
 import { AppLink } from "@/components/ui/app-link";
 import { SITE_ROLE } from "@/lib/constants";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils";
 const POLL_INTERVAL_MS = 30_000;
 
 /** "Listening to …" while Spotify plays, otherwise the role line under the name. */
-export function SpotifyStatus({ className }: { className?: string }) {
+export const SpotifyStatus = ({ className }: { className?: string }) => {
   const [data, setData] = useState<SpotifyData | null>(null);
 
   useEffect(() => {
@@ -65,9 +66,10 @@ export function SpotifyStatus({ className }: { className?: string }) {
   return data ? (
     <AppLink
       aria-label={`Currently listening to ${data.title} by ${data.artist} on Spotify`}
-      className={cn("hover-fade flex items-center gap-1.5", className)}
+      className={className}
       external
       href={data.songUrl}
+      tone="status"
     >
       <div className="text-dim-gray-100">
         <Note />
@@ -90,4 +92,4 @@ export function SpotifyStatus({ className }: { className?: string }) {
   ) : (
     <div className={cn(TEXT_CAPTION, className)}>{SITE_ROLE}</div>
   );
-}
+};

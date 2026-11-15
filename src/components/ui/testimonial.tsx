@@ -6,14 +6,14 @@ import { TEXT_BODY, TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
 import { cn, densitySrcSet } from "@/lib/utils";
 
 /** Splits a paragraph into lines; every line but the last ends in a <br>. */
-export function toLines(paragraph: string) {
+export const toLines = (paragraph: string) => {
   const lines = paragraph.split("\n");
   return lines.map((text, index) => ({
     breakAfter: index < lines.length - 1,
     key: `${index}-${text.slice(0, 30)}`,
     text,
   }));
-}
+};
 
 interface TestimonialProps {
   author: {
@@ -25,15 +25,20 @@ interface TestimonialProps {
   className?: string;
 }
 
-export function Testimonial({ author, children, className }: TestimonialProps) {
+export const Testimonial = ({
+  author,
+  children,
+  className,
+}: TestimonialProps) => {
   const paragraphs = children.split("\n\n").filter(Boolean);
 
   return (
     <Section
-      className={cn("narrow-container", className)}
+      className={className}
       color={MUTED_ACCENT}
       headingId="testimonial-heading"
       title="Reference"
+      variant="narrow"
     >
       <figure className="relative">
         {/* Inline on purpose: it keeps the line box the old wrapper div had. */}
@@ -72,7 +77,7 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1">
-            <p className="font-semibold text-13/4 text-ink -tracking-[0.03em]">
+            <p className="text-13/4 font-semibold tracking-tight-3 text-ink">
               {author.name}
             </p>
             <p className={TEXT_CAPTION}>{author.title}</p>
@@ -81,4 +86,4 @@ export function Testimonial({ author, children, className }: TestimonialProps) {
       </figure>
     </Section>
   );
-}
+};

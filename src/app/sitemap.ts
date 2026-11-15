@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       changeFrequency: "monthly",
       lastModified: new Date(getCommitISO()),
-      priority: 1.0,
+      priority: 1,
       url: SITE_URL,
     },
     ...caseStudies.map((project) => ({

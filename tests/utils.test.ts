@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -10,6 +9,8 @@ import {
   getYear,
   getYears,
   INSET_SHADOW_TOKENS,
+  SHADOW_TOKENS,
+  TRACKING_TOKENS,
 } from "@/lib/utils";
 
 describe("getYear", () => {
@@ -47,21 +48,33 @@ describe("absoluteUrl", () => {
 describe("tailwind-merge token lists", () => {
   const css = readFileSync(
     fileURLToPath(new URL("../src/app/globals.css", import.meta.url)),
-    "utf8"
+    "utf-8"
   );
   const tokens = (prefix: string) =>
-    [...css.matchAll(new RegExp(`--${prefix}-([\\w-]+):`, "g"))].map(
-      (match) => match[1]
+    [...css.matchAll(new RegExp(`--${prefix}-(?<name>[\\w-]+):`, "gu"))].map(
+      (match) => match.groups?.name
     );
 
   test("lists every --text-* token in globals.css", () => {
     const fontSizes = tokens("text");
-    expect([...FONT_SIZE_TOKENS].sort()).toEqual([...fontSizes].sort());
+    expect(FONT_SIZE_TOKENS.toSorted()).toEqual(fontSizes.toSorted());
   });
 
   test("lists every --inset-shadow-* token in globals.css", () => {
     const shadows = tokens("inset-shadow");
-    expect([...INSET_SHADOW_TOKENS].sort()).toEqual([...shadows].sort());
+    expect(INSET_SHADOW_TOKENS.toSorted()).toEqual(shadows.toSorted());
+  });
+
+  test("lists every --shadow-* token in globals.css", () => {
+    expect(SHADOW_TOKENS.toSorted()).toEqual(tokens("shadow").toSorted());
+  });
+
+  test("lists every --tracking-* token in globals.css", () => {
+    expect(TRACKING_TOKENS.toSorted()).toEqual(tokens("tracking").toSorted());
+  });
+
+  test("tracking tokens merge with each other", () => {
+    expect(cn("tracking-tight-1", "tracking-tight-3")).toBe("tracking-tight-3");
   });
 });
 

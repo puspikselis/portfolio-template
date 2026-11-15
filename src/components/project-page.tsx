@@ -29,11 +29,9 @@ interface ProjectImage {
 const CASE_STUDY_IMAGE_SIZE = { height: 1872, width: 2784 };
 
 /** One gallery image at the default export size, unless it sets its own height. */
-export function caseStudyImage(
+export const caseStudyImage = (
   image: Omit<ProjectImage, "height" | "width"> & { height?: number }
-): ProjectImage {
-  return { ...CASE_STUDY_IMAGE_SIZE, ...image };
-}
+): ProjectImage => ({ ...CASE_STUDY_IMAGE_SIZE, ...image });
 
 interface TestimonialData {
   author: { image: string; name: string; title: string };
@@ -53,7 +51,7 @@ interface ProjectPageProps {
   testimonial?: TestimonialData;
 }
 
-export function ProjectPage({
+export const ProjectPage = ({
   children,
   color: colorProp,
   imageColor: imageColorProp,
@@ -61,7 +59,7 @@ export function ProjectPage({
   slug,
   tags,
   testimonial,
-}: ProjectPageProps) {
+}: ProjectPageProps) => {
   const project = getCaseStudy(slug);
   const { company: name, year } = project;
   const color = colorProp ?? project.color;
@@ -89,7 +87,7 @@ export function ProjectPage({
       <FloatingThingy />
       <JsonLd data={jsonLd} />
       <main className="pt-15 pb-42">
-        <Section className="narrow-container" color={color} title="Intro">
+        <Section color={color} title="Intro" variant="narrow">
           <div>
             <YearLabel year={year} />
             <h1 className={cn("mt-2", TEXT_DISPLAY)}>{name}</h1>
@@ -137,4 +135,4 @@ export function ProjectPage({
       </main>
     </>
   );
-}
+};

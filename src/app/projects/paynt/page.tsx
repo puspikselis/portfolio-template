@@ -22,16 +22,12 @@ export default function Paynt() {
         hands-on product designer for the ISO onboarding platform, POS
         applications, and marketing website, and I managed designers producing
         marketing materials, documents, and other collateral. I also led the
-        company's rebrand from Paydoo to Paynt in partnership with{" "}
-        <AppLink
-          className="hover-fade no-underline"
-          external
-          href="https://www.asketic.com"
-        >
+        company&apos;s rebrand from Paydoo to Paynt in partnership with{" "}
+        <AppLink external href="https://www.asketic.com" tone="fade">
           Asketic
         </AppLink>
         , aligning the identity, visual language, and messaging with the
-        company's evolution.
+        company&apos;s evolution.
       </p>
       <p>
         Samples show both Paydoo and Paynt branding — the rebrand happened

@@ -11,40 +11,36 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
-function TooltipProvider(
+const TooltipProvider = (
   props: ComponentProps<typeof TooltipProviderPrimitive>
-) {
-  return <TooltipProviderPrimitive {...props} />;
-}
+) => <TooltipProviderPrimitive {...props} />;
 
-function Tooltip(props: ComponentProps<typeof TooltipRoot>) {
-  return <TooltipRoot {...props} />;
-}
+const Tooltip = (props: ComponentProps<typeof TooltipRoot>) => (
+  <TooltipRoot {...props} />
+);
 
-function TooltipTrigger(props: ComponentProps<typeof TooltipTriggerPrimitive>) {
-  return <TooltipTriggerPrimitive {...props} />;
-}
+const TooltipTrigger = (
+  props: ComponentProps<typeof TooltipTriggerPrimitive>
+) => <TooltipTriggerPrimitive {...props} />;
 
-function TooltipContent({
+const TooltipContent = ({
   children,
   className,
   sideOffset = 8,
   ...props
-}: ComponentProps<typeof TooltipContentPrimitive>) {
-  return (
-    <TooltipPortal>
-      <TooltipContentPrimitive sideOffset={sideOffset} {...props}>
-        <div
-          className={cn(
-            "animate-[tooltip-in_480ms_var(--ease-spring-tooltip)_both] rounded-md bg-nero-100 px-2.5 py-1.5 font-medium text-12 text-ink",
-            className
-          )}
-        >
-          {children}
-        </div>
-      </TooltipContentPrimitive>
-    </TooltipPortal>
-  );
-}
+}: ComponentProps<typeof TooltipContentPrimitive>) => (
+  <TooltipPortal>
+    <TooltipContentPrimitive sideOffset={sideOffset} {...props}>
+      <div
+        className={cn(
+          "animate-tooltip-in rounded-md bg-nero-100 px-2.5 py-1.5 text-12 font-medium text-ink",
+          className
+        )}
+      >
+        {children}
+      </div>
+    </TooltipContentPrimitive>
+  </TooltipPortal>
+);
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };

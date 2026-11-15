@@ -133,21 +133,19 @@ export const projects: Project[] = [
   },
 ];
 
-function isCaseStudy(project: Project): project is CaseStudy {
-  return Boolean(project.slug && project.description && project.lastModified);
-}
+const isCaseStudy = (project: Project): project is CaseStudy =>
+  Boolean(project.slug && project.description && project.lastModified);
 
 export const caseStudies: CaseStudy[] = projects.filter(isCaseStudy);
 
-export function getCaseStudy(slug: string): CaseStudy {
+export const getCaseStudy = (slug: string): CaseStudy => {
   const caseStudy = caseStudies.find((project) => project.slug === slug);
   if (!caseStudy) {
     throw new Error(`Unknown case study: ${slug}`);
   }
   return caseStudy;
-}
+};
 
 /** Roles held now ("Since 2025") versus roles that have ended. */
-export function isCurrentRole(year: string): boolean {
-  return year.startsWith("Since");
-}
+export const isCurrentRole = (year: string): boolean =>
+  year.startsWith("Since");

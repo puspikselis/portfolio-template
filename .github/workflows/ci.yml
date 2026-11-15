@@ -20,7 +20,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Lint
-        run: bun x biome check src
+        run: bun run lint
 
       - name: Typecheck
         run: bun x tsc --noEmit

@@ -24,11 +24,9 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | null>(null);
 ToastContext.displayName = "ToastProvider";
 
-export function useToast() {
-  return useRequiredContext(ToastContext, "useToast");
-}
+export const useToast = () => useRequiredContext(ToastContext, "useToast");
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
+export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toast, setToast] = useState<{
     description: string;
     open: boolean;
@@ -70,18 +68,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <ToastRoot asChild duration={4000} onOpenChange={setOpen} open={open}>
             <div
               className={cn(
-                "fixed inset-highlight z-50 flex h-15 w-76 items-center justify-center gap-3 rounded-2xl bg-nero-300 p-3",
+                "fixed z-50 flex h-15 w-76 items-center justify-center gap-3 rounded-2xl bg-nero-300 p-3 inset-highlight",
                 CORNER_INSET,
-                "data-[state=closed]:animate-[toast-out_250ms_ease-in_both] data-[state=open]:animate-[toast-in_600ms_var(--ease-spring-toast)_both]"
+                "data-[state=closed]:animate-toast-out data-[state=open]:animate-toast-in"
               )}
             >
               {tone === "success" ? (
-                <div className="inset-highlight flex size-8 items-center justify-center rounded-lg bg-nero-100">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-nero-100 inset-highlight">
                   <CheckCircle />
                 </div>
               ) : null}
               <div className="flex flex-1 flex-col gap-1">
-                <ToastTitle className="font-semibold text-12/4 text-ink -tracking-[0.03em]">
+                <ToastTitle className="text-12/4 font-semibold tracking-tight-3 text-ink">
                   {title}
                 </ToastTitle>
                 {description ? (
@@ -97,4 +95,4 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       </ToastProviderPrimitive>
     </ToastContext.Provider>
   );
-}
+};

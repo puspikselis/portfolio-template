@@ -9,7 +9,7 @@ import {
 import { caseStudyUrl } from "@/lib/metadata";
 
 /** Plain-text summary for /llms.txt (https://llmstxt.org), built from the site's data. */
-export function buildLlmsTxt(): string {
+export const buildLlmsTxt = (): string => {
   const studies = caseStudies.map(
     (project) =>
       `- [${project.company}: ${project.title}, ${project.year}](${caseStudyUrl(project.slug)}): ${project.description}`
@@ -30,4 +30,4 @@ export function buildLlmsTxt(): string {
     `- [GitHub](${GITHUB_PROFILE_URL})`,
     "",
   ].join("\n");
-}
+};

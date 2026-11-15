@@ -17,23 +17,22 @@ const lastUpdated = {
   }),
 };
 
-export function Footer() {
-  return (
-    <footer className="flex items-center justify-between px-8 pt-5 pb-30 font-medium text-12 text-dim-gray-100 md:px-12 md:pt-8 md:pb-12">
-      <p>
-        Updated <time dateTime={lastUpdated.dateTime}>{lastUpdated.label}</time>
-      </p>
-      <p>
-        Built with AI — grab the code{" "}
-        <AppLink
-          aria-label="View source code on GitHub"
-          className="group text-nobel-100 transition-colors hover:text-ink"
-          external
-          href={GITHUB_REPO_URL}
-        >
-          <RollingText text="on GitHub" />
-        </AppLink>
-      </p>
-    </footer>
-  );
-}
+export const Footer = () => (
+  <footer className="flex items-center justify-between px-8 pt-5 pb-30 text-12 font-medium text-dim-gray-100 md:px-12 md:pt-8 md:pb-12">
+    <p>
+      Updated <time dateTime={lastUpdated.dateTime}>{lastUpdated.label}</time>
+    </p>
+    <p>
+      Built with AI — grab the code{" "}
+      <AppLink
+        aria-label="View source code on GitHub"
+        className="group"
+        external
+        href={GITHUB_REPO_URL}
+        tone="quiet"
+      >
+        <RollingText text="on GitHub" />
+      </AppLink>
+    </p>
+  </footer>
+);

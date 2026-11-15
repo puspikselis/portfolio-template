@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { useCursorPreview } from "@/components/features/cursor-preview";
 import { AppLink } from "@/components/ui/app-link";
@@ -42,7 +42,7 @@ interface EntryCardProps {
 }
 
 /** One row of the employment history or ventures list: year, logo, role, company and tags. */
-export function EntryCard({
+export const EntryCard = ({
   actions,
   cardHref,
   className,
@@ -57,7 +57,7 @@ export function EntryCard({
   title,
   truncate,
   year,
-}: EntryCardProps) {
+}: EntryCardProps) => {
   const { hidePreview, showPreview } = useCursorPreview();
   const previewHandlers = preview
     ? {
@@ -77,19 +77,14 @@ export function EntryCard({
         )}
         {...previewHandlers}
       >
-        <Avatar
-          className="size-12 rounded-xl bg-(--color)"
-          style={{ "--color": color } as CSSProperties}
-        >
+        <Avatar className="size-12" color={color} shape="tile">
           <AvatarImage alt={`${company} logo`} src={image} />
-          <AvatarFallback className="bg-transparent text-15 text-ink/20 -tracking-[0.02em]">
-            {fallback}
-          </AvatarFallback>
+          <AvatarFallback tone="onColor">{fallback}</AvatarFallback>
         </Avatar>
         <div className={cn("space-y-1", truncate && "min-w-0 flex-1")}>
           <h3
             className={cn(
-              "font-semibold text-15/6 text-ink -tracking-[0.02em]",
+              "text-15/6 font-semibold tracking-tight-2 text-ink",
               truncate && "truncate"
             )}
           >
@@ -100,12 +95,7 @@ export function EntryCard({
         </div>
         {cardHref ? (
           // Same target as the row's button, so keyboard users skip it.
-          <AppLink
-            className="link-overlay"
-            external={external}
-            href={cardHref}
-            tabIndex={-1}
-          >
+          <AppLink external={external} href={cardHref} overlay tabIndex={-1}>
             <span className="sr-only">{company}</span>
           </AppLink>
         ) : null}
@@ -115,4 +105,4 @@ export function EntryCard({
       </div>
     </div>
   );
-}
+};
