@@ -1,32 +1,23 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
+
+import { caseStudies } from "@/data/projects";
+import { getCommitISO } from "@/lib/commit-date";
+import { SITE_URL } from "@/lib/constants";
+import { caseStudyUrl } from "@/lib/metadata";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://kristaps.kruze.lv';
-
   return [
     {
-      changeFrequency: 'monthly',
-      lastModified: new Date(),
-      priority: 1.0,
-      url: baseUrl,
+      changeFrequency: "monthly",
+      lastModified: new Date(getCommitISO()),
+      priority: 1,
+      url: SITE_URL,
     },
-    {
-      changeFrequency: 'yearly',
-      lastModified: new Date('2025-01-15'),
+    ...caseStudies.map((project) => ({
+      changeFrequency: "yearly" as const,
+      lastModified: new Date(project.lastModified),
       priority: 0.9,
-      url: `${baseUrl}/projects/centus`,
-    },
-    {
-      changeFrequency: 'yearly',
-      lastModified: new Date('2018-12-31'),
-      priority: 0.8,
-      url: `${baseUrl}/projects/chip`,
-    },
-    {
-      changeFrequency: 'yearly',
-      lastModified: new Date('2021-12-31'),
-      priority: 0.9,
-      url: `${baseUrl}/projects/paynt`,
-    },
+      url: caseStudyUrl(project.slug),
+    })),
   ];
 }

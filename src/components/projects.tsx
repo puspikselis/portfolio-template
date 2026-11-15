@@ -1,101 +1,129 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import type { CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useCursorPreview } from '@/components/features/cursor-preview';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { projects } from '@/data/projects';
+import { EntryAction } from "@/components/entry-action";
+import { EntryCard } from "@/components/entry-card";
+import { Button } from "@/components/ui/button";
+import { Section } from "@/components/ui/section";
+import { projects } from "@/data/projects";
+import { caseStudyPath } from "@/lib/metadata";
+import { cn, getYears } from "@/lib/utils";
 
-function ProjectCard({
+// Roles shown before "Show earlier roles"; the rest stay in the DOM (crawlable) but collapsed.
+const VISIBLE_ROLES = 5;
+const EARLIER_ROLES_ID = "earlier-roles";
+
+const fallbackButtonLabel = (hasDetailPage: boolean, comingSoon?: boolean) => {
+  if (hasDetailPage) {
+    return "View";
+  }
+  return comingSoon ? null : "Archive";
+};
+
+const ProjectCard = ({
   project,
   isFirst,
 }: {
   project: (typeof projects)[number];
   isFirst?: boolean;
-}) {
-  const { hidePreview, showPreview } = useCursorPreview();
-
-  const previewColor = project.color || '#1d1d1d';
-  const hasDetailPage = Boolean(project.slug);
-  const isComingSoon = project.id === 2;
-  const buttonLabel = hasDetailPage ? 'View' : isComingSoon ? 'Soon' : 'Archive';
-
-  const handlePointerEnter = () => {
-    if (!hasDetailPage || !project.preview) return;
-    showPreview(previewColor, project.preview);
-  };
+}) => {
+  const buttonLabel =
+    project.buttonLabel ??
+    fallbackButtonLabel(Boolean(project.slug), project.comingSoon);
+  const href = project.slug ? caseStudyPath(project.slug) : undefined;
 
   return (
-    <div className="space-y-6">
-      <p
-        className="font-medium text-13/4 text-dim-gray-100"
-        data-align-target={isFirst ? 'true' : undefined}
-      >
-        {project.year}
-      </p>
-      <div
-        className="relative flex items-center gap-4"
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={hidePreview}
-      >
-        <Avatar
-          className="size-12 rounded-xl bg-(--color)"
-          style={{ '--color': previewColor } as CSSProperties}
-        >
-          <AvatarImage alt={`${project.title} logo`} src={project.image} />
-          <AvatarFallback className="-tracking-[0.02em] bg-transparent text-15 text-white/20">
-            {project.Icon ? <project.Icon /> : '?'}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1 space-y-1">
-          <h3 className="-tracking-[0.02em] truncate font-semibold text-15/6 text-white">
-            {project.title}
-          </h3>
-          <ul className="flex min-w-0">
-            {project.tags.map((tag) => (
-              <li
-                className="flex min-w-0 items-center not-first:*:text-dim-gray-100 not-first:before:mx-2 not-first:before:block not-first:before:size-1 not-first:before:shrink-0 not-first:before:rounded-full not-first:before:bg-nero-100 not-first:before:content-['']"
-                key={tag}
-              >
-                <span className="-tracking-[0.02em] truncate text-15/6">{tag}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <Button
-          asChild={hasDetailPage}
-          className="inset-shadow-0-1-0 inset-shadow-white/8 ml-auto h-9 rounded-full bg-nero-100 px-5 font-semibold text-12 text-white hover:bg-nero-200 disabled:bg-nero-300 disabled:text-dim-gray-100"
-          disabled={!hasDetailPage}
-        >
-          {hasDetailPage ? (
-            <Link className="link-overlay" href={`/projects/${project.slug}`}>
-              {buttonLabel}
-            </Link>
-          ) : (
-            buttonLabel
-          )}
-        </Button>
-      </div>
-    </div>
+    <EntryCard
+      actions={
+        buttonLabel ? (
+          <EntryAction
+            company={project.company}
+            href={href}
+            label={buttonLabel}
+          />
+        ) : null
+      }
+      cardHref={href}
+      color={project.color}
+      company={project.company}
+      fallback={project.Icon ? <project.Icon /> : undefined}
+      image={project.image}
+      isFirst={isFirst}
+      preview={project.preview ? { image: project.preview } : undefined}
+      tags={project.tags}
+      title={project.title}
+      truncate
+      year={project.year}
+    />
   );
-}
+};
 
-export function Projects({ excludeSlug }: { excludeSlug?: string } = {}) {
+export const Projects = ({ excludeSlug }: { excludeSlug?: string } = {}) => {
   const filteredProjects = excludeSlug
     ? projects.filter((project) => project.slug && project.slug !== excludeSlug)
     : projects;
+  const title = excludeSlug ? "Other Positions" : "Employment History";
+  const [isExpanded, setIsExpanded] = useState(false);
+  const expand = useCallback(() => setIsExpanded(true), []);
+  const earlierRef = useRef<HTMLDivElement>(null);
+
+  // The expand button unmounts, so hand keyboard focus to the revealed roles.
+  useEffect(() => {
+    if (isExpanded) {
+      earlierRef.current?.focus({ preventScroll: true });
+    }
+  }, [isExpanded]);
+  const recent = filteredProjects.slice(0, VISIBLE_ROLES);
+  const earlier = filteredProjects.slice(VISIBLE_ROLES);
+  const earlierYears = earlier.flatMap((project) => getYears(project.year));
+  const earliestYear = Math.min(...earlierYears.map(Number));
+  const latestEarlierYear = Math.max(...earlierYears.map(Number));
 
   return (
-    <section
-      className="narrow-container space-y-14"
-      data-color="var(--color-orange-100)"
-      data-title={excludeSlug ? 'Other positions' : 'Employment history'}
-    >
-      {filteredProjects.map((project, index) => (
-        <ProjectCard isFirst={index === 0} key={project.id} project={project} />
-      ))}
-    </section>
+    <Section headingId="projects-heading" title={title} variant="narrow">
+      <div className="space-y-14">
+        {recent.map((project, index) => (
+          <ProjectCard
+            isFirst={index === 0}
+            key={project.id}
+            project={project}
+          />
+        ))}
+      </div>
+      {earlier.length > 0 && (
+        <>
+          <div
+            className={cn(
+              "grid transition-grid-rows duration-500 ease-out outline-none motion-reduce:transition-none",
+              isExpanded ? "grid-rows-expanded" : "grid-rows-collapsed"
+            )}
+            id={EARLIER_ROLES_ID}
+            inert={!isExpanded}
+            ref={earlierRef}
+            tabIndex={-1}
+          >
+            <div className="overflow-hidden">
+              <div className="space-y-14 pt-14">
+                {earlier.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            </div>
+          </div>
+          {!isExpanded && (
+            <Button
+              aria-controls={EARLIER_ROLES_ID}
+              className="mt-14 w-full"
+              onClick={expand}
+              variant="outline"
+            >
+              Show {earlier.length} earlier roles ({earliestYear} to{" "}
+              {latestEarlierYear})
+            </Button>
+          )}
+        </>
+      )}
+    </Section>
   );
-}
+};

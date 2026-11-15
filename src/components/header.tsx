@@ -1,76 +1,128 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useState } from "react";
+import type { ChangeEvent } from "react";
 
-import { ContactDialog } from '@/components/dialogs/contact-dialog';
-import { SpotifyStatus } from '@/components/features/spotify-status';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { RollingText } from '@/components/ui/rolling-text';
+import { ContactDialog } from "@/components/dialogs/contact-dialog";
+import { SpotifyStatus } from "@/components/features/spotify-status";
+import { AppLink } from "@/components/ui/app-link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { RollingText } from "@/components/ui/rolling-text";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  LINKEDIN_URL,
+  OWNER_PHOTO_PATH,
+  RESUME_PATH,
+  RESUME_UPDATED,
+  SITE_NAME,
+} from "@/lib/constants";
 
-export function Header() {
+interface HeaderLink {
+  /** Accessible name of the desktop button. */
+  ariaLabel: string;
+  href: string;
+  label: string;
+  /** Extra detail: the mobile option's suffix and the desktop tooltip. */
+  updated?: string;
+}
+
+/** External links, shown as a menu on mobile and as buttons from `md`. */
+const LINKS: readonly HeaderLink[] = [
+  {
+    ariaLabel: "Download Resume PDF",
+    href: RESUME_PATH,
+    label: "Resume",
+    updated: RESUME_UPDATED,
+  },
+  {
+    ariaLabel: "Visit LinkedIn profile",
+    href: LINKEDIN_URL,
+    label: "LinkedIn",
+  },
+];
+
+const HeaderLinkButton = ({ link }: { link: HeaderLink }) => {
+  const button = (
+    <Button asChild className="group hidden md:inline-flex" variant="link">
+      <AppLink aria-label={link.ariaLabel} external href={link.href}>
+        <RollingText text={link.label} />
+      </AppLink>
+    </Button>
+  );
+  if (!link.updated) {
+    return button;
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent>Updated {link.updated}</TooltipContent>
+    </Tooltip>
+  );
+};
+
+const handleLinksChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  if (e.target.value) {
+    window.open(e.target.value, "_blank", "noopener,noreferrer");
+  }
+  e.target.value = "";
+};
+
+export const Header = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const openContact = useCallback(() => setIsContactOpen(true), []);
+  const closeContact = useCallback(() => setIsContactOpen(false), []);
 
   return (
     <>
-      <header className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between bg-black p-5 md:sticky md:top-0 md:bg-transparent md:px-12 md:py-8">
-        <div
-          className="flex gap-3"
-          onPointerEnter={() => setIsHovered(true)}
-          onPointerLeave={() => setIsHovered(false)}
-        >
-          <Link className="focus:outline-none md:focus:outline-auto" href="/">
-            <Avatar className="size-9 rounded-xl transition-opacity hover:opacity-80">
-              <AvatarImage alt="Kristaps Krūze" className="rounded-none" src="/images/KK.avif" />
+      <header className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between bg-canvas p-5 md:sticky md:top-0 md:bg-transparent md:px-12 md:py-8">
+        {/* One home link covers avatar and name; the status sits over its empty top-right cell. */}
+        <div className="group grid grid-cols-[auto_auto] items-center gap-x-3">
+          <AppLink
+            className="col-[1/3] row-[1/3] grid grid-cols-subgrid grid-rows-subgrid"
+            focusRing
+            href="/"
+          >
+            <Avatar className="row-span-2 size-9" fade shape="tile">
+              <AvatarImage alt="" src={OWNER_PHOTO_PATH} />
               <AvatarFallback>KK</AvatarFallback>
             </Avatar>
-          </Link>
-          <div className="flex flex-col-reverse justify-center gap-0.5">
-            <SpotifyStatus isHovered={isHovered} />
-          </div>
+            <RollingText
+              className="col-start-2 row-start-2 self-start"
+              text={SITE_NAME}
+              tone="title"
+            />
+          </AppLink>
+          <SpotifyStatus className="col-start-2 row-start-1 self-end" />
         </div>
-        <div className="flex items-center md:gap-5">
+        <nav aria-label="Primary" className="flex items-center md:gap-5">
           <select
             aria-label="Links"
-            className="appearance-none font-semibold text-12 text-nobel-100 focus:outline-none md:hidden"
-            onChange={(e) => {
-              e.target.value && window.open(e.target.value, '_blank');
-              e.target.value = '';
-            }}
+            className="appearance-none text-12 font-semibold text-nobel-100 focus-ring md:hidden"
+            onChange={handleLinksChange}
           >
             <option value="">Links</option>
-            <option value="/documents/kristaps-kruze-resume.pdf">Resume</option>
-            <option value="https://www.linkedin.com/in/kristapskruze/">LinkedIn</option>
+            {LINKS.map((link) => (
+              <option key={link.href} value={link.href}>
+                {link.updated
+                  ? `${link.label} (updated ${link.updated})`
+                  : link.label}
+              </option>
+            ))}
           </select>
-          <a
-            aria-label="Download Resume PDF"
-            className="hidden font-semibold text-12 text-nobel-100 hover:text-white md:block"
-            href="/documents/kristaps-kruze-resume.pdf"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <RollingText text="Resume" />
-          </a>
-          <a
-            aria-label="Visit LinkedIn profile"
-            className="hidden font-semibold text-12 text-nobel-100 hover:text-white md:block"
-            href="https://www.linkedin.com/in/kristapskruze/"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <RollingText text="LinkedIn" />
-          </a>
-          <button
-            className="inset-shadow-0-1-0 inset-shadow-white/8 h-9 cursor-pointer rounded-full bg-nero-100 px-5 font-semibold text-12 text-white hover:bg-nero-200 focus:outline-none md:focus:outline-auto"
-            onClick={() => setIsContactOpen(true)}
-            type="button"
-          >
+          {LINKS.map((link) => (
+            <HeaderLinkButton key={link.href} link={link} />
+          ))}
+          <Button onClick={openContact} variant="pill">
             Contact
-          </button>
-        </div>
+          </Button>
+        </nav>
       </header>
-      <ContactDialog isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+      <ContactDialog isOpen={isContactOpen} onClose={closeContact} />
     </>
   );
-}
+};

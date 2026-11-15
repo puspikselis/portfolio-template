@@ -1,281 +1,294 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as Dialog from '@radix-ui/react-dialog';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import {
+  Close as DialogClose,
+  Content as DialogContent,
+  Description as DialogDescription,
+  Overlay as DialogOverlay,
+  Portal as DialogPortal,
+  Root as DialogRoot,
+  Title as DialogTitle,
+} from "@radix-ui/react-dialog";
+import { useCallback, useRef, useState } from "react";
+import type { FormEvent } from "react";
 
-import { useToast } from '@/components/ui/toast';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { useToast } from "@/components/ui/toast";
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/lib/constants";
+import { TEXT_BODY, TEXT_DISPLAY } from "@/lib/typography";
 
-type Props = { isOpen: boolean; onClose: () => void };
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-const schema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().optional(),
-});
+// Native constraints (required, minLength, type="email") on each field decide
+// validity; these are the messages shown under an invalid field.
+const ERRORS = {
+  email: "Enter a valid email address",
+  message: "Message must be at least 10 characters",
+  name: "Name must be at least 2 characters",
+} as const;
 
-type FormValues = z.infer<typeof schema>;
+type ValidatedField = keyof typeof ERRORS;
+type Errors = Partial<Record<ValidatedField, string>>;
+type FieldElement = HTMLInputElement | HTMLTextAreaElement;
 
-const inputC =
-  'inset-shadow-0-1-0 inset-shadow-white/8 h-11 w-full rounded-xl bg-nero-100 px-4 py-3 text-15/6 text-white shadow-[0_1px_2px_rgba(0,0,0,.48)] transition-all placeholder:text-dim-gray-100 focus:placeholder:opacity-50 focus:outline-none focus:ring-1 focus:ring-orange-100';
+const isValidated = (name: string): name is ValidatedField => name in ERRORS;
 
-export function ContactDialog({ isOpen, onClose }: Props) {
+/** The message for every invalid validated control in the form. */
+const collectErrors = (form: HTMLFormElement): Errors => {
+  const errors: Errors = {};
+  for (const name of Object.keys(ERRORS)) {
+    const control = form.elements.namedItem(name);
+    if (
+      isValidated(name) &&
+      (control instanceof HTMLInputElement ||
+        control instanceof HTMLTextAreaElement) &&
+      !control.validity.valid
+    ) {
+      errors[name] = ERRORS[name];
+    }
+  }
+  return errors;
+};
+
+const formString = (data: FormData, key: string) => {
+  const value = data.get(key);
+  return typeof value === "string" ? value : "";
+};
+
+// Focus the dialog itself rather than the first field, so phones don't pop the
+// keyboard on open; focus must still leave the (now aria-hidden) trigger.
+const focusDialog = (e: Event) => {
+  e.preventDefault();
+  (e.currentTarget as HTMLElement | null)?.focus();
+};
+
+export const ContactDialog = ({ isOpen, onClose }: Props) => {
   const { showToast } = useToast();
-  const honeyRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [errors, setErrors] = useState<Errors>({});
+  const [isValid, setIsValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // After the first submit, leaving a field re-checks it too.
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isValid },
-  } = useForm<FormValues>({
-    defaultValues: { email: '', message: '', name: '', phone: '' },
-    mode: 'onChange', // real-time button enable/disable
-    resolver: zodResolver(schema),
-  });
+  const reset = useCallback(() => {
+    formRef.current?.reset();
+    setErrors({});
+    setIsValid(false);
+    setHasSubmitted(false);
+  }, []);
 
-  const onSubmit = async (values: FormValues) => {
-    // Honeypot guard
-    if (honeyRef.current?.value) return;
-
-    const fd = new FormData();
-    fd.set('name', values.name);
-    fd.set('email', values.email);
-    fd.set('phone', values.phone ?? '');
-    fd.set('message', values.message);
-    fd.set('_replyto', values.email);
-    fd.set('_subject', `Portfolio Contact from ${values.name}`);
-
-    try {
-      const res = await fetch('https://formsubmit.co/ajax/kristaps@kruze.lv', {
-        body: fd,
-        headers: { Accept: 'application/json' },
-        method: 'POST',
-      });
-      if (!res.ok) throw new Error('send failed');
-
-      // Play success sound
-      const audio = new Audio('/audio/mail-sent.mp3');
-      audio.play().catch(() => {});
-      reset();
-      onClose();
-      showToast('Message sent successfully!', "I'll get back to you as soon as possible.");
-    } catch {
-      showToast('Failed to send message', 'Please email me directly at kristaps@kruze.lv');
+  const checkField = (el: FieldElement) => {
+    const { name } = el;
+    if (isValidated(name)) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: el.validity.valid ? undefined : ERRORS[name],
+      }));
     }
   };
 
-  return (
-    <Dialog.Root
-      onOpenChange={(open) => {
-        if (!open) {
-          reset();
-          onClose();
-        }
-      }}
-      open={isOpen}
-    >
-      <AnimatePresence>
-        {isOpen && (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild forceMount>
-              <motion.div
-                animate={{ opacity: 1 }}
-                className="fixed inset-0 z-30"
-                exit={{ opacity: 0 }}
-                initial={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-              >
-                <div className="-translate-x-1/2 fixed inset-y-0 left-1/2 w-full max-w-404">
-                  <div className="mx-px h-full bg-black/95 backdrop-blur-sm" />
-                </div>
-              </motion.div>
-            </Dialog.Overlay>
-            <Dialog.Content asChild forceMount onOpenAutoFocus={(e) => e.preventDefault()}>
-              <motion.div
-                animate={{ filter: 'blur(0px)', opacity: 1, scale: 1, y: 0 }}
-                className="fixed inset-0 z-40 overflow-y-auto"
-                exit={{ filter: 'blur(8px)', opacity: 0, scale: 0.98, y: 4 }}
-                initial={{ filter: 'blur(8px)', opacity: 0, scale: 0.98, y: 4 }}
-                transition={{
-                  damping: 30,
-                  duration: 0.4,
-                  filter: { delay: 0.05 },
-                  stiffness: 200,
-                  type: 'spring',
-                }}
-              >
-                <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
-                  <Dialog.Close
-                    asChild
-                    className="absolute inset-shadow-0-1-0 inset-shadow-white/8 top-5 right-5 z-60 h-9 rounded-full bg-nero-100 px-5 font-semibold text-12 text-white hover:bg-nero-200 md:top-8 md:right-12"
-                  >
-                    <button type="button">Close</button>
-                  </Dialog.Close>
+  // Every keystroke re-checks its field and the Send button's enabled state.
+  const handleInput = (e: FormEvent<FieldElement>) => {
+    checkField(e.currentTarget);
+    setIsValid(e.currentTarget.form?.checkValidity() ?? false);
+  };
 
-                  <div className="w-full max-w-136 space-y-12 px-8 py-12">
-                    <div className="space-y-2">
-                      <Dialog.Title asChild>
-                        <h2 className="-tracking-[0.01em] font-medium text-28/10 text-white">
-                          Get in touch
-                        </h2>
-                      </Dialog.Title>
-                      <Dialog.Description asChild>
-                        <p className="-tracking-[0.02em] text-15/7 text-nobel-100">
-                          You can reach me by filling out the form below, or directly via email at{' '}
-                          <a
-                            className="text-white transition-opacity hover:opacity-80"
-                            href="mailto:kristaps@kruze.lv"
-                          >
-                            kristaps@kruze.lv
-                          </a>{' '}
-                          or phone{' '}
-                          <a
-                            className="text-white transition-opacity hover:opacity-80"
-                            href="tel:+37129234926"
-                          >
-                            +371 292 34 926
-                          </a>
-                          .
-                        </p>
-                      </Dialog.Description>
-                    </div>
+  const handleBlur = (e: FormEvent<FieldElement>) => {
+    if (hasSubmitted) {
+      checkField(e.currentTarget);
+    }
+  };
 
-                    <form className="space-y-5" noValidate onSubmit={handleSubmit(onSubmit)}>
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="name"
-                          >
-                            Name
-                          </label>
-                          <input
-                            id="name"
-                            {...register('name')}
-                            className={inputC}
-                            placeholder="John Doe"
-                            {...(errors.name && {
-                              'aria-describedby': 'name-error',
-                              'aria-invalid': 'true',
-                            })}
-                          />
-                          {errors.name && (
-                            <p
-                              className="-tracking-[0.01em] text-12/4 text-red-500"
-                              id="name-error"
-                            >
-                              {errors.name.message}
-                            </p>
-                          )}
-                        </div>
+  const send = async (data: FormData) => {
+    const name = formString(data, "name");
+    const email = formString(data, "email");
+    const fd = new FormData();
+    fd.set("name", name);
+    fd.set("email", email);
+    fd.set("phone", formString(data, "phone"));
+    fd.set("message", formString(data, "message"));
+    fd.set("_replyto", email);
+    fd.set("_subject", `Portfolio Contact from ${name}`);
 
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="email"
-                          >
-                            Email
-                          </label>
-                          <input
-                            id="email"
-                            type="email"
-                            {...register('email')}
-                            className={inputC}
-                            placeholder="your@email.com"
-                            {...(errors.email && {
-                              'aria-describedby': 'email-error',
-                              'aria-invalid': 'true',
-                            })}
-                          />
-                          {errors.email && (
-                            <p
-                              className="-tracking-[0.01em] text-12/4 text-red-500"
-                              id="email-error"
-                            >
-                              {errors.email.message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+    const res = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
+      body: fd,
+      headers: { Accept: "application/json" },
+      method: "POST",
+    }).catch(() => null);
+    if (!res?.ok) {
+      showToast(
+        "Couldn't send your message",
+        `Email me at ${CONTACT_EMAIL} instead`,
+        "error"
+      );
+      return;
+    }
 
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-2">
-                          <label
-                            className="-tracking-[0.01em] block font-medium text-15 text-white"
-                            htmlFor="phone"
-                          >
-                            Phone # <span className="text-dim-gray-100">(optional)</span>
-                          </label>
-                          <input
-                            id="phone"
-                            type="tel"
-                            {...register('phone')}
-                            className={inputC}
-                            placeholder="+1 (555) 000-0000"
-                          />
-                        </div>
-                        <div className="flex-1" />
-                      </div>
+    new Audio("/audio/mail-sent.mp3").play().catch(() => {
+      // autoplay blocked — the toast is confirmation enough
+    });
+    reset();
+    onClose();
+    showToast("Message sent", "I'll get back to you as soon as possible.");
+  };
 
-                      <div className="space-y-2">
-                        <label
-                          className="-tracking-[0.01em] block font-medium text-15 text-white"
-                          htmlFor="message"
-                        >
-                          Message
-                        </label>
-                        <textarea
-                          id="message"
-                          {...register('message')}
-                          className={cn(inputC, 'h-auto min-h-24 resize-y')}
-                          placeholder="I'm looking for help with..."
-                          {...(errors.message && {
-                            'aria-describedby': 'message-error',
-                            'aria-invalid': 'true',
-                          })}
-                        />
-                        {errors.message && (
-                          <p
-                            className="-tracking-[0.01em] text-12/4 text-red-500"
-                            id="message-error"
-                          >
-                            {errors.message.message}
-                          </p>
-                        )}
-                      </div>
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setHasSubmitted(true);
+    if (!form.checkValidity()) {
+      setErrors(collectErrors(form));
+      return;
+    }
+    const data = new FormData(form);
+    if (formString(data, "_honey")) {
+      return;
+    }
+    setIsSubmitting(true);
+    await send(data);
+    setIsSubmitting(false);
+  };
 
-                      {/* Honeypot */}
-                      <input
-                        aria-hidden="true"
-                        autoComplete="off"
-                        className="hidden"
-                        name="_honey"
-                        ref={honeyRef}
-                        tabIndex={-1}
-                        type="text"
-                      />
-
-                      <button
-                        className="inset-shadow-0-1-0 inset-shadow-white/8 h-12 rounded-full bg-white px-6 font-semibold text-13/4 text-nero-100 hover:bg-white/90 disabled:cursor-not-allowed disabled:bg-nero-300 disabled:text-dim-gray-100 disabled:opacity-50"
-                        disabled={isSubmitting || !isValid}
-                        type="submit"
-                      >
-                        {isSubmitting ? 'Sending…' : 'Send'}
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        )}
-      </AnimatePresence>
-    </Dialog.Root>
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        return;
+      }
+      reset();
+      onClose();
+    },
+    [reset, onClose]
   );
-}
+
+  return (
+    <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
+      <DialogPortal>
+        <DialogOverlay className="fixed inset-0 z-30 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in">
+          <div className="fixed inset-y-0 left-1/2 w-full max-w-page -translate-x-1/2">
+            <div className="mx-px h-full bg-canvas/95 backdrop-blur-sm" />
+          </div>
+        </DialogOverlay>
+        <DialogContent
+          className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-dialog-out data-[state=open]:animate-dialog-in"
+          onOpenAutoFocus={focusDialog}
+        >
+          <div className="relative mx-auto flex min-h-screen max-w-page items-center justify-center">
+            <DialogClose asChild>
+              <Button className="z-60" placement="corner" variant="pill">
+                Close
+              </Button>
+            </DialogClose>
+
+            <div className="w-full max-w-136 space-y-12 px-8 py-12">
+              <div className="space-y-2">
+                <DialogTitle asChild>
+                  <h2 className={TEXT_DISPLAY}>Get in Touch</h2>
+                </DialogTitle>
+                <DialogDescription asChild>
+                  <p className={TEXT_BODY}>
+                    Fill out the form below. Or reach me directly at{" "}
+                    <a
+                      className="text-ink hover-fade"
+                      href={`mailto:${CONTACT_EMAIL}`}
+                    >
+                      {CONTACT_EMAIL}
+                    </a>{" "}
+                    or{" "}
+                    <a
+                      className="text-ink hover-fade"
+                      href={CONTACT_PHONE.href}
+                    >
+                      {CONTACT_PHONE.display}
+                    </a>
+                    .
+                  </p>
+                </DialogDescription>
+              </div>
+
+              <form
+                className="space-y-5"
+                noValidate
+                onSubmit={handleSubmit}
+                ref={formRef}
+              >
+                <div className="flex gap-4">
+                  <Field
+                    error={errors.name}
+                    id="name"
+                    label="Name"
+                    minLength={2}
+                    onBlur={handleBlur}
+                    onInput={handleInput}
+                    placeholder="John Doe"
+                    required
+                  />
+                  <Field
+                    error={errors.email}
+                    id="email"
+                    label="Email"
+                    onBlur={handleBlur}
+                    onInput={handleInput}
+                    // Stricter than type="email" alone: needs a dot in the domain.
+                    pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                    placeholder="your@email.com"
+                    required
+                    type="email"
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <Field
+                    hint={
+                      <span className="text-dim-gray-100"> (optional)</span>
+                    }
+                    id="phone"
+                    label="Phone"
+                    onBlur={handleBlur}
+                    onInput={handleInput}
+                    placeholder="+1 (555) 000-0000"
+                    type="tel"
+                  />
+                  <div className="flex-1" />
+                </div>
+
+                <Field
+                  error={errors.message}
+                  id="message"
+                  label="Message"
+                  minLength={10}
+                  multiline
+                  onBlur={handleBlur}
+                  onInput={handleInput}
+                  placeholder="I'm looking for help with..."
+                  required
+                />
+
+                <input
+                  aria-hidden="true"
+                  autoComplete="off"
+                  className="hidden"
+                  name="_honey"
+                  tabIndex={-1}
+                  type="text"
+                />
+
+                <Button
+                  disabled={isSubmitting || !isValid}
+                  type="submit"
+                  variant="pillLg"
+                >
+                  {isSubmitting ? "Sending…" : "Send"}
+                </Button>
+              </form>
+            </div>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </DialogRoot>
+  );
+};

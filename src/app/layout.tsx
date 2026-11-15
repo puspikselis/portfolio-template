@@ -1,64 +1,68 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Script from 'next/script';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import Script from "next/script";
 
-import { CursorPreviewProvider } from '@/components/features/cursor-preview';
-import { GridOverlay } from '@/components/features/grid-overlay';
-import { Footer } from '@/components/footer';
-import { Header } from '@/components/header';
-import { ToastProvider } from '@/components/ui/toast';
+import { CursorPreviewProvider } from "@/components/features/cursor-preview";
+import { GridOverlay } from "@/components/features/grid-overlay";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { JsonLd } from "@/components/inline-scripts";
+import { ToastProvider } from "@/components/ui/toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/constants";
+import { AUTHOR, buildPersonJsonLd, schemaNode } from "@/lib/json-ld";
+import { socialMetadata } from "@/lib/metadata";
 
-import './globals.css';
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
+const GA_ID = "G-1BYJXYBJPS";
+
+export const viewport: Viewport = {
+  initialScale: 1,
+  themeColor: "#000000",
+  width: "device-width",
+};
 
 export const metadata: Metadata = {
-  authors: [{ name: 'Kristaps Krūze' }],
-  creator: 'Kristaps Krūze',
-  description:
-    "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  description: SITE_DESCRIPTION,
   icons: {
-    apple: '/favicon/apple-icon.png',
-    icon: '/favicon/icon.png',
+    apple: "/favicon/apple-icon.png",
+    icon: "/favicon/icon.png",
   },
-  keywords: [
-    'Product Designer',
-    'UX/UI Design',
-    'Kristaps Krūze',
-    'Digital Product Design',
-    'Latvia',
-    'Portfolio',
-  ],
-  metadataBase: new URL('https://kristaps.kruze.lv'),
-  openGraph: {
-    description:
-      "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
-    locale: 'en_US',
-    siteName: 'Kristaps Krūze - Designer',
-    title: 'Kristaps Krūze - Designer',
-    type: 'website',
-    url: 'https://kristaps.kruze.lv',
-  },
-  publisher: 'Kristaps Krūze',
+  metadataBase: new URL(SITE_URL),
+  publisher: SITE_NAME,
   robots: {
     follow: true,
     googleBot: {
       follow: true,
       index: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-      'max-video-preview': -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
     index: true,
   },
-  title: 'Kristaps Krūze - Designer',
-  twitter: {
-    card: 'summary_large_image',
-    description:
-      "Designer turning ideas into products people actually enjoy using. I've built my own businesses and helped clients worldwide create complete digital experiences that look great and work even better.",
-    title: 'Kristaps Krūze - Designer',
-  },
+  title: SITE_TITLE,
+  ...socialMetadata({
+    description: SITE_DESCRIPTION,
+    title: SITE_TITLE,
+    url: SITE_URL,
+  }),
 };
+
+const websiteJsonLd = schemaNode("WebSite", {
+  author: AUTHOR,
+  name: SITE_TITLE,
+  url: SITE_URL,
+});
 
 export default function RootLayout({
   children,
@@ -68,12 +72,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      style={{ '--default-font-family': inter.style.fontFamily } as React.CSSProperties}
+      style={
+        {
+          "--default-font-family": inter.style.fontFamily,
+        } as React.CSSProperties
+      }
     >
       <body className="relative">
-        {/* Google Analytics */}
+        <JsonLd data={[buildPersonJsonLd(), websiteJsonLd]} />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-1BYJXYBJPS"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -81,20 +89,22 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-1BYJXYBJPS');
+            gtag('config', '${GA_ID}');
           `}
         </Script>
 
-        <ToastProvider>
-          <CursorPreviewProvider>
-            <GridOverlay />
-            <div className="relative mx-auto max-w-404 border-nero-500 border-r border-l">
-              <Header />
-              {children}
-              <Footer />
-            </div>
-          </CursorPreviewProvider>
-        </ToastProvider>
+        <TooltipProvider delayDuration={150}>
+          <ToastProvider>
+            <CursorPreviewProvider>
+              <GridOverlay />
+              <div className="relative mx-auto max-w-page border-r border-l border-nero-500">
+                <Header />
+                {children}
+                <Footer />
+              </div>
+            </CursorPreviewProvider>
+          </ToastProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

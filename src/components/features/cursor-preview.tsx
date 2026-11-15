@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
-import { motion, type SpringOptions } from 'framer-motion';
 import {
   createContext,
-  type ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
-} from 'react';
+} from "react";
+import type { CSSProperties, ReactNode } from "react";
+
+import { businesses } from "@/data/businesses";
+import { projects } from "@/data/projects";
+import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { useRequiredContext } from "@/lib/use-required-context";
+import { cn, densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
   color: string;
@@ -17,129 +23,308 @@ interface CursorPreviewState {
   image?: string;
   isVisible: boolean;
   width: number;
-  x: number;
-  y: number;
 }
 
 interface CursorPreviewContextValue {
   hidePreview: () => void;
-  showPreview: (color: string, image?: string, width?: number, height?: number) => void;
+  showPreview: (
+    color: string,
+    image?: string,
+    width?: number,
+    height?: number
+  ) => void;
 }
 
-const CursorPreviewContext = createContext<CursorPreviewContextValue | null>(null);
+const CursorPreviewContext = createContext<CursorPreviewContextValue | null>(
+  null
+);
+CursorPreviewContext.displayName = "CursorPreviewProvider";
 
-const SPRING_CONFIG: SpringOptions = {
-  bounce: 0.15,
-  damping: 25,
-  stiffness: 800,
+// Critically damped (damping = 2 * sqrt(stiffness)): follows the cursor
+// tightly with no overshoot or wobble.
+const STIFFNESS = 800;
+const DAMPING = 2 * Math.sqrt(STIFFNESS);
+// Gap between the cursor tip and the preview's top-left corner.
+const CURSOR_OFFSET = 12;
+
+// Previews without their own size in the data use these.
+const DEFAULT_WIDTH = 248;
+const DEFAULT_HEIGHT = 156;
+const COARSE_POINTER_QUERY = "(pointer: coarse)";
+const MEDIA_CLASSES = "size-full rounded-2xl object-cover";
+
+const isVideoSrc = (src: string | undefined): src is string =>
+  Boolean(src?.endsWith(".webm"));
+
+const VIDEO_PREVIEWS = [
+  ...projects.map((project) => project.preview),
+  ...businesses.flatMap((business) =>
+    business.buttons.map((button) => button.preview?.image)
+  ),
+].filter((src): src is string => isVideoSrc(src));
+
+const isMediaReady = (el: HTMLImageElement | HTMLVideoElement): boolean =>
+  el instanceof HTMLVideoElement
+    ? el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    : el.complete && el.naturalWidth > 0;
+
+interface PreviewMediaProps {
+  height: number;
+  /** Called with `src` once the media has a frame to show (at once if cached). */
+  onLoaded: (src: string) => void;
+  src: string;
+  width: number;
+}
+
+const PreviewMedia = ({ height, onLoaded, src, width }: PreviewMediaProps) => {
+  const mediaRef = useCallback(
+    (el: HTMLImageElement | HTMLVideoElement | null) => {
+      if (!el) {
+        return;
+      }
+      const markLoaded = () => onLoaded(src);
+      if (isMediaReady(el)) {
+        markLoaded();
+        return;
+      }
+      const event = el instanceof HTMLVideoElement ? "loadeddata" : "load";
+      el.addEventListener(event, markLoaded, { once: true });
+      return () => el.removeEventListener(event, markLoaded);
+    },
+    [onLoaded, src]
+  );
+
+  return isVideoSrc(src) ? (
+    <video
+      autoPlay
+      className={MEDIA_CLASSES}
+      loop
+      muted
+      playsInline
+      ref={mediaRef}
+      src={src}
+    />
+  ) : (
+    // <picture>: the hand-made @2x/@3x files are the sources; no optimizer needed.
+    <picture>
+      <img
+        alt=""
+        className={MEDIA_CLASSES}
+        height={height}
+        ref={mediaRef}
+        src={src}
+        srcSet={densitySrcSet(src)}
+        width={width}
+      />
+    </picture>
+  );
 };
 
-export function CursorPreviewProvider({ children }: { children: ReactNode }) {
+export const CursorPreviewProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [state, setState] = useState<CursorPreviewState>({
-    color: '#1d1d1d',
-    height: 156,
+    color: DEFAULT_PREVIEW_COLOR,
+    height: DEFAULT_HEIGHT,
     isVisible: false,
-    width: 248,
-    x: 0,
-    y: 0,
+    width: DEFAULT_WIDTH,
   });
 
+  const isCoarsePointerRef = useRef(true);
+  const isVisibleRef = useRef(false);
+  const positionRef = useRef<HTMLDivElement>(null);
+  // Set by the spring effect: jumps the preview to the cursor with no travel.
+  const snapRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setState((prev) => ({
-        ...prev,
-        x: e.clientX,
-        y: e.clientY,
-      }));
-    };
-
-    const handleClick = () => {
-      setState((prev) => ({ ...prev, isVisible: false }));
-    };
-
-    const handleScroll = () => {
-      setState((prev) => ({ ...prev, isVisible: false }));
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('click', handleClick);
-    window.addEventListener('scroll', handleScroll, true);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('click', handleClick);
-      window.removeEventListener('scroll', handleScroll, true);
-    };
-  }, []);
-
-  const showPreview = useCallback((color: string, image?: string, width = 248, height = 156) => {
-    // Disable cursor preview on mobile/touch devices
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-      return;
-    }
-    setState((prev) => ({ ...prev, color, height, image, isVisible: true, width }));
-  }, []);
+    isVisibleRef.current = state.isVisible;
+  }, [state.isVisible]);
 
   const hidePreview = useCallback(() => {
+    if (!isVisibleRef.current) {
+      return;
+    }
+    isVisibleRef.current = false;
     setState((prev) => ({ ...prev, isVisible: false }));
   }, []);
 
-  const contextValue = useMemo(() => ({ hidePreview, showPreview }), [hidePreview, showPreview]);
+  // Touch devices never show previews: hide one that is up when the pointer
+  // turns coarse, and skip the prefetch below.
+  const isCoarsePointer = useMediaQuery(COARSE_POINTER_QUERY);
+  useEffect(() => {
+    isCoarsePointerRef.current = isCoarsePointer !== false;
+    if (isCoarsePointer) {
+      hidePreview();
+    }
+  }, [hidePreview, isCoarsePointer]);
 
-  const isVideo = state.image?.endsWith('.webm');
+  // Hover previews mount on demand; prefetch the videos so the first hover
+  // plays at once.
+  useEffect(() => {
+    if (isCoarsePointer !== false) {
+      return;
+    }
+    const prefetched = VIDEO_PREVIEWS.map((href) => {
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.as = "video";
+      link.href = href;
+      document.head.append(link);
+      return link;
+    });
+    return () => {
+      for (const link of prefetched) {
+        link.remove();
+      }
+    };
+  }, [isCoarsePointer]);
+
+  useEffect(() => {
+    const target = { x: 0, y: 0 };
+    const pos = { vx: 0, vy: 0, x: 0, y: 0 };
+    let raf: number | null = null;
+    let lastTime = 0;
+
+    const step = (now: number) => {
+      const dt = Math.min((now - lastTime) / 1000, 0.032);
+      lastTime = now;
+      pos.vx += (-STIFFNESS * (pos.x - target.x) - DAMPING * pos.vx) * dt;
+      pos.vy += (-STIFFNESS * (pos.y - target.y) - DAMPING * pos.vy) * dt;
+      pos.x += pos.vx * dt;
+      pos.y += pos.vy * dt;
+
+      const settled =
+        Math.abs(pos.x - target.x) < 0.1 &&
+        Math.abs(pos.y - target.y) < 0.1 &&
+        Math.abs(pos.vx) < 0.1 &&
+        Math.abs(pos.vy) < 0.1;
+      if (settled) {
+        pos.x = target.x;
+        pos.y = target.y;
+        pos.vx = 0;
+        pos.vy = 0;
+      }
+
+      render();
+      raf = settled ? null : requestAnimationFrame(step);
+    };
+
+    const render = () => {
+      // Whole pixels on a 3D layer: a fractional offset made Chrome composite
+      // the video apart from its box, showing a band of the box colour.
+      if (positionRef.current) {
+        positionRef.current.style.transform = `translate3d(${Math.round(pos.x)}px, ${Math.round(pos.y)}px, 0)`;
+      }
+    };
+
+    // A hidden preview must not fly in from wherever it was last shown.
+    snapRef.current = () => {
+      pos.x = target.x;
+      pos.y = target.y;
+      pos.vx = 0;
+      pos.vy = 0;
+      render();
+    };
+
+    const ensureLoop = () => {
+      if (raf === null) {
+        lastTime = performance.now();
+        raf = requestAnimationFrame(step);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      target.x = e.clientX + CURSOR_OFFSET;
+      target.y = e.clientY + CURSOR_OFFSET;
+      ensureLoop();
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("click", hidePreview);
+    window.addEventListener("scroll", hidePreview, true);
+    return () => {
+      if (raf !== null) {
+        cancelAnimationFrame(raf);
+      }
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("click", hidePreview);
+      window.removeEventListener("scroll", hidePreview, true);
+    };
+  }, [hidePreview]);
+
+  const showPreview = useCallback<CursorPreviewContextValue["showPreview"]>(
+    (color, image, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT) => {
+      if (isCoarsePointerRef.current) {
+        return;
+      }
+      if (!isVisibleRef.current) {
+        snapRef.current?.();
+      }
+      isVisibleRef.current = true;
+      setState((prev) => ({
+        ...prev,
+        color,
+        height,
+        image,
+        isVisible: true,
+        width,
+      }));
+    },
+    []
+  );
+
+  const contextValue = useMemo(
+    () => ({ hidePreview, showPreview }),
+    [hidePreview, showPreview]
+  );
+
+  // The box colour is only a loading placeholder: once the media has a frame
+  // the box goes transparent, so no colour can show around it.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const isLoaded = state.image !== undefined && loadedSrc === state.image;
+
+  // key={src}: a new preview never shows the old frame at the new size.
+  const media = state.image ? (
+    <PreviewMedia
+      height={state.height}
+      key={state.image}
+      onLoaded={setLoadedSrc}
+      src={state.image}
+      width={state.width}
+    />
+  ) : null;
 
   return (
     <CursorPreviewContext.Provider value={contextValue}>
       {children}
-      <motion.div
-        animate={{
-          filter: state.isVisible ? 'blur(0px)' : 'blur(8px)',
-          opacity: state.isVisible ? 1 : 0,
-          scale: state.isVisible ? 1 : 0.85,
-          x: state.x + 12,
-          y: state.y + 12,
-        }}
-        className="pointer-events-none fixed top-0 left-0 z-50 overflow-hidden rounded-2xl shadow-2xl"
-        initial={{ filter: 'blur(8px)', opacity: 0, scale: 0.85 }}
-        style={{
-          backgroundColor: state.color,
-          height: state.height,
-          width: state.width,
-        }}
-        transition={{
-          filter: { damping: 15, delay: state.isVisible ? 0.03 : 0, stiffness: 500 },
-          opacity: { damping: 15, stiffness: 600 },
-          scale: { damping: 15, stiffness: 600 },
-          x: SPRING_CONFIG,
-          y: SPRING_CONFIG,
-        }}
+      {/* Outer div is positioned imperatively by the spring loop; React never touches its style. */}
+      <div
+        className="pointer-events-none fixed top-0 left-0 z-50"
+        ref={positionRef}
       >
-        {state.image &&
-          (isVideo ? (
-            <video
-              autoPlay
-              className="size-full object-cover"
-              loop
-              muted
-              playsInline
-              src={state.image}
-            />
-          ) : (
-            <img
-              alt="Preview"
-              className="size-full object-cover"
-              src={state.image}
-              srcSet={`${state.image} 1x, ${state.image.replace(/\.avif$/, '@2x.avif')} 2x, ${state.image.replace(/\.avif$/, '@3x.avif')} 3x`}
-            />
-          ))}
-      </motion.div>
+        {/* No blur filter: filtering a playing <video> made Chrome draw it
+            shifted inside its box during the transition. */}
+        <div
+          className={cn(
+            "h-(--preview-height) w-(--preview-width) origin-top-left overflow-hidden rounded-2xl shadow-2xl transition-fade-scale duration-200 ease-out-quint",
+            state.isVisible ? "scale-100 opacity-100" : "scale-90 opacity-0",
+            isLoaded ? "bg-transparent" : "bg-(--preview-color)"
+          )}
+          style={
+            {
+              "--preview-color": state.color,
+              "--preview-height": `${state.height}px`,
+              "--preview-width": `${state.width}px`,
+            } as CSSProperties
+          }
+        >
+          {media}
+        </div>
+      </div>
     </CursorPreviewContext.Provider>
   );
-}
+};
 
-export function useCursorPreview() {
-  const context = useContext(CursorPreviewContext);
-  if (!context) {
-    throw new Error('useCursorPreview must be used within CursorPreviewProvider');
-  }
-  return context;
-}
+export const useCursorPreview = () =>
+  useRequiredContext(CursorPreviewContext, "useCursorPreview");

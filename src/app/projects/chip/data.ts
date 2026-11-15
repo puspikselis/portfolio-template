@@ -1,75 +1,77 @@
+import { caseStudyImage } from "@/components/project-page";
+
 export const tags = [
-  'Product design',
-  'UX/UI Design',
-  'Prototyping',
-  'Handoff',
-  'Design QA',
-  'Mobile applications',
+  "Product design",
+  "UX/UI Design",
+  "Prototyping",
+  "Handoff",
+  "Design QA",
+  "Mobile applications",
 ];
 
 export const images = [
-  {
-    alt: 'Chip onboarding experience',
+  caseStudyImage({
+    alt: "Chip onboarding experience",
     description:
-      'Designed conversational onboarding flow that guides users through bank connection and savings goal setup with a friendly, approachable tone.',
-    id: 'onboarding',
-    src: '/images/chip/1-onboarding.avif',
-    title: 'Onboarding',
-  },
-  {
-    alt: 'Chip main interface showing savings chips',
+      "Conversational onboarding that walks users through bank connection and first savings goal.",
+    height: 4068,
+    id: "onboarding",
+    src: "/images/chip/1-onboarding@3x.avif",
+    title: "Onboarding",
+  }),
+  caseStudyImage({
+    alt: "Chip main interface showing savings chips",
     description:
-      'Created the signature "chips" interface that visualizes savings progress with playful, engaging animations and clear financial insights.',
-    id: 'chips-interface',
-    src: '/images/chip/2-chips.avif',
-    title: 'Chips interface',
-  },
-  {
-    alt: 'Chip balance overview',
+      'The signature "chips" interface that shows savings progress with playful animation.',
+    id: "chips-interface",
+    src: "/images/chip/2-chips@3x.avif",
+    title: "Chips Interface",
+  }),
+  caseStudyImage({
+    alt: "Chip balance overview",
     description:
-      'Designed balance dashboard with clear financial overview, spending insights, and savings progress tracking for informed decision making.',
-    id: 'balance',
-    src: '/images/chip/3-balance.avif',
-    title: 'Balance overview',
-  },
-  {
-    alt: 'Chip manual save feature',
+      "Balance overview with spending insights and savings progress.",
+    id: "balance",
+    src: "/images/chip/3-balance@3x.avif",
+    title: "Balance Overview",
+  }),
+  caseStudyImage({
+    alt: "Chip manual save feature",
+    description: "Manual save with suggested amounts and one-tap saving.",
+    id: "manual-save",
+    src: "/images/chip/4-manualSave@3x.avif",
+    title: "Manual Save",
+  }),
+  caseStudyImage({
+    alt: "Chip X premium features",
     description:
-      'Built manual save functionality with smart suggestions and one-tap saving options to give users control over their savings journey.',
-    id: 'manual-save',
-    src: '/images/chip/4-manualSave.avif',
-    title: 'Manual save',
-  },
-  {
-    alt: 'Chip X premium features',
+      "Chip X premium tier with deeper analytics and higher savings limits.",
+    id: "chip-x",
+    src: "/images/chip/5-chipX@3x.avif",
+    title: "Chip X",
+  }),
+  caseStudyImage({
+    alt: "Chip savings goals",
     description:
-      'Designed Chip X premium tier with advanced analytics, higher savings limits, and exclusive features for power users.',
-    id: 'chip-x',
-    src: '/images/chip/5-chipX.avif',
-    title: 'Chip X',
-  },
-  {
-    alt: 'Chip savings goals',
+      "Savings goals users can define and track, with clear progress indicators.",
+    height: 6588,
+    id: "goals",
+    src: "/images/chip/6-goals@3x.avif",
+    title: "Savings Goals",
+  }),
+  caseStudyImage({
+    alt: "Chip profile views",
+    description: "Profile and settings for account management and preferences.",
+    id: "profile",
+    src: "/images/chip/7-someProfileViews@3x.avif",
+    title: "Profile & Settings",
+  }),
+  caseStudyImage({
+    alt: "Chip Android App designs",
     description:
-      'Created goal-setting interface that helps users define, track, and achieve their financial objectives with motivational progress indicators.',
-    id: 'goals',
-    src: '/images/chip/6-goals.avif',
-    title: 'Savings goals',
-  },
-  {
-    alt: 'Chip profile views',
-    description:
-      'Designed comprehensive profile and settings interface with account management, preferences, and personalization options.',
-    id: 'profile',
-    src: '/images/chip/7-someProfileViews.avif',
-    title: 'Profile & settings',
-  },
-  {
-    alt: 'Chip Android app designs',
-    description:
-      'Led Android app development with Material Design principles, ensuring consistent experience across iOS and Android platforms.',
-    id: 'android',
-    src: '/images/chip/8-androidDesigns.avif',
-    title: 'Android app',
-  },
+      "Android app designed with Material guidelines, matching the iOS experience.",
+    id: "android",
+    src: "/images/chip/8-androidDesigns@3x.avif",
+    title: "Android App",
+  }),
 ];

@@ -1,0 +1,56 @@
+import { businesses } from "@/data/businesses";
+import { isCurrentRole, projects } from "@/data/projects";
+import {
+  absoluteUrl,
+  GITHUB_PROFILE_URL,
+  LINKEDIN_URL,
+  OWNER_PHOTO_PATH,
+  SITE_COUNTRY,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_ROLE,
+  SITE_URL,
+} from "@/lib/constants";
+
+/** A top-level schema.org node: adds the shared @context. */
+export const schemaNode = <T extends Record<string, unknown>>(
+  type: string,
+  props: T
+) => ({ "@context": "https://schema.org", "@type": type, ...props });
+
+/** The site owner as a schema.org author reference. */
+export const AUTHOR = { "@type": "Person", name: SITE_NAME } as const;
+
+const organization = (name: string, url?: string) =>
+  url
+    ? { "@type": "Organization", name, url }
+    : { "@type": "Organization", name };
+
+/** schema.org Person for the site owner, derived from the projects and ventures data. */
+export const buildPersonJsonLd = () => {
+  const current = projects.filter((project) => isCurrentRole(project.year));
+  const past = projects.filter((project) => !isCurrentRole(project.year));
+
+  return schemaNode("Person", {
+    alumniOf: past.map((project) => organization(project.company)),
+    description: SITE_DESCRIPTION,
+    image: absoluteUrl(OWNER_PHOTO_PATH),
+    jobTitle: SITE_ROLE,
+    knowsAbout: [
+      "Product Design",
+      "UX Design",
+      "UI Design",
+      "Digital Product Design",
+    ],
+    name: SITE_NAME,
+    nationality: { "@type": "Country", name: SITE_COUNTRY },
+    sameAs: [LINKEDIN_URL, GITHUB_PROFILE_URL],
+    url: SITE_URL,
+    worksFor: [
+      ...current.map((project) => organization(project.company)),
+      ...businesses.map((business) =>
+        organization(business.company, business.website)
+      ),
+    ],
+  });
+};

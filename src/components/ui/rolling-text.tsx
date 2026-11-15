@@ -1,49 +1,62 @@
-'use client';
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
+import type { CSSProperties } from "react";
 
-import { motion } from 'framer-motion';
+import { CharSlot, displayChar, toCharItems } from "@/components/ui/char-split";
+import { cn } from "@/lib/utils";
 
-import { cn } from '@/lib/utils';
+const rollingTextVariants = cva("inline-block", {
+  variants: {
+    tone: {
+      /** 13px semibold ink, for the site name in the header. */
+      title: "text-13/4 font-semibold text-ink",
+    },
+  },
+});
 
-interface RollingTextProps {
-  text: string;
+interface RollingTextProps extends VariantProps<typeof rollingTextVariants> {
   className?: string;
+  text: string;
 }
 
-const transition = { duration: 0.3, ease: [0.33, 1, 0.68, 1] as const };
+const STAGGER_MS = 15;
+// 0.3s on --ease-out-cubic, staggered STAGGER_MS per character (--char-delay).
+const CHAR_CLASSES =
+  "inline-block transition-roll delay-(--char-delay) duration-300 ease-out-cubic";
 
-export function RollingText({ text, className }: RollingTextProps) {
-  return (
-    <motion.span className={cn('inline-block', className)} initial="initial" whileHover="hover">
-      {text.split('').map((char, index) => {
-        const displayChar = char === ' ' ? '\u00A0' : char;
+export const RollingText = ({ className, text, tone }: RollingTextProps) => (
+  <span className={cn(rollingTextVariants({ tone }), className)}>
+    <span className="sr-only">{text}</span>
+    {/* Characters render twice for the roll effect; hide them from screen readers. */}
+    <span aria-hidden="true">
+      {toCharItems(text).map(({ char, id, position }) => {
+        const shown = displayChar(char);
+        const style = {
+          "--char-delay": `${position * STAGGER_MS}ms`,
+        } as CSSProperties;
         return (
-          <span
-            className="relative inline-block overflow-hidden align-bottom"
-            key={`${index}-${char}`}
-          >
-            <motion.span
-              className="inline-block"
-              transition={{ ...transition, delay: index * 0.015 }}
-              variants={{
-                hover: { filter: 'blur(4px)', opacity: 0, y: '100%' },
-                initial: { filter: 'blur(0px)', opacity: 1, y: 0 },
-              }}
+          <CharSlot key={id}>
+            <span
+              className={cn(
+                CHAR_CLASSES,
+                "group-hover:translate-y-full group-hover:opacity-0 group-hover:blur-[4px]"
+              )}
+              style={style}
             >
-              {displayChar}
-            </motion.span>
-            <motion.span
-              className="absolute inset-0 inline-block"
-              transition={{ ...transition, delay: index * 0.015 }}
-              variants={{
-                hover: { filter: 'blur(0px)', opacity: 1, y: 0 },
-                initial: { filter: 'blur(4px)', opacity: 0, y: '-100%' },
-              }}
+              {shown}
+            </span>
+            <span
+              className={cn(
+                CHAR_CLASSES,
+                "absolute inset-0 -translate-y-full opacity-0 blur-[4px] group-hover:translate-y-0 group-hover:opacity-100 group-hover:blur-none"
+              )}
+              style={style}
             >
-              {displayChar}
-            </motion.span>
-          </span>
+              {shown}
+            </span>
+          </CharSlot>
         );
       })}
-    </motion.span>
-  );
-}
+    </span>
+  </span>
+);

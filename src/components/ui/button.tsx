@@ -1,60 +1,56 @@
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-import type * as React from 'react';
+import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
+import type * as React from "react";
 
-import { cn } from '@/lib/utils';
+import { CORNER_INSET } from "@/lib/styles";
+import { cn } from "@/lib/utils";
+
+// `inactive:` (globals.css) matches :disabled and [data-inactive], so a
+// non-interactive <span> label can share the disabled look.
+const PILL =
+  "inset-highlight rounded-full inactive:bg-nero-300 inactive:text-dim-gray-100";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex cursor-pointer items-center justify-center gap-2 font-semibold whitespace-nowrap focus-ring transition-all inactive:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
-    defaultVariants: {
-      size: 'unstyled',
-      variant: 'unstyled',
-    },
     variants: {
-      size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        icon: 'size-9',
-        'icon-lg': 'size-10',
-        'icon-sm': 'size-8',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        unstyled: '',
-      },
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+        link: "text-12 text-nobel-100 hover:text-ink",
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        unstyled: '',
+          "h-12 rounded-full border border-nero-400 px-6 text-13/4 text-nobel-100 hover:bg-nero-300 hover:text-ink focus-visible:bg-nero-300 focus-visible:text-ink",
+        pill: `${PILL} h-9 bg-nero-100 px-4 text-12 text-ink hover:bg-nero-200`,
+        pillLg: `${PILL} h-12 bg-ink px-6 text-13/4 text-nero-100 hover:bg-ink/90 inactive:opacity-50`,
       },
+      /** Pinned to the top-right corner of its positioned parent. */
+      placement: { corner: `absolute ${CORNER_INSET}` },
+      /** Square pill for a single icon. */
+      size: { icon: "w-9 px-0" },
     },
-  },
+  }
 );
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<'button'> &
+type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
-  }) {
-  const Comp = asChild ? Slot : 'button';
+  };
 
+const Button = ({
+  asChild = false,
+  className,
+  placement,
+  size,
+  variant,
+  ...props
+}: ButtonProps) => {
+  const Comp = asChild ? Slot : "button";
   return (
     <Comp
-      className={cn(buttonVariants({ className, size, variant }))}
+      className={cn(buttonVariants({ className, placement, size, variant }))}
       data-slot="button"
       {...props}
     />
   );
-}
+};
 
-export { Button, buttonVariants };
+export { Button };

@@ -1,66 +1,113 @@
-export const businesses = [
+/** Hover preview media; the cursor preview's default size fills in what is omitted. */
+interface Preview {
+  height?: number;
+  image: string;
+  width?: number;
+}
+
+type Platform = "android" | "ios";
+
+interface BusinessButton {
+  /** Kept in the data but not rendered. */
+  hidden?: boolean;
+  /** Omitted for the website button: it links to the business's `website`. */
+  href?: string;
+  icon?: "appStore" | "playStore";
+  label: string;
+  platform?: Platform;
+  preview?: Preview;
+}
+
+interface Business {
+  buttons: BusinessButton[];
+  color?: string;
+  company: string;
+  id: number;
+  image: string;
+  tags: string[];
+  title: string;
+  website: string;
+  year: string;
+}
+
+export type { Platform };
+
+export const businesses: Business[] = [
   {
     buttons: [
       {
-        href: 'https://datreal.com',
-        label: 'Website',
+        label: "Website",
+        preview: {
+          height: 140,
+          image: "/images/datreal/preview.webm",
+        },
       },
     ],
-    cardHref: 'https://datreal.com',
-    color: '#025333',
+    color: "#003E2D",
+    company: "DatReal",
     id: 3,
-    image: '/images/datreal.svg',
-    tags: ['DatReal', 'Public Business Data'],
-    title: 'Co-founder',
-    year: 'Operating from 2025',
+    image: "/images/datreal.svg",
+    tags: ["Public Business Data"],
+    title: "Co-Founder",
+    website: "https://datreal.com",
+    year: "Since 2025",
   },
   {
     buttons: [
       {
-        href: 'https://apps.apple.com/lv/app/ai-dating-reimagined-wisp/id6738913963',
-        label: 'App Store',
+        hidden: true,
+        href: "https://apps.apple.com/lv/app/ai-dating-reimagined-wisp/id6738913963",
+        icon: "appStore",
+        label: "App Store",
+        platform: "ios",
         preview: {
           height: 200,
-          image: '/images/wisp/appstore.avif',
-          width: 248,
+          image: "/images/wisp/appstore.avif",
         },
       },
       {
-        href: 'https://play.google.com/store/apps/details?id=com.getwisp.wisp',
-        label: 'PlayStore',
+        hidden: true,
+        href: "https://play.google.com/store/apps/details?id=com.getwisp.wisp",
+        icon: "playStore",
+        label: "Google Play",
+        platform: "android",
         preview: {
           height: 200,
-          image: '/images/wisp/playstore.avif',
-          width: 248,
+          image: "/images/wisp/playstore.avif",
+        },
+      },
+      {
+        label: "Website",
+        preview: {
+          image: "/images/wisp/preview.webm",
         },
       },
     ],
-    color: '#44a1ff',
+    color: "#44a1ff",
+    company: "Wisp",
     id: 1,
-    image: '/images/wisp.avif',
-    tags: ['Wisp', 'AI Dating'],
-    title: 'Co-founder',
-    year: 'Operating since 2025',
+    image: "/images/wisp.avif",
+    tags: ["AI Dating"],
+    title: "Co-Founder",
+    website: "https://heywisp.com",
+    year: "Since 2025",
   },
   {
     buttons: [
       {
-        href: 'https://eloking.com/',
-        label: 'Website',
+        label: "Website",
         preview: {
           height: 200,
-          image: '/images/eloking/preview.webm',
-          width: 248,
+          image: "/images/eloking/preview.webm",
         },
       },
     ],
-    cardHref: 'https://eloking.com/',
-    color: '#1d1d1d',
+    company: "Eloking",
     id: 2,
-    image: '/images/eloking.avif',
-    previewOnCardHover: true,
-    tags: ['Eloking', 'eSports'],
-    title: 'Co-founder',
-    year: '2021 - 2025',
+    image: "/images/eloking.avif",
+    tags: ["eSports"],
+    title: "Co-Founder",
+    website: "https://eloking.com/",
+    year: "Since 2021",
   },
 ];
