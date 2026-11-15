@@ -117,9 +117,9 @@ export const ProjectPage = ({
                 src={image.src}
                 width={image.width}
               />
-              <figcaption className="mt-3 text-13/5 text-nobel-100">
-                <span className="sr-only">{image.title}: </span>
-                {image.description}
+              {/* Read by screen readers and search engines only; the images speak for themselves. */}
+              <figcaption className="sr-only">
+                {image.title}: {image.description}
               </figcaption>
             </figure>
           ))}

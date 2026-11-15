@@ -78,8 +78,8 @@ export const EntryCard = ({
         {...previewHandlers}
       >
         <Avatar className="size-12" color={color} shape="tile">
-          <AvatarImage alt={`${company} logo`} src={image} />
           <AvatarFallback tone="onColor">{fallback}</AvatarFallback>
+          {image ? <AvatarImage alt={`${company} logo`} src={image} /> : null}
         </Avatar>
         <div className={cn("space-y-1", truncate && "min-w-0 flex-1")}>
           <h3

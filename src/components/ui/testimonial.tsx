@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Section } from "@/components/ui/section";
 import { MUTED_ACCENT } from "@/lib/styles";
 import { TEXT_BODY, TEXT_CAPTION, TEXT_DISPLAY } from "@/lib/typography";
-import { cn, densitySrcSet } from "@/lib/utils";
+import { cn, densityVariant } from "@/lib/utils";
 
 /** Splits a paragraph into lines; every line but the last ends in a <br>. */
 export const toLines = (paragraph: string) => {
@@ -66,8 +66,7 @@ export const Testimonial = ({
           <Avatar className="size-9 rounded-xl">
             <AvatarImage
               alt={author.name}
-              src={author.image}
-              srcSet={densitySrcSet(author.image)}
+              src={densityVariant(author.image, "3x")}
             />
             <AvatarFallback className="rounded-xl bg-dim-gray-100 text-ink">
               {author.name

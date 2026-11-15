@@ -33,11 +33,13 @@ export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 const FILE_EXT_RE = /(?<ext>\.[a-z0-9]+)$/iu;
 
+/** Path of a hand-made density sibling: "/a.jpg" + "3x" -> "/a@3x.jpg". */
+export const densityVariant = (src: string, scale: "2x" | "3x"): string =>
+  src.replace(FILE_EXT_RE, `@${scale}$<ext>`);
+
 /** srcSet for an image with hand-made @2x/@3x siblings next to the 1x file. */
-export const densitySrcSet = (src: string): string => {
-  const at = (scale: string) => src.replace(FILE_EXT_RE, `@${scale}$<ext>`);
-  return `${src} 1x, ${at("2x")} 2x, ${at("3x")} 3x`;
-};
+export const densitySrcSet = (src: string): string =>
+  `${src} 1x, ${densityVariant(src, "2x")} 2x, ${densityVariant(src, "3x")} 3x`;
 
 const YEAR_RE = /\d{4}/gu;
 

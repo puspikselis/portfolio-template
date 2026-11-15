@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  Fallback as AvatarFallbackPrimitive,
-  Image as AvatarImagePrimitive,
-  Root as AvatarRootPrimitive,
-} from "@radix-ui/react-avatar";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import { cn } from "@/lib/utils";
@@ -26,7 +23,7 @@ const avatarVariants = cva(
   }
 );
 
-type AvatarProps = ComponentProps<typeof AvatarRootPrimitive> &
+type AvatarProps = ComponentProps<"span"> &
   VariantProps<typeof avatarVariants> & {
     /** Background colour behind the image (any CSS colour, e.g. from data). */
     color?: string;
@@ -40,7 +37,7 @@ const Avatar = ({
   style,
   ...props
 }: AvatarProps) => (
-  <AvatarRootPrimitive
+  <span
     className={cn(
       avatarVariants({ fade, shape }),
       color && "bg-(--color)",
@@ -52,16 +49,46 @@ const Avatar = ({
   />
 );
 
+// The image sits on top of the fallback: while it loads it is transparent, and
+// if it fails it is removed, so the fallback shows.
+// Logos and photos are already exported at 3x, so they skip the optimizer.
 const AvatarImage = ({
+  alt,
   className,
-  ...props
-}: ComponentProps<typeof AvatarImagePrimitive>) => (
-  <AvatarImagePrimitive
-    className={cn("aspect-square size-full", className)}
-    data-slot="avatar-image"
-    {...props}
-  />
-);
+  src,
+}: {
+  alt: string;
+  className?: string;
+  src: string;
+}) => {
+  const ref = useRef<HTMLImageElement>(null);
+  const [failed, setFailed] = useState(false);
+
+  // A failure before hydration fires no onError, so check once on mount.
+  useEffect(() => {
+    const img = ref.current;
+    if (img?.complete && img.naturalWidth === 0) {
+      setFailed(true);
+    }
+  }, []);
+
+  if (failed) {
+    return null;
+  }
+  return (
+    <Image
+      alt={alt}
+      className={cn("object-cover", className)}
+      data-slot="avatar-image"
+      fill
+      onError={() => setFailed(true)}
+      ref={ref}
+      sizes="48px"
+      src={src}
+      unoptimized
+    />
+  );
+};
 
 const avatarFallbackVariants = cva(
   "flex size-full items-center justify-center rounded-full bg-nero-100",
@@ -79,9 +106,8 @@ const AvatarFallback = ({
   className,
   tone,
   ...props
-}: ComponentProps<typeof AvatarFallbackPrimitive> &
-  VariantProps<typeof avatarFallbackVariants>) => (
-  <AvatarFallbackPrimitive
+}: ComponentProps<"span"> & VariantProps<typeof avatarFallbackVariants>) => (
+  <span
     className={cn(avatarFallbackVariants({ tone }), className)}
     data-slot="avatar-fallback"
     {...props}
