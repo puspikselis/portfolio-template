@@ -64,10 +64,7 @@ export function SpotifyStatus({ className }: { className?: string }) {
   return data ? (
     <AppLink
       aria-label={`Currently listening to ${data.title} by ${data.artist} on Spotify`}
-      className={cn(
-        "flex items-center gap-1.5 transition-opacity hover:opacity-70",
-        className
-      )}
+      className={cn("hover-fade flex items-center gap-1.5", className)}
       external
       href={data.songUrl}
     >

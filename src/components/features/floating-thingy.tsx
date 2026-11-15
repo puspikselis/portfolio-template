@@ -254,7 +254,7 @@ export function FloatingThingy() {
     <div className="pointer-events-none fixed inset-x-0 top-40 z-10 hidden md:block">
       <div
         className={cn(
-          "mx-auto max-w-404 translate-y-[var(--offset)] space-y-2 pl-24 transition-[translate] duration-200 ease-out",
+          "mx-auto max-w-page translate-y-[var(--offset)] space-y-2 pl-24 transition-[translate] duration-200 ease-out",
           config.title &&
             'before:absolute before:top-2 before:left-0 before:block before:h-px before:w-8 before:bg-nero-500 before:content-[""]',
           config.title &&

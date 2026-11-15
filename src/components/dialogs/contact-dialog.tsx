@@ -111,7 +111,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
     <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
       <DialogPortal>
         <DialogOverlay className="fixed inset-0 z-30 data-[state=closed]:animate-[fade-out_200ms_ease-in-out_both] data-[state=open]:animate-[fade-in_200ms_ease-in-out_both]">
-          <div className="fixed inset-y-0 left-1/2 w-full max-w-404 -translate-x-1/2">
+          <div className="fixed inset-y-0 left-1/2 w-full max-w-page -translate-x-1/2">
             <div className="mx-px h-full bg-canvas/95 backdrop-blur-sm" />
           </div>
         </DialogOverlay>
@@ -119,7 +119,7 @@ export function ContactDialog({ isOpen, onClose }: Props) {
           className="fixed inset-0 z-40 overflow-y-auto data-[state=closed]:animate-[dialog-out_600ms_var(--ease-spring-dialog)_both,blur-out_600ms_var(--ease-spring-dialog)_50ms_both] data-[state=open]:animate-[dialog-in_600ms_var(--ease-spring-dialog)_both,blur-in_600ms_var(--ease-spring-dialog)_50ms_both]"
           onOpenAutoFocus={focusDialog}
         >
-          <div className="relative mx-auto flex min-h-screen max-w-404 items-center justify-center">
+          <div className="relative mx-auto flex min-h-screen max-w-page items-center justify-center">
             <DialogClose asChild>
               <Button
                 className={cn("absolute z-60", CORNER_INSET)}

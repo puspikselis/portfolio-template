@@ -7,17 +7,12 @@ import {
   Title as ToastTitle,
   Viewport as ToastViewport,
 } from "@radix-ui/react-toast";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
 
 import { CheckCircle } from "@/components/icons/check-circle";
 import { CORNER_INSET } from "@/lib/styles";
 import { TEXT_CAPTION } from "@/lib/typography";
+import { useRequiredContext } from "@/lib/use-required-context";
 import { cn } from "@/lib/utils";
 
 type ToastTone = "error" | "success";
@@ -26,14 +21,11 @@ interface ToastContextType {
   showToast: (title: string, description?: string, tone?: ToastTone) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+const ToastContext = createContext<ToastContextType | null>(null);
+ToastContext.displayName = "ToastProvider";
 
 export function useToast() {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error("useToast must be used within ToastProvider");
-  }
-  return context;
+  return useRequiredContext(ToastContext, "useToast");
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

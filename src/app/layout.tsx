@@ -97,7 +97,7 @@ export default function RootLayout({
           <ToastProvider>
             <CursorPreviewProvider>
               <GridOverlay />
-              <div className="relative mx-auto max-w-404 border-nero-500 border-r border-l">
+              <div className="relative mx-auto max-w-page border-nero-500 border-r border-l">
                 <Header />
                 {children}
                 <Footer />

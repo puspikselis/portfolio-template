@@ -27,6 +27,8 @@
 }
 
 @theme inline {
+  /* Width of the page frame (layout, floating label, contact dialog). */
+  --container-page: 101rem;
   --color-canvas: #000000;
   --color-ink: #ffffff;
   /* top-edge highlight on cards/buttons */

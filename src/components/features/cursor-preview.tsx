@@ -4,7 +4,6 @@ import {
   createContext,
   type ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -15,6 +14,7 @@ import { businesses } from "@/data/businesses";
 import { projects } from "@/data/projects";
 import { DEFAULT_PREVIEW_COLOR } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/use-media-query";
+import { useRequiredContext } from "@/lib/use-required-context";
 import { densitySrcSet } from "@/lib/utils";
 
 interface CursorPreviewState {
@@ -38,6 +38,7 @@ interface CursorPreviewContextValue {
 const CursorPreviewContext = createContext<CursorPreviewContextValue | null>(
   null
 );
+CursorPreviewContext.displayName = "CursorPreviewProvider";
 
 // Critically damped (damping = 2 * sqrt(stiffness)): follows the cursor
 // tightly with no overshoot or wobble.
@@ -330,11 +331,5 @@ export function CursorPreviewProvider({ children }: { children: ReactNode }) {
 }
 
 export function useCursorPreview() {
-  const context = useContext(CursorPreviewContext);
-  if (!context) {
-    throw new Error(
-      "useCursorPreview must be used within CursorPreviewProvider"
-    );
-  }
-  return context;
+  return useRequiredContext(CursorPreviewContext, "useCursorPreview");
 }
