@@ -3,14 +3,16 @@ import { caseStudyMetadata } from "@/lib/metadata";
 
 import { images, tags, testimonial } from "./data";
 
-export const metadata = caseStudyMetadata("centus");
+const SLUG = "centus";
+
+export const metadata = caseStudyMetadata(SLUG);
 
 export default function Centus() {
   return (
     <ProjectPage
       color="var(--color-dim-gray-100)"
       images={images}
-      slug="centus"
+      slug={SLUG}
       tags={tags}
       testimonial={testimonial}
     >

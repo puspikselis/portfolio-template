@@ -4,13 +4,15 @@ import { caseStudyMetadata } from "@/lib/metadata";
 
 import { images, tags, testimonial } from "./data";
 
-export const metadata = caseStudyMetadata("paynt");
+const SLUG = "paynt";
+
+export const metadata = caseStudyMetadata(SLUG);
 
 export default function Paynt() {
   return (
     <ProjectPage
       images={images}
-      slug="paynt"
+      slug={SLUG}
       tags={tags}
       testimonial={testimonial}
     >
