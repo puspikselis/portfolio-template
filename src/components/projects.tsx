@@ -41,8 +41,6 @@ function ProjectCard({
             company={project.company}
             href={href}
             label={buttonLabel}
-            preview={project.preview ? { image: project.preview } : undefined}
-            previewColor={previewColor}
           />
         ) : null
       }
@@ -52,6 +50,7 @@ function ProjectCard({
       fallback={project.Icon ? <project.Icon /> : undefined}
       image={project.image}
       isFirst={isFirst}
+      preview={project.preview ? { image: project.preview } : undefined}
       tags={project.tags}
       title={project.title}
       truncate

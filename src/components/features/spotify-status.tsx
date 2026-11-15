@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { Note } from "@/components/icons/note";
+import { AppLink } from "@/components/ui/app-link";
 import type { SpotifyData } from "@/lib/spotify";
 import { cn } from "@/lib/utils";
 
@@ -61,15 +61,14 @@ export function SpotifyStatus({ className }: { className?: string }) {
   }, []);
 
   return data ? (
-    <a
+    <AppLink
       aria-label={`Currently listening to ${data.title} by ${data.artist} on Spotify`}
       className={cn(
         "flex items-center gap-1.5 transition-opacity hover:opacity-70",
         className
       )}
+      external
       href={data.songUrl}
-      rel="noopener noreferrer"
-      target="_blank"
     >
       <div className="text-dim-gray-100">
         <Note />
@@ -86,7 +85,7 @@ export function SpotifyStatus({ className }: { className?: string }) {
           ))}
         </div>
       </div>
-    </a>
+    </AppLink>
   ) : (
     <div
       className={cn(

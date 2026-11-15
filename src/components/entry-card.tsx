@@ -1,9 +1,18 @@
-import Link from "next/link";
+"use client";
+
 import type { CSSProperties, ReactNode } from "react";
 
+import { useCursorPreview } from "@/components/features/cursor-preview";
+import { AppLink } from "@/components/ui/app-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TagList } from "@/components/ui/tag-list";
 import { cn, getYear } from "@/lib/utils";
+
+export interface EntryPreview {
+  height?: number;
+  image: string;
+  width?: number;
+}
 
 interface EntryCardProps {
   /** Right-side buttons or labels. */
@@ -20,6 +29,8 @@ interface EntryCardProps {
   image?: string;
   /** Marks the year line as the floating label's alignment target. */
   isFirst?: boolean;
+  /** Shown by the cursor while it is over the row. */
+  preview?: EntryPreview;
   tags: readonly string[];
   title: string;
   /** Truncate title and tags to one line (employment history). */
@@ -38,11 +49,21 @@ export function EntryCard({
   fallback = "?",
   image,
   isFirst,
+  preview,
   tags,
   title,
   truncate,
   year,
 }: EntryCardProps) {
+  const { hidePreview, showPreview } = useCursorPreview();
+  const previewHandlers = preview
+    ? {
+        onPointerEnter: () =>
+          showPreview(color, preview.image, preview.width, preview.height),
+        onPointerLeave: hidePreview,
+      }
+    : {};
+
   return (
     <div className={cn("space-y-6", className)}>
       <p
@@ -56,6 +77,7 @@ export function EntryCard({
           "relative flex items-center gap-4",
           cardHref && "cursor-pointer"
         )}
+        {...previewHandlers}
       >
         <Avatar
           className="size-12 rounded-xl bg-(--color)"
@@ -78,20 +100,16 @@ export function EntryCard({
           </h3>
           <TagList tags={[company, ...tags]} truncate={truncate} />
         </div>
-        {cardHref && external ? (
-          <a
+        {cardHref ? (
+          // Same target as the row's button, so keyboard users skip it.
+          <AppLink
             className="link-overlay"
+            external={external}
             href={cardHref}
-            rel="noopener noreferrer"
-            target="_blank"
+            tabIndex={-1}
           >
-            <span className="sr-only">Visit {company} website</span>
-          </a>
-        ) : null}
-        {cardHref && !external ? (
-          <Link className="link-overlay" href={cardHref} tabIndex={-1}>
             <span className="sr-only">{company}</span>
-          </Link>
+          </AppLink>
         ) : null}
         {actions ? (
           <div className="ml-auto flex items-center gap-1">{actions}</div>

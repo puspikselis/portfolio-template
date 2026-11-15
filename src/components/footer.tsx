@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/ui/app-link";
 import "server-only";
 
 import { RollingText } from "@/components/ui/rolling-text";
@@ -24,15 +25,14 @@ export function Footer() {
       </p>
       <p>
         Built with AI — grab the code{" "}
-        <a
+        <AppLink
           aria-label="View source code on GitHub"
           className="group text-nobel-100 transition-colors hover:text-ink"
+          external
           href={GITHUB_REPO_URL}
-          rel="noopener noreferrer"
-          target="_blank"
         >
           <RollingText text="on GitHub" />
-        </a>
+        </AppLink>
       </p>
     </footer>
   );

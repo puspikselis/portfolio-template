@@ -1,4 +1,5 @@
 import { ProjectPage } from "@/components/project-page";
+import { AppLink } from "@/components/ui/app-link";
 import { caseStudyMetadata } from "@/lib/metadata";
 
 import { images, tags, testimonial } from "./data";
@@ -22,14 +23,13 @@ export default function Paynt() {
         applications, and marketing website, and I managed designers producing
         marketing materials, documents, and other collateral. I also led the
         company's rebrand from Paydoo to Paynt in partnership with{" "}
-        <a
+        <AppLink
           className="no-underline transition-opacity hover:opacity-80"
+          external
           href="https://www.asketic.com"
-          rel="noopener noreferrer"
-          target="_blank"
         >
           Asketic
-        </a>
+        </AppLink>
         , aligning the identity, visual language, and messaging with the
         company's evolution.
       </p>

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { type ChangeEvent, useCallback, useState } from "react";
-
 import { ContactDialog } from "@/components/dialogs/contact-dialog";
 import { SpotifyStatus } from "@/components/features/spotify-status";
+import { AppLink } from "@/components/ui/app-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { RollingText } from "@/components/ui/rolling-text";
@@ -76,14 +76,13 @@ export function Header() {
                 className="group hidden md:inline-flex"
                 variant="link"
               >
-                <a
+                <AppLink
                   aria-label="Download Resume PDF"
+                  external
                   href={RESUME_PATH}
-                  rel="noopener noreferrer"
-                  target="_blank"
                 >
                   <RollingText text="Resume" />
-                </a>
+                </AppLink>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Updated {RESUME_UPDATED}</TooltipContent>
@@ -93,14 +92,13 @@ export function Header() {
             className="group hidden md:inline-flex"
             variant="link"
           >
-            <a
+            <AppLink
               aria-label="Visit LinkedIn profile"
+              external
               href={LINKEDIN_URL}
-              rel="noopener noreferrer"
-              target="_blank"
             >
               <RollingText text="LinkedIn" />
-            </a>
+            </AppLink>
           </Button>
           <Button onClick={openContact} variant="pill">
             Contact

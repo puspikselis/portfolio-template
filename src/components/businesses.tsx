@@ -63,23 +63,22 @@ function BusinessCard({
   const platform = usePlatform();
   const irrelevant: Platform | null =
     platform && (platform === "ios" ? "android" : "ios");
-  const actions = business.buttons
-    .filter((btn) => !btn.hidden && btn.platform !== irrelevant)
-    .map((button) => {
-      const Icon = button.icon ? STORE_ICONS[button.icon] : null;
-      return (
-        <EntryAction
-          company={business.company}
-          external
-          href={button.href ?? business.website}
-          icon={Icon ? <Icon className="size-3.5" /> : undefined}
-          key={button.label}
-          label={button.label}
-          preview={button.preview}
-          previewColor={previewColor}
-        />
-      );
-    });
+  const buttons = business.buttons.filter(
+    (btn) => !btn.hidden && btn.platform !== irrelevant
+  );
+  const actions = buttons.map((button) => {
+    const Icon = button.icon ? STORE_ICONS[button.icon] : null;
+    return (
+      <EntryAction
+        company={business.company}
+        external
+        href={button.href ?? business.website}
+        icon={Icon ? <Icon className="size-3.5" /> : undefined}
+        key={button.label}
+        label={button.label}
+      />
+    );
+  });
 
   return (
     <EntryCard
@@ -91,6 +90,7 @@ function BusinessCard({
       external
       image={business.image}
       isFirst={isFirst}
+      preview={buttons.find((button) => button.preview)?.preview}
       tags={business.tags}
       title={business.title}
       year={business.year}
